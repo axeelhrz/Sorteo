@@ -1,0 +1,211 @@
+.blockContainer {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+  margin-top: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.messageBox {
+  text-align: center;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.messageBox p {
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.loginButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.loginButton:hover {
+  background: #0056b3;
+}
+
+.infoSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.value {
+  color: #1a1a1a;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.quantitySection {
+  margin-bottom: 24px;
+}
+
+.quantitySection .label {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.quantityControls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.quantityInput {
+  width: 80px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.quantityInput:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.quickButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.quickButton {
+  padding: 8px 12px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.quickButton:hover:not(:disabled) {
+  background: #e0e0e0;
+  border-color: #999;
+}
+
+.quickButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.subtotalSection {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.subtotalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+}
+
+.subtotalValue {
+  font-weight: 600;
+  color: #007bff;
+  font-size: 18px;
+}
+
+.errorMessage {
+  background: #fee;
+  color: #c33;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  border-left: 4px solid #c33;
+}
+
+.buyButton {
+  width: 100%;
+  padding: 14px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.buyButton:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.buyButton:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.validationMessage {
+  color: #c33;
+  font-size: 12px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .blockContainer {
+    padding: 16px;
+  }
+
+  .infoSection {
+    grid-template-columns: 1fr;
+  }
+
+  .quantityControls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quantityInput {
+    width: 100%;
+  }
+
+  .quickButtons {
+    width: 100%;
+  }
+
+  .quickButton {
+    flex: 1;
+  }
+}

@@ -1,0 +1,718 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Back Link */
+.backLink {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #2196F3;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.backLink:hover {
+  color: #1976D2;
+  transform: translateX(-4px);
+}
+
+/* Loading and Error States */
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  min-height: 400px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #2196F3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  color: #667eea;
+}
+
+.errorTitle {
+  margin: 0 0 12px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+.errorDescription {
+  margin: 0 0 24px 0;
+  font-size: 16px;
+  color: #666;
+  max-width: 400px;
+}
+
+.backButton {
+  padding: 12px 32px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.backButton:hover {
+  background: #1976D2;
+  transform: scale(1.05);
+}
+
+/* Main Content */
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 60px;
+}
+
+/* Left Column */
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  background: #f5f5f5;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.imagePlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  color: #999;
+  font-size: 16px;
+}
+
+.statusBadge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+}
+
+.statusBadge.status-active {
+  background: #4CAF50;
+}
+
+.statusBadge.status-sold_out {
+  background: #FF9800;
+}
+
+.statusBadge.status-finished {
+  background: #9C27B0;
+}
+
+.statusBadge.status-paused {
+  background: #FF9800;
+}
+
+/* Shop Info */
+.shopInfo {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shopTitle {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.shopCard {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+
+.shopLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.shopDetails {
+  flex: 1;
+}
+
+.shopName {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.verifiedIcon {
+  font-size: 14px;
+}
+
+.shopDescription {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.viewShopButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f5f5f5;
+  color: #333;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.viewShopButton:hover {
+  background: #efefef;
+  border-color: #2196F3;
+}
+
+/* Right Column */
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Product Section */
+.productSection {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.productName {
+  margin: 0 0 12px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.3;
+}
+
+.productDescription {
+  margin: 0 0 20px 0;
+  font-size: 15px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.valueBox {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: #f0f7ff;
+  border-left: 4px solid #2196F3;
+  border-radius: 8px;
+}
+
+.valueLabel {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.valueAmount {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2196F3;
+}
+
+/* Rules Section */
+.rulesSection {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sectionTitle {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.rulesList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rule {
+  display: flex;
+  gap: 12px;
+}
+
+.ruleIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.ruleTitle {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.ruleText {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Progress Section */
+.progressSection {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progressLabel {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.progressCount {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.progressBar {
+  width: 100%;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50 0%, #45a049 100%);
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.progressFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.remainingTickets {
+  color: #666;
+}
+
+.progressPercent {
+  font-weight: 600;
+  color: #333;
+}
+
+.estimatedDate {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f0f7ff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.estimatedLabel {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.estimatedValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2196F3;
+}
+
+/* Deposit Info */
+.depositInfo {
+  display: flex;
+  gap: 12px;
+  background: #f0f7ff;
+  border-left: 4px solid #2196F3;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.depositIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+  color: #2196F3;
+}
+
+.depositTitle {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.depositText {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* User Participation */
+.userParticipation {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.participationText {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.ticketsList {
+  margin-top: 12px;
+}
+
+.ticketNumbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.ticketNumber {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  border: 1px solid #90caf9;
+}
+
+.participationDate {
+  margin: 12px 0 0 0;
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
+
+/* Login Prompt */
+.loginPrompt {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.loginText {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.loginButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.loginButton,
+.registerButton {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.loginButton {
+  background: #2196F3;
+  color: white;
+}
+
+.loginButton:hover {
+  background: #1976D2;
+}
+
+.registerButton {
+  background: white;
+  color: #2196F3;
+  border: 2px solid #2196F3;
+}
+
+.registerButton:hover {
+  background: #f0f7ff;
+}
+
+/* CTA Buttons */
+.buyButton {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: auto;
+}
+
+.buyButton:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+.buyButton:active {
+  transform: scale(0.98);
+}
+
+.soldOutMessage,
+.finishedMessage {
+  padding: 20px;
+  background: #fff3cd;
+  border-left: 4px solid #FF9800;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.soldOutMessage p,
+.finishedMessage p {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #856404;
+  font-weight: 600;
+}
+
+.viewWinnerButton {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.viewWinnerButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Winner Section */
+.winnerSection {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  padding: 40px 24px;
+  margin: 60px 0;
+  text-align: center;
+}
+
+.winnerTitle {
+  margin: 0 0 24px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+.winnerCard {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.winnerInfo {
+  margin-bottom: 24px;
+}
+
+.winnerLabel {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.winnerNumber {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #9C27B0;
+  font-family: 'Courier New', monospace;
+}
+
+.winnerDetails {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 24px;
+}
+
+.winnerDetailText {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Related Section */
+.relatedSection {
+  text-align: center;
+  padding: 40px 0;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 60px;
+}
+
+.relatedTitle {
+  margin: 0 0 16px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.relatedText {
+  margin: 0;
+  font-size: 16px;
+}
+
+.relatedText a {
+  color: #2196F3;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.relatedText a:hover {
+  color: #1976D2;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 24px 16px;
+  }
+
+  .productName {
+    font-size: 24px;
+  }
+
+  .valueAmount {
+    font-size: 24px;
+  }
+
+  .winnerNumber {
+    font-size: 24px;
+  }
+
+  .loginButtons {
+    flex-direction: column;
+  }
+
+  .loginButton,
+  .registerButton {
+    width: 100%;
+  }
+}

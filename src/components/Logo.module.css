@@ -1,0 +1,55 @@
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logoLink {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+}
+
+.logoImage {
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.5px;
+  color: #2c3e50;
+}
+
+/* Size variants */
+.small .logoText {
+  font-size: 1rem;
+}
+
+.medium .logoText {
+  font-size: 1.25rem;
+}
+
+.large .logoText {
+  font-size: 1.5rem;
+}
+
+/* Dark theme variant */
+.dark .logoText {
+  color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .logoText {
+    font-size: 1rem;
+  }
+  
+  .large .logoText {
+    font-size: 1.25rem;
+  }
+}
+
