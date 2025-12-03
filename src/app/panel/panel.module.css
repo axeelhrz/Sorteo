@@ -1,0 +1,693 @@
+/* Panel Layout */
+.panelContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.navLink {
+  display: block;
+  padding: 15px 20px;
+  color: #ecf0f1;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+  font-size: 14px;
+}
+
+.navLink:hover {
+  background-color: #34495e;
+  border-left-color: #3498db;
+}
+
+.navLink.active {
+  background-color: #3498db;
+  border-left-color: #2980b9;
+  color: white;
+  font-weight: 600;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* Shop Header */
+.shopHeader {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.shopHeaderContent {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.shopLogo {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.shopHeaderInfo {
+  flex: 1;
+}
+
+.shopName {
+  margin: 0;
+  font-size: 28px;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.shopDescription {
+  margin: 8px 0 0 0;
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+/* Status Badge */
+.statusBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Forms */
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.formInput,
+.formTextarea,
+.formSelect {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+.formInput:focus,
+.formTextarea:focus,
+.formSelect:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Buttons */
+.primaryButton,
+.secondaryButton,
+.dangerButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.primaryButton {
+  background-color: #3498db;
+  color: white;
+}
+
+.primaryButton:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.secondaryButton {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.secondaryButton:hover {
+  background-color: #7f8c8d;
+}
+
+.dangerButton {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.dangerButton:hover {
+  background-color: #c0392b;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.cardActions {
+  display: flex;
+  gap: 10px;
+}
+
+.cardAction {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cardActionPrimary {
+  background-color: #3498db;
+  color: white;
+}
+
+.cardActionPrimary:hover {
+  background-color: #2980b9;
+}
+
+.cardActionSecondary {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.cardActionSecondary:hover {
+  background-color: #7f8c8d;
+}
+
+/* Tables */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tableHeader {
+  background-color: #34495e;
+  color: white;
+}
+
+.tableHeaderCell {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tableRow {
+  border-bottom: 1px solid #ecf0f1;
+  transition: background-color 0.3s ease;
+}
+
+.tableRow:hover {
+  background-color: #f8f9fa;
+}
+
+.tableCell {
+  padding: 15px;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.tableCellCenter {
+  text-align: center;
+}
+
+.tableCellRight {
+  text-align: right;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.emptyStateIcon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.emptyStateTitle {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.emptyStateDescription {
+  margin: 0 0 30px 0;
+  color: #7f8c8d;
+  font-size: 14px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Alert Messages */
+.alert {
+  padding: 15px 20px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alertSuccess {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alertError {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.alertWarning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.alertInfo {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+/* Progress Bar */
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background-color: #ecf0f1;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: #3498db;
+  transition: width 0.3s ease;
+}
+
+/* Shop Profile Form */
+.profileForm {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+}
+
+.profileFormSection {
+  margin-bottom: 30px;
+}
+
+.profileFormSectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.readOnlyField {
+  background-color: #f8f9fa;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Raffle Form */
+.raffleForm {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.raffleFormSection {
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.raffleFormSection:last-child {
+  border-bottom: none;
+}
+
+.raffleFormSectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.dimensionsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.dimensionInfo {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 4px;
+  border-left: 4px solid #3498db;
+}
+
+.dimensionLabel {
+  font-size: 12px;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.dimensionValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.depositWarning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+  padding: 15px;
+  margin: 15px 0;
+  color: #856404;
+  font-size: 14px;
+}
+
+.ticketCalculation {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  border-radius: 4px;
+  padding: 15px;
+  margin: 15px 0;
+  color: #0c5460;
+  font-size: 14px;
+}
+
+.ticketCalculationValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0c5460;
+  margin-top: 10px;
+}
+
+/* Raffle Detail */
+.raffleDetail {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.raffleDetailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.raffleDetailTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.raffleDetailStatus {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.raffleDetailSection {
+  margin-bottom: 30px;
+}
+
+.raffleDetailSectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.raffleDetailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.raffleDetailItem {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+.raffleDetailItemLabel {
+  font-size: 12px;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.raffleDetailItemValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.ticketProgress {
+  margin: 20px 0;
+}
+
+.ticketProgressLabel {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.ticketProgressPercentage {
+  color: #3498db;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .panelContainer {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+
+  .sidebarNav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .navLink {
+    flex: 1;
+    min-width: 150px;
+    border-left: none;
+    border-bottom: 4px solid transparent;
+  }
+
+  .navLink.active {
+    border-left: none;
+    border-bottom-color: #3498db;
+  }
+
+  .mainContent {
+    padding: 20px;
+  }
+
+  .dimensionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .raffleDetailGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .shopHeaderContent {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .cardActions {
+    flex-direction: column;
+  }
+
+  .cardAction {
+    width: 100%;
+  }
+}
+
+/* Statistics Cards */
+.statCard {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.statCardIcon {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.statCardValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.statCardLabel {
+  font-size: 14px;
+  color: #7f8c8d;
+  text-transform: uppercase;
+}
+
+/* Form Help Text */
+.formHelpText {
+  font-size: 13px;
+  color: #7f8c8d;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* Form Input Error */
+.formInputError {
+  border-color: #e74c3c !important;
+  background-color: #fdf2f2 !important;
+}
+
+/* Danger Button */
+.dangerButton {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.dangerButton:hover {
+  background-color: #c0392b;
+}
+
+.dangerButton:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}

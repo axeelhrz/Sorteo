@@ -1,0 +1,210 @@
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 40px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.failedCard {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+  padding: 40px;
+  text-align: center;
+}
+
+.failedIcon {
+  width: 80px;
+  height: 80px;
+  background: #f44336;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  margin: 0 auto 24px;
+  font-weight: bold;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.reasonBox {
+  background: #ffebee;
+  border-left: 4px solid #f44336;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.reasonBox p {
+  color: #c62828;
+  font-size: 14px;
+  margin: 0;
+}
+
+.summarySection {
+  text-align: left;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.summarySection h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.summaryItem:last-child {
+  border-bottom: none;
+}
+
+.summaryItem span:first-child {
+  color: #666;
+  font-size: 14px;
+}
+
+.value {
+  color: #1a1a1a;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.infoBox {
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+.infoBox p {
+  color: #e65100;
+  font-size: 14px;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.primaryButton {
+  padding: 14px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.primaryButton:hover {
+  background: #f57c00;
+}
+
+.secondaryButton {
+  padding: 14px;
+  background: #f0f0f0;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.secondaryButton:hover {
+  background: #e0e0e0;
+  border-color: #999;
+}
+
+.loadingSpinner {
+  text-align: center;
+  font-size: 18px;
+  color: #666;
+}
+
+.errorBox {
+  text-align: center;
+  padding: 40px;
+}
+
+.errorBox h1 {
+  color: #c33;
+  margin-bottom: 16px;
+}
+
+.errorBox p {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.errorBox button {
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.errorBox button:hover {
+  background: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  .failedCard {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .failedIcon {
+    width: 60px;
+    height: 60px;
+    font-size: 36px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}

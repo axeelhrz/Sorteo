@@ -1,0 +1,185 @@
+.container {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  padding: 40px 24px;
+  margin: 32px 0;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.title {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: #666;
+}
+
+/* Steps Container */
+.stepsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stepIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+  color: #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e3f2fd 100%);
+  border-radius: 16px;
+  margin: 0 auto 16px;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepTitle {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.stepDescription {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.connector {
+  position: absolute;
+  width: 2px;
+  height: 40px;
+  background: linear-gradient(180deg, #2196F3 0%, transparent 100%);
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Info Box */
+.infoBox {
+  background: white;
+  border-left: 4px solid #2196F3;
+  border-radius: 8px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.infoTitle {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.infoList {
+  margin: 0;
+  padding-left: 20px;
+  list-style: none;
+}
+
+.infoList li {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  position: relative;
+  padding-left: 20px;
+}
+
+.infoList li:before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #4CAF50;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.infoList li:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 24px 16px;
+    margin: 24px 0;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  .stepsContainer {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .connector {
+    display: none;
+  }
+
+  .stepIcon {
+    font-size: 40px;
+  }
+
+  .stepTitle {
+    font-size: 15px;
+  }
+
+  .stepDescription {
+    font-size: 13px;
+  }
+
+  .infoBox {
+    padding: 16px;
+  }
+
+  .infoTitle {
+    font-size: 16px;
+  }
+
+  .infoList li {
+    font-size: 13px;
+  }
+}
