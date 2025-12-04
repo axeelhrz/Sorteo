@@ -1,6 +1,30 @@
 import axios, { AxiosInstance } from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+// Asegurar que la URL sea absoluta y termine con /api
+const getApiUrl = () => {
+  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  
+  // Si la URL no empieza con http:// o https://, agregar https://
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    console.warn('⚠️ NEXT_PUBLIC_API_URL no tiene protocolo, usando https://');
+    return `https://${url}`;
+  }
+  
+  // Asegurar que termine con /api
+  if (!url.endsWith('/api')) {
+    const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+    return `${cleanUrl}/api`;
+  }
+  
+  return url;
+};
+
+const API_URL = getApiUrl();
+
+// Log para debugging (solo en desarrollo)
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔗 API URL configurada:', API_URL);
+}
 
 class ApiClient {
   private client: AxiosInstance;
