@@ -6,7 +6,6 @@ import { useAuthStore } from '@/store/auth-store';
 import { UserRole } from '@/types/auth';
 import { Shop } from '@/types/shop';
 import { CreateProductDto } from '@/types/product';
-import { shopService } from '@/services/shop-service';
 import { productService } from '@/services/product-service';
 import { uploadService } from '@/services/upload-service';
 import { ShopHeader } from '@/components/ShopPanel/ShopHeader';
