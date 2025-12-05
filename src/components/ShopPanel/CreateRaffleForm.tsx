@@ -71,7 +71,7 @@ export function CreateRaffleForm({ shop }: CreateRaffleFormProps) {
         router.push(`/panel/sorteos/${raffle.id}`);
       }, 1500);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al crear el sorteo');
+      setError(err.message || 'Error al crear el sorteo');
     } finally {
       setLoading(false);
     }

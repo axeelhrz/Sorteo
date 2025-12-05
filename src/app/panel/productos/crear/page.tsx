@@ -44,11 +44,42 @@ export default function CreateProductPage() {
   const loadShop = async () => {
     setLoadingShop(true);
     try {
-      const shopData = await shopService.getMyShop();
-      setShop(shopData);
-      setFormData((prev) => ({ ...prev, shopId: shopData.id }));
+      // Buscar tienda por userId en Firestore
+      if (!user?.id) {
+        setError('Usuario no autenticado');
+        return;
+      }
+
+      const { collection, query, where, getDocs } = await import('firebase/firestore');
+      const { db } = await import('@/lib/firebase');
+      const shopsRef = collection(db, 'shops');
+      const q = query(shopsRef, where('userId', '==', user.id));
+      const snapshot = await getDocs(q);
+      
+      if (!snapshot.empty) {
+        const shopDoc = snapshot.docs[0];
+        const shopData = shopDoc.data();
+        const shop: Shop = {
+          id: shopDoc.id,
+          userId: shopData.userId || user.id,
+          name: shopData.name || '',
+          description: shopData.description,
+          logo: shopData.logo,
+          publicEmail: shopData.publicEmail,
+          phone: shopData.phone,
+          socialMedia: shopData.socialMedia,
+          status: shopData.status || 'pending',
+          createdAt: shopData.createdAt?.toDate() || new Date(),
+          updatedAt: shopData.updatedAt?.toDate() || new Date(),
+        };
+        
+        setShop(shop);
+        setFormData((prev) => ({ ...prev, shopId: shop.id }));
+      } else {
+        setError('No se encontró tu tienda');
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar la tienda');
+      setError(err.message || 'Error al cargar la tienda');
     } finally {
       setLoadingShop(false);
     }

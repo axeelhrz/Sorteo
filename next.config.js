@@ -28,7 +28,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:3001 https://*.railway.app https://*.example.com;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com; style-src 'self' 'unsafe-inline' https://*.googleapis.com https://*.gstatic.com; connect-src 'self' http://localhost:3001 https://*.railway.app https://*.example.com https://identitytoolkit.googleapis.com https://*.googleapis.com https://*.firebaseapp.com https://*.firebaseio.com https://firestore.googleapis.com https://*.gstatic.com; img-src 'self' data: https: blob:; font-src 'self' https://*.gstatic.com data:;",
           },
         ],
       },
@@ -42,6 +42,18 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '*.railway.app',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.firebaseapp.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.googleapis.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
       },
     ],
     formats: ['image/avif', 'image/webp'],

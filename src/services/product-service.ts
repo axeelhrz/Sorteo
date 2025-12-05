@@ -1,39 +1,35 @@
 import { apiClient } from '@/lib/api-client';
+import { firebaseProductService } from './firebase-product-service';
 import { Product, CreateProductDto, UpdateProductDto } from '@/types/product';
 
 export const productService = {
+  // Operaciones de lectura del marketplace usan Firebase
   async getProductsByShop(shopId: string): Promise<Product[]> {
-    const response = await apiClient.get(`/products?shopId=${shopId}`);
-    return response.data;
+    return firebaseProductService.getProductsByShop(shopId);
   },
 
   async getActiveProductsByShop(shopId: string): Promise<Product[]> {
-    const response = await apiClient.get(`/products/shop/${shopId}/active`);
-    return response.data;
+    return firebaseProductService.getActiveProductsByShop(shopId);
   },
 
   async getProductById(id: string): Promise<Product> {
-    const response = await apiClient.get(`/products/${id}`);
-    return response.data;
-  },
-
-  async createProduct(data: CreateProductDto): Promise<Product> {
-    const response = await apiClient.post('/products', data);
-    return response.data;
-  },
-
-  async updateProduct(id: string, data: UpdateProductDto): Promise<Product> {
-    const response = await apiClient.put(`/products/${id}`, data);
-    return response.data;
-  },
-
-  async deactivateProduct(id: string): Promise<Product> {
-    const response = await apiClient.put(`/products/${id}/deactivate`, {});
-    return response.data;
+    return firebaseProductService.getProductById(id);
   },
 
   async getAllProducts(): Promise<Product[]> {
-    const response = await apiClient.get('/products');
-    return response.data;
+    return firebaseProductService.getAllProducts();
+  },
+
+  // Operaciones de escritura usan Firebase
+  async createProduct(data: CreateProductDto): Promise<Product> {
+    return firebaseProductService.createProduct(data);
+  },
+
+  async updateProduct(id: string, data: UpdateProductDto): Promise<Product> {
+    return firebaseProductService.updateProduct(id, data);
+  },
+
+  async deactivateProduct(id: string): Promise<Product> {
+    return firebaseProductService.deactivateProduct(id);
   },
 };

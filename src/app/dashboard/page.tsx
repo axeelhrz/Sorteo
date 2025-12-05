@@ -19,11 +19,10 @@ import {
   FiXCircle
 } from 'react-icons/fi';
 import { useAuth } from '@/hooks/useAuth';
-import { apiClient } from '@/lib/api-client';
 import { shopService } from '@/services/shop-service';
+import { productService } from '@/services/product-service';
 import { paymentService } from '@/services/payment-service';
 import { uploadService } from '@/services/upload-service';
-import { adminService } from '@/services/admin-service';
 import Logo from '@/components/Logo';
 import { Shop } from '@/types/shop';
 import { Product } from '@/types/product';
@@ -40,10 +39,10 @@ interface Raffle {
   totalTickets: number;
   soldTickets: number;
   status: string;
-  createdAt: string;
+  createdAt: string | Date;
   productValue?: number;
   winnerTicketId?: string;
-  raffleExecutedAt?: string;
+  raffleExecutedAt?: string | Date;
 }
 
 interface RaffleTicket {
@@ -63,7 +62,7 @@ interface Deposit {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, token, setUser, logout, isHydrated } = useAuth();
+  const { user, token, logout, isHydrated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [shops, setShops] = useState<Shop[]>([]);
   const [myShop, setMyShop] = useState<Shop | null>(null);
@@ -91,7 +90,6 @@ export default function DashboardPage() {
   const [formData, setFormData] = useState({
     shopId: '',
     productId: '',
-    totalTickets: '',
     specialConditions: '',
   });
   const [productFormData, setProductFormData] = useState({
@@ -112,6 +110,159 @@ export default function DashboardPage() {
   const [resumingRaffle, setResumingRaffle] = useState<string | null>(null);
   const [submittingRaffle, setSubmittingRaffle] = useState<string | null>(null);
 
+  // Función helper para cargar sorteos pendientes desde Firestore
+  const loadPendingRaffles = async () => {
+    try {
+      const { collection, query, getDocs, doc, getDoc } = await import('firebase/firestore');
+      const { db } = await import('@/lib/firebase');
+      const rafflesRef = collection(db, 'raffles');
+      
+      // Obtener todos los sorteos y filtrar en memoria (más confiable, no requiere índices)
+      const allSnapshot = await getDocs(query(rafflesRef));
+      console.log('📊 Total sorteos en la base de datos:', allSnapshot.docs.length);
+      
+      // Mostrar todos los status encontrados para debugging
+      const statusCounts: { [key: string]: number } = {};
+      allSnapshot.docs.forEach(doc => {
+        const status = doc.data().status || 'sin-status';
+        statusCounts[status] = (statusCounts[status] || 0) + 1;
+      });
+      console.log('📊 Status encontrados en todos los sorteos:', statusCounts);
+      
+      // Filtrar sorteos pendientes (aceptar diferentes variantes)
+      const pendingVariants = ['pending_approval', 'Pendiente de Aprobación', 'pending', 'Pendiente'];
+      const pendingDocs = allSnapshot.docs.filter(doc => {
+        const status = doc.data().status || '';
+        const statusLower = status.toLowerCase();
+        // Buscar coincidencias exactas o parciales
+        return pendingVariants.some(variant => {
+          const variantLower = variant.toLowerCase();
+          return statusLower === variantLower || statusLower.includes('pending') || statusLower.includes('pendiente');
+        });
+      });
+      
+      console.log('📊 Sorteos pendientes encontrados después de filtrar:', pendingDocs.length);
+      
+      if (pendingDocs.length === 0) {
+        console.warn('⚠️ No se encontraron sorteos pendientes. Verifica que los sorteos tengan status "pending_approval" en Firestore.');
+      }
+      
+      const pending: Raffle[] = [];
+      
+      for (const docSnap of pendingDocs) {
+        const data = docSnap.data();
+        console.log('🔍 Sorteo encontrado:', {
+          id: docSnap.id,
+          status: data.status,
+          productId: data.productId,
+          createdAt: data.createdAt
+        });
+        let product = null;
+        if (data.productId) {
+          try {
+            const productDoc = await getDoc(doc(db, 'products', data.productId));
+            if (productDoc.exists()) {
+              const productData = productDoc.data();
+              product = {
+                id: productDoc.id,
+                name: productData.name || '',
+                value: productData.value || 0,
+              };
+            }
+          } catch (err) {
+            console.log('Error loading product:', err);
+          }
+        }
+        
+        const createdAt = data.createdAt?.toDate() || new Date();
+        
+        pending.push({
+          id: docSnap.id,
+          productId: data.productId || '',
+          product: product || undefined,
+          totalTickets: data.totalTickets || 0,
+          soldTickets: data.soldTickets || 0,
+          status: data.status || 'draft',
+          createdAt: createdAt.toISOString(),
+          productValue: data.productValue || 0,
+          winnerTicketId: data.winnerTicketId,
+          raffleExecutedAt: data.raffleExecutedAt?.toDate()?.toISOString(),
+        });
+      }
+      
+      // Ordenar por fecha de creación descendente en memoria
+      pending.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return dateB - dateA;
+      });
+      
+      console.log('✅ Sorteos pendientes cargados:', pending.length);
+      console.log('📋 IDs de sorteos pendientes:', pending.map(r => r.id));
+      return pending;
+    } catch (err: any) {
+      console.error('Error loading pending raffles:', err);
+      // Si el error es por índice faltante, intentar sin orderBy
+      if (err.code === 'failed-precondition' || err.message?.includes('index')) {
+        console.log('⚠️ Índice faltante, intentando sin orderBy...');
+        try {
+          const { collection, query, where, getDocs, doc, getDoc } = await import('firebase/firestore');
+          const { db } = await import('@/lib/firebase');
+          const rafflesRef = collection(db, 'raffles');
+          const pendingQuery = query(rafflesRef, where('status', '==', 'pending_approval'));
+          const pendingSnapshot = await getDocs(pendingQuery);
+          const pending: Raffle[] = [];
+          
+          for (const docSnap of pendingSnapshot.docs) {
+            const data = docSnap.data();
+            let product = null;
+            if (data.productId) {
+              try {
+                const productDoc = await getDoc(doc(db, 'products', data.productId));
+                if (productDoc.exists()) {
+                  const productData = productDoc.data();
+                  product = {
+                    id: productDoc.id,
+                    name: productData.name || '',
+                    value: productData.value || 0,
+                  };
+                }
+              } catch (err) {
+                console.log('Error loading product:', err);
+              }
+            }
+            
+            const createdAt = data.createdAt?.toDate() || new Date();
+            pending.push({
+              id: docSnap.id,
+              productId: data.productId || '',
+              product: product || undefined,
+              totalTickets: data.totalTickets || 0,
+              soldTickets: data.soldTickets || 0,
+              status: data.status || 'draft',
+              createdAt: createdAt.toISOString(),
+              productValue: data.productValue || 0,
+              winnerTicketId: data.winnerTicketId,
+              raffleExecutedAt: data.raffleExecutedAt?.toDate()?.toISOString(),
+            });
+          }
+          
+          pending.sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateB - dateA;
+          });
+          
+          return pending;
+        } catch (retryErr) {
+          console.error('Error en reintento:', retryErr);
+          return [];
+        }
+      }
+      return [];
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       if (!isHydrated) {
@@ -124,63 +275,65 @@ export default function DashboardPage() {
       }
 
       try {
-        // Fetch profile
-        const profileResponse = await apiClient.getProfile();
-        setUser(profileResponse.data);
+        // El usuario ya está en el store desde Firebase Auth
+        if (!user) {
+          router.push('/login');
+          return;
+        }
 
         // Fetch shops first
         let shopsData: Shop[] = [];
         let currentShop: Shop | null = null;
         
-        // Si el usuario tiene rol shop, obtener su tienda (el backend la creará si no existe)
-        if (profileResponse.data.role === 'shop') {
+        // Si el usuario tiene rol shop, obtener su tienda desde Firestore
+        if (user.role === 'shop') {
           try {
             console.log('🛒 Obteniendo tienda para usuario con rol shop...');
-            currentShop = await shopService.getMyShop();
-            console.log('✅ Tienda obtenida:', currentShop);
-            if (currentShop) {
-              const shop = currentShop;
-              setMyShop(shop);
-              shopsData = [shop];
+            // Buscar tienda por userId en Firestore
+            const { collection, query, where, getDocs } = await import('firebase/firestore');
+            const { db } = await import('@/lib/firebase');
+            const shopsRef = collection(db, 'shops');
+            const q = query(shopsRef, where('userId', '==', user.id));
+            const snapshot = await getDocs(q);
+            
+            if (!snapshot.empty) {
+              const shopDoc = snapshot.docs[0];
+              const shopData = shopDoc.data();
+              currentShop = {
+                id: shopDoc.id,
+                userId: shopData.userId || user.id,
+                name: shopData.name || '',
+                description: shopData.description,
+                logo: shopData.logo,
+                publicEmail: shopData.publicEmail,
+                phone: shopData.phone,
+                socialMedia: shopData.socialMedia,
+                status: shopData.status || 'pending',
+                createdAt: shopData.createdAt?.toDate() || new Date(),
+                updatedAt: shopData.updatedAt?.toDate() || new Date(),
+              } as Shop;
+              
+              console.log('✅ Tienda obtenida:', currentShop);
+              setMyShop(currentShop);
+              shopsData = [currentShop];
               setShops(shopsData);
               // Establecer shopId inmediatamente
-              setFormData(prev => ({ ...prev, shopId: shop.id }));
-              setProductFormData(prev => ({ ...prev, shopId: shop.id }));
+              setFormData(prev => ({ ...prev, shopId: currentShop!.id }));
+              setProductFormData(prev => ({ ...prev, shopId: currentShop!.id }));
+            } else {
+              console.log('⚠️ No se encontró tienda para este usuario');
             }
           } catch (err: any) {
             console.error('❌ Error obteniendo tienda del usuario:', err);
-            console.error('Detalles del error:', {
-              status: err.response?.status,
-              message: err.response?.data?.message || err.message,
-              data: err.response?.data,
-            });
-            
-            // Intentar una vez más después de un breve delay
-            // El backend debería crear la tienda automáticamente si no existe
-            setTimeout(async () => {
-              try {
-                console.log('🔄 Reintentando obtener tienda...');
-                const retryShop = await shopService.getMyShop();
-                console.log('✅ Tienda obtenida en reintento:', retryShop);
-                setMyShop(retryShop);
-                setShops([retryShop]);
-                setFormData(prev => ({ ...prev, shopId: retryShop.id }));
-                setProductFormData(prev => ({ ...prev, shopId: retryShop.id }));
-                setError(null); // Limpiar error si se obtuvo exitosamente
-              } catch (retryErr: any) {
-                console.error('❌ Error al reintentar obtener la tienda:', retryErr);
-                setError(`Error al obtener tu tienda: ${retryErr.response?.data?.message || retryErr.message || 'Error desconocido'}. Por favor, recarga la página.`);
-              }
-            }, 1000);
+            setError('Error al obtener tu tienda. Por favor, recarga la página.');
           }
         } else {
-          // Para otros roles, obtener todas las tiendas
-        try {
-          const shopsResponse = await apiClient.get('/shops');
-            shopsData = shopsResponse.data || [];
+          // Para otros roles, obtener todas las tiendas desde Firestore
+          try {
+            shopsData = await shopService.getAllShops();
             setShops(shopsData);
-        } catch (err) {
-          console.log('No shops found');
+          } catch (err) {
+            console.log('No shops found');
           }
         }
 
@@ -191,10 +344,8 @@ export default function DashboardPage() {
             const allProducts: Product[] = [];
             for (const shop of shopsData) {
               try {
-                const productsResponse = await apiClient.get(`/products?shopId=${shop.id}`);
-                if (productsResponse.data && Array.isArray(productsResponse.data)) {
-                  allProducts.push(...productsResponse.data);
-                }
+                const products = await productService.getProductsByShop(shop.id);
+                allProducts.push(...products);
               } catch (err) {
                 console.log(`No products found for shop ${shop.id}`);
               }
@@ -202,60 +353,74 @@ export default function DashboardPage() {
             setProducts(allProducts);
           } else {
             // Si no tiene tiendas, intentar obtener todos los productos
-          const productsResponse = await apiClient.get('/products');
-          setProducts(productsResponse.data || []);
+            try {
+              const allProducts = await productService.getAllProducts();
+              setProducts(allProducts);
+            } catch (err) {
+              console.log('No products found');
+            }
           }
         } catch (err) {
           console.log('No products found');
         }
 
-        // Fetch raffles
+        // Fetch raffles desde Firestore
         try {
-          if (profileResponse.data.role === 'admin') {
+          if (user.role === 'admin') {
             // Para admin, obtener sorteos pendientes de aprobación
-            const pendingResponse = await adminService.getPendingRaffles(50, 0);
-            setPendingRaffles(pendingResponse.data || []);
+            const pending = await loadPendingRaffles();
+            setPendingRaffles(pending);
             
-            // También obtener todos los sorteos para otras vistas
-            const rafflesResponse = await apiClient.get('/raffles');
-            setRaffles(rafflesResponse.data || []);
+            // Obtener todos los sorteos
+            const { raffleService } = await import('@/services/raffle-service');
+            const allRaffles = await raffleService.getAllRaffles();
+            setRaffles(allRaffles.map((r: any) => ({
+              ...r,
+              createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
+              raffleExecutedAt: r.raffleExecutedAt instanceof Date ? r.raffleExecutedAt.toISOString() : r.raffleExecutedAt,
+            })));
           } else {
-            const rafflesResponse = await apiClient.get('/raffles');
-            const allRaffles = rafflesResponse.data || [];
-            setRaffles(allRaffles);
+            // Para shop/user, obtener sorteos desde Firestore
+            const { raffleService } = await import('@/services/raffle-service');
+            const allRaffles = await raffleService.getAllRaffles();
+            setRaffles(allRaffles.map((r: any) => ({
+              ...r,
+              createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
+              raffleExecutedAt: r.raffleExecutedAt instanceof Date ? r.raffleExecutedAt.toISOString() : r.raffleExecutedAt,
+            })));
             
             // Si es usuario normal, mostrar todos los sorteos (no solo activos)
-            if (profileResponse.data.role === 'user') {
-              // Filtrar sorteos que no deberían mostrarse (draft, rejected)
-              const visibleRaffles = allRaffles.filter((r: Raffle) => 
+            if (user.role === 'user') {
+              const visibleRaffles = allRaffles.filter((r: any) => 
                 r.status !== 'draft' && r.status !== 'rejected'
               );
-              setActiveRaffles(visibleRaffles);
+              setActiveRaffles(visibleRaffles.map((r: any) => ({
+                ...r,
+                createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
+                raffleExecutedAt: r.raffleExecutedAt instanceof Date ? r.raffleExecutedAt.toISOString() : r.raffleExecutedAt,
+              })));
             }
           }
         } catch (err) {
-          console.log('No raffles found');
+          console.log('No raffles found:', err);
         }
 
-        // Fetch tickets
+        // Fetch tickets - por ahora vacío hasta implementar en Firestore
+        // TODO: Implementar carga de tickets desde Firestore
         try {
-          if (profileResponse.data.role === 'user') {
-            // Para usuarios, obtener solo sus tickets
-            const ticketsResponse = await apiClient.get(`/raffle-tickets?userId=${profileResponse.data.id}`);
-            setMyTickets(ticketsResponse.data || []);
+          if (user.role === 'user') {
+            setMyTickets([]);
           } else {
-            // Para shop/admin, obtener todos los tickets
-          const ticketsResponse = await apiClient.get('/raffle-tickets');
-          setTickets(ticketsResponse.data || []);
+            setTickets([]);
           }
         } catch (err) {
           console.log('No tickets found');
         }
 
-        // Fetch deposits
+        // Fetch deposits - por ahora vacío hasta implementar en Firestore
+        // TODO: Implementar carga de depósitos desde Firestore
         try {
-          const depositsResponse = await apiClient.get('/deposits');
-          setDeposits(depositsResponse.data || []);
+          setDeposits([]);
         } catch (err) {
           console.log('No deposits found');
         }
@@ -283,11 +448,10 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     try {
-      await apiClient.logout();
+      await logout();
+      router.push('/');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
-    } finally {
-      logout();
       router.push('/');
     }
   };
@@ -307,7 +471,6 @@ export default function DashboardPage() {
     setFormData({
       shopId: '',
       productId: '',
-      totalTickets: '',
       specialConditions: '',
     });
   };
@@ -320,32 +483,27 @@ export default function DashboardPage() {
       return;
     }
 
-    // Validar totalTickets si se proporciona
-    if (formData.totalTickets && (isNaN(Number(formData.totalTickets)) || Number(formData.totalTickets) < 1)) {
-      setError('La cantidad de tickets debe ser un número mayor a 0');
-      return;
-    }
-
     setCreatingRaffle(true);
     try {
-      const payload: any = {
+      const { raffleService } = await import('@/services/raffle-service');
+      const newRaffle = await raffleService.createRaffle({
         shopId: formData.shopId,
         productId: formData.productId,
         specialConditions: formData.specialConditions || undefined,
+      });
+
+      // Convertir el Raffle de Firebase al formato del dashboard
+      const dashboardRaffle: Raffle = {
+        ...newRaffle,
+        createdAt: newRaffle.createdAt instanceof Date ? newRaffle.createdAt.toISOString() : newRaffle.createdAt,
+        raffleExecutedAt: newRaffle.raffleExecutedAt instanceof Date ? newRaffle.raffleExecutedAt.toISOString() : newRaffle.raffleExecutedAt,
       };
 
-      // Solo incluir totalTickets si se proporciona
-      if (formData.totalTickets) {
-        payload.totalTickets = parseInt(formData.totalTickets, 10);
-      }
-
-      const response = await apiClient.post('/raffles', payload);
-
-      setRaffles([...raffles, response.data]);
+      setRaffles([...raffles, dashboardRaffle]);
       handleCloseModal();
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al crear el sorteo');
+      setError(err.message || 'Error al crear el sorteo');
     } finally {
       setCreatingRaffle(false);
     }
@@ -379,31 +537,40 @@ export default function DashboardPage() {
   };
 
   const handleOpenProductModal = async () => {
-    // Si el usuario tiene rol shop pero no tiene tienda cargada, intentar obtenerla o crearla
+    // Si el usuario tiene rol shop pero no tiene tienda cargada, intentar obtenerla desde Firestore
     if (user?.role === 'shop' && !myShop) {
       try {
-        // El backend ahora crea la tienda automáticamente si no existe
-        const shop = await shopService.getMyShop();
-        setMyShop(shop);
-        setShops([shop]);
-        setProductFormData(prev => ({ ...prev, shopId: shop.id }));
+        // Buscar tienda por userId en Firestore
+        const { collection, query, where, getDocs } = await import('firebase/firestore');
+        const { db } = await import('@/lib/firebase');
+        const shopsRef = collection(db, 'shops');
+        const q = query(shopsRef, where('userId', '==', user.id));
+        const snapshot = await getDocs(q);
+        
+        if (!snapshot.empty) {
+          const shopDoc = snapshot.docs[0];
+          const shopData = shopDoc.data();
+          const shop = {
+            id: shopDoc.id,
+            userId: shopData.userId || user.id,
+            name: shopData.name || '',
+            description: shopData.description,
+            logo: shopData.logo,
+            publicEmail: shopData.publicEmail,
+            phone: shopData.phone,
+            socialMedia: shopData.socialMedia,
+            status: shopData.status || 'pending',
+            createdAt: shopData.createdAt?.toDate() || new Date(),
+            updatedAt: shopData.updatedAt?.toDate() || new Date(),
+          } as Shop;
+          
+          setMyShop(shop);
+          setShops([shop]);
+          setProductFormData(prev => ({ ...prev, shopId: shop.id }));
+        }
       } catch (err: any) {
         console.error('Error obteniendo tienda al abrir modal:', err);
-        // No mostrar error, simplemente intentar de nuevo
-        setError(null);
-        // Intentar una vez más después de un breve delay
-        setTimeout(async () => {
-          try {
-            const shop = await shopService.getMyShop();
-            setMyShop(shop);
-            setShops([shop]);
-            setProductFormData(prev => ({ ...prev, shopId: shop.id }));
-            setShowCreateProductModal(true);
-          } catch (retryErr) {
-            console.error('Error al reintentar obtener la tienda:', retryErr);
-            setError('No se pudo obtener la información de tu tienda. Por favor, recarga la página.');
-          }
-        }, 500);
+        setError('No se pudo obtener la información de tu tienda. Por favor, recarga la página.');
         return;
       }
     } else if (myShop) {
@@ -436,13 +603,10 @@ export default function DashboardPage() {
     setPausingRaffle(raffleId);
     setError(null);
     try {
-      const response = await apiClient.put(`/raffles/${raffleId}/pause`, {});
-      setRaffles(raffles.map(r => r.id === raffleId ? response.data : r));
-      if (user?.role === 'user') {
-        setActiveRaffles(activeRaffles.map(r => r.id === raffleId ? response.data : r));
-      }
+      // TODO: Implementar pausar sorteo en Firebase
+      setError('Función de pausar sorteo aún no implementada en Firebase');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al pausar el sorteo');
+      setError(err.message || 'Error al pausar el sorteo');
     } finally {
       setPausingRaffle(null);
     }
@@ -452,13 +616,10 @@ export default function DashboardPage() {
     setResumingRaffle(raffleId);
     setError(null);
     try {
-      const response = await apiClient.put(`/raffles/${raffleId}/resume`, {});
-      setRaffles(raffles.map(r => r.id === raffleId ? response.data : r));
-      if (user?.role === 'user') {
-        setActiveRaffles(activeRaffles.map(r => r.id === raffleId ? response.data : r));
-      }
+      // TODO: Implementar reanudar sorteo en Firebase
+      setError('Función de reanudar sorteo aún no implementada en Firebase');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al reanudar el sorteo');
+      setError(err.message || 'Error al reanudar el sorteo');
     } finally {
       setResumingRaffle(null);
     }
@@ -472,15 +633,21 @@ export default function DashboardPage() {
     setSubmittingRaffle(raffleId);
     setError(null);
     try {
-      const response = await apiClient.put(`/raffles/${raffleId}/submit-approval`, {});
-      setRaffles(raffles.map(r => r.id === raffleId ? response.data : r));
-      // Si el admin está viendo, actualizar también la lista de pendientes
+      const { raffleService } = await import('@/services/raffle-service');
+      const updatedRaffle = await raffleService.submitForApproval(raffleId);
+      const dashboardRaffle: Raffle = {
+        ...updatedRaffle,
+        createdAt: updatedRaffle.createdAt instanceof Date ? updatedRaffle.createdAt.toISOString() : updatedRaffle.createdAt,
+        raffleExecutedAt: updatedRaffle.raffleExecutedAt instanceof Date ? updatedRaffle.raffleExecutedAt.toISOString() : updatedRaffle.raffleExecutedAt,
+      };
+      setRaffles(raffles.map(r => r.id === raffleId ? dashboardRaffle : r));
+      // Si el admin está viendo, recargar sorteos pendientes desde Firestore
       if (user?.role === 'admin') {
-        const pendingResponse = await adminService.getPendingRaffles(50, 0);
-        setPendingRaffles(pendingResponse.data || []);
+        const pending = await loadPendingRaffles();
+        setPendingRaffles(pending);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al enviar el sorteo a aprobación');
+      setError(err.message || 'Error al enviar el sorteo a aprobación');
     } finally {
       setSubmittingRaffle(null);
     }
@@ -488,11 +655,51 @@ export default function DashboardPage() {
 
   const handleViewRaffleDetail = async (raffleId: string) => {
     try {
-      const detail = await adminService.getRaffleDetail(raffleId);
-      setSelectedRaffle(detail as any);
+      // Obtener sorteo desde Firestore
+      const { doc, getDoc } = await import('firebase/firestore');
+      const { db } = await import('@/lib/firebase');
+      const raffleDoc = await getDoc(doc(db, 'raffles', raffleId));
+      
+      if (!raffleDoc.exists()) {
+        setError('Sorteo no encontrado');
+        return;
+      }
+      
+      const data = raffleDoc.data();
+      let product = null;
+      if (data.productId) {
+        try {
+          const productDoc = await getDoc(doc(db, 'products', data.productId));
+          if (productDoc.exists()) {
+            const productData = productDoc.data();
+            product = {
+              id: productDoc.id,
+              name: productData.name || '',
+              value: productData.value || 0,
+            };
+          }
+        } catch (err) {
+          console.log('Error loading product:', err);
+        }
+      }
+      
+      const raffle: Raffle = {
+        id: raffleDoc.id,
+        productId: data.productId || '',
+        product: product || undefined,
+        totalTickets: data.totalTickets || 0,
+        soldTickets: data.soldTickets || 0,
+        status: data.status || 'draft',
+        createdAt: data.createdAt?.toDate()?.toISOString() || new Date().toISOString(),
+        productValue: data.productValue || 0,
+        winnerTicketId: data.winnerTicketId,
+        raffleExecutedAt: data.raffleExecutedAt?.toDate()?.toISOString(),
+      };
+      
+      setSelectedRaffle(raffle);
       setShowRaffleDetail(true);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar detalles del sorteo');
+      setError(err.message || 'Error al cargar detalles del sorteo');
     }
   };
 
@@ -502,18 +709,35 @@ export default function DashboardPage() {
     setApprovingRaffle(raffleId);
     setError(null);
     try {
-      await adminService.approveRaffle(raffleId);
+      // Actualizar sorteo en Firestore
+      const { doc, updateDoc, serverTimestamp } = await import('firebase/firestore');
+      const { db } = await import('@/lib/firebase');
+      const raffleRef = doc(db, 'raffles', raffleId);
+      
+      await updateDoc(raffleRef, {
+        status: 'active',
+        updatedAt: serverTimestamp(),
+        activatedAt: serverTimestamp(),
+      });
+      
       setPendingRaffles(pendingRaffles.filter(r => r.id !== raffleId));
       setShowRaffleDetail(false);
       setSelectedRaffle(null);
+      
       // Recargar sorteos pendientes
-      const pendingResponse = await adminService.getPendingRaffles(50, 0);
-      setPendingRaffles(pendingResponse.data || []);
+      const pending = await loadPendingRaffles();
+      setPendingRaffles(pending);
+      
       // Recargar todos los sorteos para actualizar el estado
-      const rafflesResponse = await apiClient.get('/raffles');
-      setRaffles(rafflesResponse.data || []);
+      const { raffleService } = await import('@/services/raffle-service');
+      const allRaffles = await raffleService.getAllRaffles();
+      setRaffles(allRaffles.map((r: any) => ({
+        ...r,
+        createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
+        raffleExecutedAt: r.raffleExecutedAt instanceof Date ? r.raffleExecutedAt.toISOString() : r.raffleExecutedAt,
+      })));
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al aprobar el sorteo');
+      setError(err.message || 'Error al aprobar el sorteo');
     } finally {
       setApprovingRaffle(null);
     }
@@ -528,20 +752,37 @@ export default function DashboardPage() {
     setRejectingRaffle(raffleId);
     setError(null);
     try {
-      await adminService.rejectRaffle(raffleId, rejectReason);
+      // Actualizar sorteo en Firestore
+      const { doc, updateDoc, serverTimestamp } = await import('firebase/firestore');
+      const { db } = await import('@/lib/firebase');
+      const raffleRef = doc(db, 'raffles', raffleId);
+      
+      await updateDoc(raffleRef, {
+        status: 'rejected',
+        updatedAt: serverTimestamp(),
+        rejectReason: rejectReason.trim(),
+      });
+      
       setPendingRaffles(pendingRaffles.filter(r => r.id !== raffleId));
       setShowRejectModal(false);
       setShowRaffleDetail(false);
       setRejectReason('');
       setSelectedRaffle(null);
+      
       // Recargar sorteos pendientes
-      const pendingResponse = await adminService.getPendingRaffles(50, 0);
-      setPendingRaffles(pendingResponse.data || []);
+      const pending = await loadPendingRaffles();
+      setPendingRaffles(pending);
+      
       // Recargar todos los sorteos para actualizar el estado
-      const rafflesResponse = await apiClient.get('/raffles');
-      setRaffles(rafflesResponse.data || []);
+      const { raffleService } = await import('@/services/raffle-service');
+      const allRaffles = await raffleService.getAllRaffles();
+      setRaffles(allRaffles.map((r: any) => ({
+        ...r,
+        createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
+        raffleExecutedAt: r.raffleExecutedAt instanceof Date ? r.raffleExecutedAt.toISOString() : r.raffleExecutedAt,
+      })));
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al rechazar el sorteo');
+      setError(err.message || 'Error al rechazar el sorteo');
     } finally {
       setRejectingRaffle(null);
     }
@@ -628,17 +869,42 @@ export default function DashboardPage() {
     e.preventDefault();
     setError(null);
 
-    // Si el usuario tiene rol shop pero no tiene shopId, intentar obtener o crear la tienda
+    // Si el usuario tiene rol shop pero no tiene shopId, intentar obtener la tienda desde Firestore
     if (!productFormData.shopId && user?.role === 'shop') {
       try {
-        // El backend ahora crea la tienda automáticamente si no existe
-        const shop = await shopService.getMyShop();
-        setMyShop(shop);
-        setShops([shop]);
-        setProductFormData(prev => ({ ...prev, shopId: shop.id }));
-        // Continuar con la creación después de obtener/crear la tienda
+        // Buscar tienda por userId en Firestore
+        const { collection, query, where, getDocs } = await import('firebase/firestore');
+        const { db } = await import('@/lib/firebase');
+        const shopsRef = collection(db, 'shops');
+        const q = query(shopsRef, where('userId', '==', user.id));
+        const snapshot = await getDocs(q);
+        
+        if (!snapshot.empty) {
+          const shopDoc = snapshot.docs[0];
+          const shopData = shopDoc.data();
+          const shop = {
+            id: shopDoc.id,
+            userId: shopData.userId || user.id,
+            name: shopData.name || '',
+            description: shopData.description,
+            logo: shopData.logo,
+            publicEmail: shopData.publicEmail,
+            phone: shopData.phone,
+            socialMedia: shopData.socialMedia,
+            status: shopData.status || 'pending',
+            createdAt: shopData.createdAt?.toDate() || new Date(),
+            updatedAt: shopData.updatedAt?.toDate() || new Date(),
+          } as Shop;
+          
+          setMyShop(shop);
+          setShops([shop]);
+          setProductFormData(prev => ({ ...prev, shopId: shop.id }));
+        } else {
+          setError('No se encontró tu tienda. Por favor, recarga la página.');
+          return;
+        }
       } catch (err: any) {
-        console.error('Error obteniendo/creando tienda:', err);
+        console.error('Error obteniendo tienda:', err);
         setError('No se pudo obtener la información de tu tienda. Por favor, recarga la página e intenta nuevamente.');
         return;
       }
@@ -668,13 +934,13 @@ export default function DashboardPage() {
 
     setCreatingProduct(true);
     try {
-      const response = await apiClient.post('/products', productFormData);
-      setProducts([...products, response.data]);
+      const newProduct = await productService.createProduct(productFormData);
+      setProducts([...products, newProduct]);
       handleCloseProductModal();
       setError(null);
       setProductImageFile(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al crear el producto');
+      setError(err.message || 'Error al crear el producto');
     } finally {
       setCreatingProduct(false);
     }
@@ -1729,39 +1995,40 @@ export default function DashboardPage() {
                   
                   return (
                     <div className={styles.formGroup}>
-                      <label htmlFor="totalTickets">
-                        Cantidad de Tickets (opcional)
-                      </label>
-                      <input
-                        type="number"
-                        id="totalTickets"
-                        min="1"
-                        step="1"
-                        value={formData.totalTickets}
-                        onChange={(e) => setFormData({ ...formData, totalTickets: e.target.value })}
-                        className={styles.input}
-                        placeholder={`Dejar vacío para usar: ${autoCalculatedTickets.toLocaleString()} tickets (automático)`}
-                      />
-                      <small style={{ display: 'block', marginTop: '5px', color: '#666', fontSize: '12px' }}>
-                        {formData.totalTickets 
-                          ? `Se crearán ${parseInt(formData.totalTickets) || 0} tickets personalizados.`
-                          : `Si no especificas una cantidad, se crearán automáticamente ${autoCalculatedTickets.toLocaleString()} tickets (valor del producto × 2).`
-                        }
-                      </small>
-                      {selectedProduct && (
-                        <div style={{ 
-                          marginTop: '8px', 
-                          padding: '8px', 
-                          backgroundColor: '#e3f2fd', 
-                          borderRadius: '4px', 
-                          fontSize: '12px',
-                          color: '#1976d2'
-                        }}>
-                          <strong>Producto seleccionado:</strong> {selectedProduct.name}<br />
-                          <strong>Valor:</strong> S/. {selectedProduct.value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br />
-                          <strong>Cálculo automático:</strong> {selectedProduct.value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} × 2 = {autoCalculatedTickets.toLocaleString()} tickets
+                      <div style={{ 
+                        padding: '12px', 
+                        backgroundColor: '#e3f2fd', 
+                        borderRadius: '8px', 
+                        fontSize: '14px',
+                        color: '#1976d2',
+                        border: '1px solid #90caf9'
+                      }}>
+                        <div style={{ marginBottom: '8px', fontWeight: '600' }}>
+                          📊 Información del Sorteo
                         </div>
-                      )}
+                        {selectedProduct && (
+                          <>
+                            <div style={{ marginBottom: '4px' }}>
+                              <strong>Producto:</strong> {selectedProduct.name}
+                            </div>
+                            <div style={{ marginBottom: '4px' }}>
+                              <strong>Valor del producto:</strong> S/. {selectedProduct.value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
+                            <div style={{ 
+                              marginTop: '8px', 
+                              padding: '8px', 
+                              backgroundColor: '#fff', 
+                              borderRadius: '4px',
+                              border: '1px solid #90caf9'
+                            }}>
+                              <strong>🎫 Tickets automáticos:</strong> {autoCalculatedTickets.toLocaleString()} tickets
+                              <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                                (Valor × 2 = {selectedProduct.value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} × 2)
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   );
                 })()}

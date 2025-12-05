@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiBell, FiUser, FiSettings, FiLock, FiLogOut, FiChevronDown } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth-store';
-import { apiClient } from '@/lib/api-client';
 import styles from './user-panel-header.module.css';
 
 export default function UserPanelHeader() {
@@ -20,11 +19,10 @@ export default function UserPanelHeader() {
 
   const handleLogout = async () => {
     try {
-      await apiClient.logout();
+      await logout();
+      router.push('/');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
-    } finally {
-      logout();
       router.push('/');
     }
   };
