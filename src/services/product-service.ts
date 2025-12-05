@@ -1,4 +1,3 @@
-import { apiClient } from '@/lib/api-client';
 import { firebaseProductService } from './firebase-product-service';
 import { Product, CreateProductDto, UpdateProductDto } from '@/types/product';
 

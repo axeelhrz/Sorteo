@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, getDoc, doc, orderBy, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Shop, ShopStatus } from '@/types/shop';
 
