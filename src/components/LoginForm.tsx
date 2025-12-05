@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FiMail, FiLock, FiLogIn } from 'react-icons/fi';
-import { apiClient } from '@/lib/api-client';
+import { firebaseAuthService } from '@/services/firebase-auth-service';
 import { useAuthStore } from '@/store/auth-store';
 import Logo from './Logo';
 import styles from './LoginForm.module.css';
@@ -33,26 +33,20 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const response = await apiClient.login(formData);
-      const { token, id, name, email, role } = response.data;
+      const { user, token } = await firebaseAuthService.login(formData);
 
       // Guardar token primero
       setToken(token);
       
       // Guardar usuario
-      setUser({
-        id,
-        name,
-        email,
-        role,
-      });
+      setUser(user);
 
       // Redirigir al dashboard
       setTimeout(() => {
         router.push('/dashboard');
       }, 100);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Credenciales inválidas');
+      setError(err.message || 'Credenciales inválidas');
     } finally {
       setLoading(false);
     }

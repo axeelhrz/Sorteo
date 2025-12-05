@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FiUser, FiMail, FiLock, FiUserPlus, FiShoppingBag } from 'react-icons/fi';
-import { apiClient } from '@/lib/api-client';
+import { firebaseAuthService } from '@/services/firebase-auth-service';
 import { useAuthStore } from '@/store/auth-store';
+import { UserRole } from '@/types/auth';
 import Logo from './Logo';
 import styles from './RegisterForm.module.css';
 
@@ -16,7 +17,7 @@ export default function RegisterForm() {
     name: '',
     email: '',
     password: '',
-    role: 'user',
+    role: 'user' as UserRole,
     shopName: '',
   });
   const [error, setError] = useState('');
@@ -43,38 +44,29 @@ export default function RegisterForm() {
     setLoading(true);
 
     try {
-      // Preparar datos para enviar (solo incluir shopName si el rol es shop)
-      const registerData: any = {
+      // Preparar datos para enviar
+      const registerData = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: formData.role,
+        role: formData.role as UserRole,
+        shopName: formData.role === 'shop' ? formData.shopName.trim() : undefined,
       };
 
-      if (formData.role === 'shop' && formData.shopName) {
-        registerData.shopName = formData.shopName.trim();
-      }
-
-      const response = await apiClient.register(registerData);
-      const { token, id, name, email, role } = response.data;
+      const { user, token } = await firebaseAuthService.register(registerData);
 
       // Guardar token primero
       setToken(token);
       
       // Guardar usuario
-      setUser({
-        id,
-        name,
-        email,
-        role,
-      });
+      setUser(user);
 
       // Redirigir al dashboard
       setTimeout(() => {
         router.push('/dashboard');
       }, 100);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al registrarse');
+      setError(err.message || 'Error al registrarse');
     } finally {
       setLoading(false);
     }

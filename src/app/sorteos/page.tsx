@@ -48,13 +48,15 @@ export default function SorteosPage() {
     setIsLoading(true);
     setError(null);
     try {
+      console.log('🔍 Cargando sorteos activos con filtros:', filters);
       const result = await publicRaffleService.getActiveRaffles(filters);
+      console.log('✅ Sorteos activos cargados:', result.data.length, 'de', result.total);
       setRaffles(result.data);
       setTotalPages(result.totalPages);
       setCurrentPage(result.page);
       setTotalRaffles(result.total);
-    } catch (err) {
-      console.error('Error loading raffles:', err);
+    } catch (err: any) {
+      console.error('❌ Error loading raffles:', err);
       setError('No pudimos cargar los sorteos. Intenta nuevamente.');
       setRaffles([]);
     } finally {

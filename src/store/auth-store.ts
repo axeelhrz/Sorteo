@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/types/auth';
+import { firebaseAuthService } from '@/services/firebase-auth-service';
 
 interface AuthState {
   user: User | null;
@@ -12,12 +13,13 @@ interface AuthState {
   setToken: (token: string | null) => void;
   setIsLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
+  refreshToken: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -34,9 +36,25 @@ export const useAuthStore = create<AuthState>()(
       },
       setIsLoading: (isLoading) => set({ isLoading }),
       setError: (error) => set({ error }),
-      logout: () => {
-        localStorage.removeItem('token');
-        set({ user: null, token: null, isAuthenticated: false });
+      logout: async () => {
+        try {
+          await firebaseAuthService.logout();
+        } catch (error) {
+          console.error('Error logging out:', error);
+        } finally {
+          localStorage.removeItem('token');
+          set({ user: null, token: null, isAuthenticated: false });
+        }
+      },
+      refreshToken: async () => {
+        try {
+          const token = await firebaseAuthService.getCurrentUserToken();
+          if (token) {
+            get().setToken(token);
+          }
+        } catch (error) {
+          console.error('Error refreshing token:', error);
+        }
       },
     }),
     {
