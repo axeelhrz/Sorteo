@@ -237,6 +237,9 @@ export const firebaseRaffleService = {
       }
 
       // Aplicar paginación manual
+      const pageSize = filters?.limit || 12;
+      const page = filters?.page || 1;
+      const offset = (page - 1) * pageSize;
       const total = raffles.length;
       const totalPages = Math.ceil(total / pageSize);
       const paginatedRaffles = raffles.slice(offset, offset + pageSize);
