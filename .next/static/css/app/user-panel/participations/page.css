@@ -1,0 +1,594 @@
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!../node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./src/components/UserPanel/user-panel-sidebar.module.css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+.user-panel-sidebar_sidebar__ZXmxx {
+  width: 250px;
+  background-color: #2c3e50;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+
+.user-panel-sidebar_sidebarHeader__z0nLM {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-panel-sidebar_title__8xInR {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+.user-panel-sidebar_menu__PEmWn {
+  flex: 1 1;
+  padding: 15px 0;
+  list-style: none;
+  margin: 0;
+}
+
+.user-panel-sidebar_menuItem__A1IhO {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.user-panel-sidebar_menuItem__A1IhO:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-left-color: #3498db;
+}
+
+.user-panel-sidebar_menuItem__A1IhO.user-panel-sidebar_active__DIftH {
+  background-color: rgba(52, 152, 219, 0.2);
+  color: white;
+  border-left-color: #3498db;
+}
+
+.user-panel-sidebar_icon__2h__E {
+  font-size: 18px;
+  min-width: 24px;
+}
+
+.user-panel-sidebar_label__vK2wW {
+  flex: 1 1;
+}
+
+.user-panel-sidebar_sidebarFooter__OXSDq {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.user-panel-sidebar_footerText__crP40 {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .user-panel-sidebar_sidebar__ZXmxx {
+    width: 100%;
+    max-height: 60px;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .user-panel-sidebar_sidebarHeader__z0nLM {
+    display: none;
+  }
+
+  .user-panel-sidebar_menu__PEmWn {
+    display: flex;
+    padding: 0;
+    gap: 0;
+  }
+
+  .user-panel-sidebar_menuItem__A1IhO {
+    padding: 15px 12px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+
+  .user-panel-sidebar_menuItem__A1IhO:hover,
+  .user-panel-sidebar_menuItem__A1IhO.user-panel-sidebar_active__DIftH {
+    border-left: none;
+    border-bottom-color: #3498db;
+  }
+
+  .user-panel-sidebar_label__vK2wW {
+    display: none;
+  }
+
+  .user-panel-sidebar_sidebarFooter__OXSDq {
+    display: none;
+  }
+}
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!../node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./src/components/UserPanel/user-panel-header.module.css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************/
+.user-panel-header_header__YvbYt {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 15px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.user-panel-header_headerContent__Wt_R3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+}
+
+.user-panel-header_leftSection__qi6d9 {
+  flex: 1 1;
+}
+
+.user-panel-header_title__zvJDX {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.user-panel-header_rightSection__O5ycN {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-panel-header_notificationBtn__1mzqo {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  position: relative;
+  padding: 5px;
+  transition: transform 0.2s;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-panel-header_notificationBtn__1mzqo:hover {
+  transform: scale(1.1);
+}
+
+.user-panel-header_badge__9b4vT {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #ff4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.user-panel-header_userMenu__RvZZg {
+  position: relative;
+}
+
+.user-panel-header_userButton__HZjuO {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.user-panel-header_userButton__HZjuO:hover {
+  background-color: #f5f5f5;
+  border-color: #d0d0d0;
+}
+
+.user-panel-header_userAvatar__qcskj {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.user-panel-header_userName__3sU8a {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.user-panel-header_chevron__tEq6H {
+  font-size: 12px;
+  color: #999;
+}
+
+.user-panel-header_dropdown__PUF_1 {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  margin-top: 8px;
+  z-index: 1000;
+}
+
+.user-panel-header_dropdownItem__y3HfC {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.user-panel-header_dropdownItem__y3HfC:hover {
+  background-color: #f5f5f5;
+}
+
+.user-panel-header_divider__CZXSh {
+  margin: 8px 0;
+  border: none;
+  border-top: 1px solid #e0e0e0;
+}
+
+.user-panel-header_logoutBtn__rP_BX {
+  color: #ff4444;
+}
+
+.user-panel-header_logoutBtn__rP_BX:hover {
+  background-color: #fff5f5;
+}
+
+@media (max-width: 768px) {
+  .user-panel-header_title__zvJDX {
+    font-size: 20px;
+  }
+
+  .user-panel-header_rightSection__O5ycN {
+    gap: 10px;
+  }
+
+  .user-panel-header_userName__3sU8a {
+    display: none;
+  }
+
+  .user-panel-header_dropdown__PUF_1 {
+    right: -10px;
+  }
+}
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!../node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./src/components/UserPanel/user-panel-layout.module.css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************/
+.user-panel-layout_container__UNfmn {
+  display: flex;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.user-panel-layout_mainContent__XokmT {
+  flex: 1 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-panel-layout_content__Faw9P {
+  flex: 1 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.user-panel-layout_loading__ve4Fo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .user-panel-layout_container__UNfmn {
+    flex-direction: column;
+  }
+
+  .user-panel-layout_content__Faw9P {
+    padding: 15px;
+  }
+}
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!../node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./src/app/user-panel/participations/participations.module.css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************/
+.participations_container__UGhj_ {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.participations_header__s0c4M {
+  margin-bottom: 30px;
+}
+
+.participations_title__m4hTs {
+  margin: 0 0 10px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+.participations_subtitle__LPp3A {
+  margin: 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.participations_loadingContainer__Rf8AM {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  font-size: 16px;
+  color: #666;
+}
+
+.participations_errorBanner__7pZO3 {
+  background-color: #ffebee;
+  border-left: 4px solid #d32f2f;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  color: #d32f2f;
+}
+
+.participations_emptyState__pOx_5 {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 8px;
+  border: 2px dashed #e0e0e0;
+}
+
+.participations_emptyIcon__Bm_y2 {
+  font-size: 64px;
+  margin: 0 0 20px 0;
+}
+
+.participations_emptyState__pOx_5 h2 {
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  color: #333;
+}
+
+.participations_emptyState__pOx_5 p {
+  margin: 0 0 20px 0;
+  color: #999;
+}
+
+.participations_ctaButton__4GuST {
+  display: inline-block;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.participations_ctaButton__4GuST:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.participations_participationsGrid__cLi4g {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 20px;
+  gap: 20px;
+}
+
+.participations_participationCard__MvAI2 {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.participations_participationCard__MvAI2:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.participations_cardImage__HaqF3 {
+  width: 100%;
+  height: 200px;
+  background-color: #f5f5f5;
+  overflow: hidden;
+}
+
+.participations_cardImage__HaqF3 img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.participations_cardContent__eISxb {
+  padding: 20px;
+}
+
+.participations_cardHeader__I2nMX {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.participations_cardTitle__E5ScV {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  flex: 1 1;
+}
+
+.participations_statusBadge__VCrUf {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.participations_statusBadge__VCrUf.participations_active__zmAUP {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.participations_statusBadge__VCrUf.participations_sold_out__Lt_L3 {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.participations_statusBadge__VCrUf.participations_finished__1imUF {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.participations_statusBadge__VCrUf.participations_cancelled__vkVtO {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.participations_shopName__CzKXS {
+  margin: 0 0 15px 0;
+  font-size: 13px;
+  color: #999;
+}
+
+.participations_ticketsInfo__en9g5 {
+  margin-bottom: 15px;
+}
+
+.participations_ticketCount__6KwlD {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.participations_purchaseDate___Mi1m {
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+}
+
+.participations_progressSection__dIMlp {
+  margin-bottom: 15px;
+}
+
+.participations_progressBar__IHM4w {
+  width: 100%;
+  height: 6px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.participations_progressFill__MS_rV {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.participations_progressText__D__H0 {
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+}
+
+.participations_winnerBadge__gPSWC {
+  background-color: #fff3e0;
+  border-left: 4px solid #ffc107;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f57c00;
+}
+
+.participations_lostBadge__f0Keu {
+  background-color: #f5f5f5;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #999;
+}
+
+.participations_viewDetailsButton__eBytS {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #3498db;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.participations_viewDetailsButton__eBytS:hover {
+  background-color: #2980b9;
+}
+
+@media (max-width: 768px) {
+  .participations_participationsGrid__cLi4g {
+    grid-template-columns: 1fr;
+  }
+
+  .participations_title__m4hTs {
+    font-size: 24px;
+  }
+}

@@ -4,19 +4,40 @@
   padding: 40px 20px;
 }
 
-/* Back Link */
-.backLink {
-  display: inline-block;
+/* Navigation Buttons */
+.navigationButtons {
+  display: flex;
+  gap: 12px;
   margin-bottom: 24px;
-  color: #2196F3;
+  flex-wrap: wrap;
+}
+
+.backLink,
+.homeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f5f5f5;
+  color: #333;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
+  font-size: 14px;
   transition: all 0.3s ease;
 }
 
-.backLink:hover {
-  color: #1976D2;
-  transform: translateX(-4px);
+.backLink:hover,
+.homeLink:hover {
+  background: #efefef;
+  border-color: #2196F3;
+  color: #2196F3;
+}
+
+.backIcon,
+.homeIcon {
+  font-size: 16px;
 }
 
 /* Loading and Error States */
@@ -214,6 +235,29 @@
   line-height: 1.5;
 }
 
+.socialMedia {
+  margin: 16px 0;
+  padding: 12px;
+  background: #f0f7ff;
+  border-radius: 8px;
+}
+
+.socialLabel {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.socialLinks {
+  margin: 0;
+  font-size: 13px;
+  color: #2196F3;
+  word-break: break-word;
+}
+
 .viewShopButton {
   width: 100%;
   padding: 12px 16px;
@@ -285,6 +329,60 @@
   color: #2196F3;
 }
 
+/* Delivery Info */
+.deliveryInfo {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.deliveryTitle {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.deliveryOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.deliveryOption {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #2196F3;
+}
+
+.deliveryIcon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: #2196F3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deliveryOptionTitle {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.deliveryOptionText {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
 /* Rules Section */
 .rulesSection {
   background: white;
@@ -312,8 +410,13 @@
 }
 
 .ruleIcon {
-  font-size: 24px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
+  color: #2196F3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ruleTitle {

@@ -37,21 +37,31 @@
 }
 
 .searchButton {
-  padding: 12px 16px;
+  padding: 6px 8px;
   background: #2196F3;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.searchIcon {
+  font-size: 16px;
 }
 
 .searchButton:hover:not(:disabled) {
   background: #1976D2;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.searchButton:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 .searchButton:disabled {
@@ -103,21 +113,22 @@
 }
 
 .toggleButton {
-  padding: 10px 16px;
-  background: #f5f5f5;
+  padding: 8px 14px;
+  background: white;
   color: #333;
   border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
 }
 
 .toggleButton:hover:not(:disabled) {
-  background: #efefef;
+  background: #f9f9f9;
   border-color: #2196F3;
+  color: #2196F3;
 }
 
 .toggleButton.active {
@@ -175,11 +186,25 @@
   cursor: not-allowed;
 }
 
-.priceRange {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
+.statusContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.statusHint {
+  margin: 0;
+  padding: 12px;
+  background: #f0f7ff;
+  border-left: 4px solid #2196F3;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.statusHint strong {
+  color: #2196F3;
 }
 
 /* Filter Actions */

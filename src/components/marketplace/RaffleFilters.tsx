@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { FiSearch } from 'react-icons/fi';
 import { RaffleFilters as RaffleFiltersType } from '@/services/public-raffle-service';
 import styles from './RaffleFilters.module.css';
 
@@ -21,8 +22,6 @@ export default function RaffleFilters({
   const [category, setCategory] = useState('');
   const [shopId, setShopId] = useState('');
   const [status, setStatus] = useState('');
-  const [minValue, setMinValue] = useState('');
-  const [maxValue, setMaxValue] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'closest' | 'price-asc' | 'price-desc'>('newest');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -32,22 +31,18 @@ export default function RaffleFilters({
       category: category || undefined,
       shopId: shopId || undefined,
       status: status || undefined,
-      minValue: minValue ? parseFloat(minValue) : undefined,
-      maxValue: maxValue ? parseFloat(maxValue) : undefined,
       sortBy,
       page: 1,
     };
 
     onFiltersChange(filters);
-  }, [search, category, shopId, status, minValue, maxValue, sortBy, onFiltersChange]);
+  }, [search, category, shopId, status, sortBy, onFiltersChange]);
 
   const handleReset = () => {
     setSearch('');
     setCategory('');
     setShopId('');
     setStatus('');
-    setMinValue('');
-    setMaxValue('');
     setSortBy('newest');
     onFiltersChange({ sortBy: 'newest', page: 1 });
   };
@@ -64,14 +59,14 @@ export default function RaffleFilters({
         <div className={styles.searchInputWrapper}>
           <input
             type="text"
-            placeholder="Buscar por nombre de producto, sorteo o tienda..."
+            placeholder="Buscar productos o tiendas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={styles.searchInput}
             disabled={isLoading}
           />
-          <button type="submit" className={styles.searchButton} disabled={isLoading}>
-            <span>🔍</span>
+          <button type="submit" className={styles.searchButton} disabled={isLoading} title="Buscar">
+            <FiSearch className={styles.searchIcon} />
           </button>
         </div>
       </form>
@@ -108,7 +103,7 @@ export default function RaffleFilters({
           onClick={() => setShowAdvanced(!showAdvanced)}
           disabled={isLoading}
         >
-          {showAdvanced ? '✕ Cerrar filtros' : '⚙️ Más filtros'}
+          {showAdvanced ? 'Cerrar filtros' : 'Más filtros'}
         </button>
       </div>
 
@@ -166,55 +161,23 @@ export default function RaffleFilters({
             <label htmlFor="status" className={styles.label}>
               Estado
             </label>
-            <select
-              id="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className={styles.select}
-              disabled={isLoading}
-            >
-              <option value="">Todos los estados</option>
-              <option value="active">Activo</option>
-              <option value="paused">Pausado</option>
-              <option value="sold_out">Agotado</option>
-              <option value="finished">Finalizado</option>
-            </select>
-          </div>
-
-          {/* Price Range Filter */}
-          <div className={styles.priceRange}>
-            <div className={styles.filterGroup}>
-              <label htmlFor="minValue" className={styles.label}>
-                Precio mínimo (S/)
-              </label>
-              <input
-                id="minValue"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0"
-                value={minValue}
-                onChange={(e) => setMinValue(e.target.value)}
-                className={styles.input}
+            <div className={styles.statusContainer}>
+              <select
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className={styles.select}
                 disabled={isLoading}
-              />
-            </div>
-
-            <div className={styles.filterGroup}>
-              <label htmlFor="maxValue" className={styles.label}>
-                Precio máximo (S/)
-              </label>
-              <input
-                id="maxValue"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="Sin límite"
-                value={maxValue}
-                onChange={(e) => setMaxValue(e.target.value)}
-                className={styles.input}
-                disabled={isLoading}
-              />
+              >
+                <option value="">Todos los estados</option>
+                <option value="active">Activo - Sorteo en curso, puedes comprar tickets</option>
+                <option value="paused">Pausado - Sorteo temporalmente detenido</option>
+                <option value="sold_out">Agotado - Todos los tickets han sido vendidos</option>
+                <option value="finished">Finalizado - Sorteo completado, ganador ya seleccionado</option>
+              </select>
+              <p className={styles.statusHint}>
+                <strong>Agotado:</strong> Significa que se han vendido todos los tickets disponibles para este sorteo. El sorteo se ejecutará automáticamente cuando se alcance este estado.
+              </p>
             </div>
           </div>
 

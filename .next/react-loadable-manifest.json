@@ -1,32 +1,28 @@
 {
-  "app/dashboard/page.tsx -> @/lib/firebase": {
-    "id": 6532,
-    "files": []
-  },
-  "app/dashboard/page.tsx -> @/services/raffle-service": {
-    "id": 6204,
+  "components/Dashboard/UserDashboard.tsx -> @/services/payment-service": {
+    "id": "components/Dashboard/UserDashboard.tsx -> @/services/payment-service",
     "files": [
-      "static/chunks/6204-077de385b05c3db9.js"
+      "static/chunks/_app-pages-browser_src_services_payment-service_ts.js"
     ]
   },
-  "app/dashboard/page.tsx -> firebase/firestore": {
-    "id": 6534,
-    "files": []
+  "components/Dashboard/UserDashboard.tsx -> @/services/product-service": {
+    "id": "components/Dashboard/UserDashboard.tsx -> @/services/product-service",
+    "files": [
+      "static/chunks/_app-pages-browser_src_services_product-service_ts.js"
+    ]
   },
-  "app/panel/productos/crear/page.tsx -> @/lib/firebase": {
-    "id": 6532,
-    "files": []
-  },
-  "app/panel/productos/crear/page.tsx -> firebase/firestore": {
-    "id": 6534,
-    "files": []
+  "components/Dashboard/UserDashboard.tsx -> @/services/raffle-service": {
+    "id": "components/Dashboard/UserDashboard.tsx -> @/services/raffle-service",
+    "files": [
+      "static/chunks/_app-pages-browser_src_services_raffle-service_ts.js"
+    ]
   },
   "services/raffle-service.ts -> @/lib/firebase": {
-    "id": 6532,
+    "id": "services/raffle-service.ts -> @/lib/firebase",
     "files": []
   },
   "services/raffle-service.ts -> firebase/firestore": {
-    "id": 6534,
+    "id": "services/raffle-service.ts -> firebase/firestore",
     "files": []
   }
 }

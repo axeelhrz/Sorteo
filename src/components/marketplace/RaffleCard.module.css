@@ -123,6 +123,14 @@
   color: #2196F3;
 }
 
+.ticketInfo {
+  font-size: 11px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
 /* Progress Section */
 .progressSection {
   margin-bottom: 12px;

@@ -5,10 +5,13 @@ import {
   onAuthStateChanged,
   User as FirebaseUser,
   updateProfile,
+  updatePassword,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp, collection, addDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { User, UserRole } from '@/types/auth';
+import { emailService } from './email-service';
 
 export interface RegisterData {
   name: string;
@@ -241,5 +244,92 @@ export const firebaseAuthService = {
       }
     });
   },
-};
 
+  /**
+   * Cambia la contraseña del usuario actual
+   */
+  async changePassword(newPassword: string): Promise<void> {
+    try {
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) {
+        throw new Error('No hay usuario autenticado');
+      }
+
+      await updatePassword(firebaseUser, newPassword);
+
+      // Enviar correo de confirmación
+      if (firebaseUser.email) {
+        const user = await convertFirebaseUserToUser(firebaseUser);
+        await emailService.sendPasswordChangeConfirmation(
+          firebaseUser.email,
+          user?.name || 'Usuario'
+        );
+      }
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      let errorMessage = 'Error al cambiar la contraseña';
+
+      if (error.code === 'auth/weak-password') {
+        errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+      } else if (error.code === 'auth/requires-recent-login') {
+        errorMessage = 'Por seguridad, debes iniciar sesión nuevamente para cambiar tu contraseña';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      throw new Error(errorMessage);
+    }
+  },
+
+  /**
+   * Envía correo de recuperación de contraseña
+   */
+  async sendPasswordReset(email: string): Promise<void> {
+    try {
+      await firebaseSendPasswordResetEmail(auth, email);
+      // Enviar correo adicional con información
+      await emailService.sendPasswordResetEmail(email);
+    } catch (error: any) {
+      console.error('Error sending password reset:', error);
+      let errorMessage = 'Error al enviar correo de recuperación';
+
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'Usuario no encontrado';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Email inválido';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      throw new Error(errorMessage);
+    }
+  },
+
+  /**
+   * Actualiza el nombre del usuario
+   */
+  async updateUserName(newName: string): Promise<User | null> {
+    try {
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) {
+        throw new Error('No hay usuario autenticado');
+      }
+
+      // Actualizar en Firebase Auth
+      await updateProfile(firebaseUser, { displayName: newName });
+
+      // Actualizar en Firestore
+      await setDoc(
+        doc(db, 'users', firebaseUser.uid),
+        { name: newName, updatedAt: serverTimestamp() },
+        { merge: true }
+      );
+
+      // Retornar usuario actualizado
+      return await convertFirebaseUserToUser(firebaseUser);
+    } catch (error: any) {
+      console.error('Error updating user name:', error);
+      throw new Error('Error al actualizar el nombre de usuario');
+    }
+  },
+};

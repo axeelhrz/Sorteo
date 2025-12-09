@@ -1,4 +1,6 @@
 import { apiClient } from '@/lib/api-client';
+import { firebaseUserParticipationService } from './firebase-user-participation-service';
+import { firebaseAuthService } from './firebase-auth-service';
 import {
   UserParticipation,
   UserWonRaffle,
@@ -26,12 +28,38 @@ export const userPanelService = {
   },
 
   /**
-   * Obtener todas las participaciones del usuario
+   * Obtener todas las participaciones del usuario (solo sorteos aprobados)
    */
   async getParticipations(): Promise<UserParticipation[]> {
     try {
-      const response = await apiClient.get('/user-panel/participations');
-      return response.data;
+      // Obtener usuario actual
+      const currentUser = await firebaseAuthService.getCurrentUser();
+      if (!currentUser) {
+        throw new Error('Usuario no autenticado');
+      }
+
+      // Obtener participaciones desde Firebase (solo sorteos aprobados)
+      const raffles = await firebaseUserParticipationService.getUserParticipations(currentUser.id);
+
+      // Convertir a formato UserParticipation
+      const participations: UserParticipation[] = raffles.map((raffle, index) => ({
+        id: `${raffle.id}-${index}`,
+        raffleId: raffle.id,
+        raffleTitle: raffle.product?.name || 'Sorteo sin nombre',
+        raffleImage: raffle.product?.mainImage,
+        raffleStatus: raffle.status.toLowerCase() as any,
+        shopName: raffle.shop?.name || 'Tienda desconocida',
+        ticketCount: 0, // Se obtendría de los tickets del usuario
+        ticketNumbers: [], // Se obtendría de los tickets del usuario
+        ticketsRemaining: raffle.totalTickets - raffle.soldTickets,
+        purchaseDate: raffle.createdAt,
+        isWinner: false,
+        winnerTicketNumber: undefined,
+        soldTickets: raffle.soldTickets,
+        totalTickets: raffle.totalTickets,
+      }));
+
+      return participations;
     } catch (error) {
       console.error('Error fetching participations:', error);
       throw error;
