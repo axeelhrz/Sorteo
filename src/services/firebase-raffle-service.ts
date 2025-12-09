@@ -274,14 +274,14 @@ export const firebaseRaffleService = {
   },
 
   /**
-   * Obtiene sorteos de una tienda específica (público)
+   * Obtiene sorteos de una tienda específica (para el dashboard de la tienda)
+   * Incluye todos los estados: borradores, pendientes, activos, finalizados, etc.
    */
   async getRafflesByShop(shopId: string, filters?: Omit<RaffleFilters, 'shopId'>): Promise<PaginatedRaffles> {
     try {
       const rafflesRef = collection(db, 'raffles');
-      // No ordenamos en la consulta para evitar problemas de índices compuestos
-      // Ordenaremos en memoria después
-      let q = query(rafflesRef, where('shopId', '==', shopId), where('status', '==', RaffleStatus.ACTIVE));
+      // Obtener TODOS los sorteos de la tienda (sin filtro de status)
+      let q = query(rafflesRef, where('shopId', '==', shopId));
 
       const allDocs = await getDocs(q);
       let raffles: Raffle[] = [];
@@ -301,7 +301,7 @@ export const firebaseRaffleService = {
         );
       }
 
-      // Ordenar en memoria
+      // Ordenar en memoria (por defecto, más recientes primero)
       if (filters?.sortBy === 'newest') {
         raffles.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
       } else if (filters?.sortBy === 'closest') {
@@ -396,4 +396,3 @@ export const firebaseRaffleService = {
     }
   },
 };
-

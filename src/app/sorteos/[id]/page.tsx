@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { FiSearch, FiLock, FiCheckCircle } from 'react-icons/fi';
+import { FiSearch, FiLock, FiCheckCircle, FiArrowLeft, FiHome } from 'react-icons/fi';
 import { publicRaffleService } from '@/services/public-raffle-service';
 import { useAuth } from '@/hooks/useAuth';
 import { Raffle, RaffleStatus } from '@/types/raffle';
@@ -23,31 +23,48 @@ export default function RaffleDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [userTickets, setUserTickets] = useState<any[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   useEffect(() => {
     const loadRaffle = async () => {
       try {
-        setIsLoading(true);
+        if (!hasLoadedOnce) {
+          setIsLoading(true);
+        }
         const data = await publicRaffleService.getRaffleById(raffleId);
         setRaffle(data);
+        setHasLoadedOnce(true);
       } catch (err) {
         console.error('Error loading raffle:', err);
-        setError('No pudimos cargar el sorteo. Intenta nuevamente.');
+        if (!hasLoadedOnce) {
+          setError('No pudimos cargar el sorteo. Intenta nuevamente.');
+        }
       } finally {
-        setIsLoading(false);
+        if (!hasLoadedOnce) {
+          setIsLoading(false);
+        }
       }
     };
 
     if (raffleId) {
       loadRaffle();
     }
+  }, [raffleId, hasLoadedOnce]);
 
-    // Actualización en tiempo real cada 5 segundos si el sorteo está activo
-    const interval = setInterval(() => {
-      if (raffleId && raffle && (raffle.status === RaffleStatus.ACTIVE || raffle.status === RaffleStatus.SOLD_OUT)) {
-        loadRaffle();
+  // Actualización en tiempo real solo si el sorteo está activo
+  useEffect(() => {
+    if (!raffle || (!raffle.status.includes('active') && raffle.status !== RaffleStatus.SOLD_OUT)) {
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      try {
+        const data = await publicRaffleService.getRaffleById(raffleId);
+        setRaffle(data);
+      } catch (err) {
+        console.error('Error updating raffle:', err);
       }
-    }, 5000);
+    }, 10000); // Aumentado a 10 segundos para reducir parpadeos
 
     return () => clearInterval(interval);
   }, [raffleId, raffle?.status]);
@@ -131,10 +148,17 @@ export default function RaffleDetailPage() {
 
   return (
     <main className={styles.container}>
-      {/* Back Button */}
-      <Link href="/sorteos" className={styles.backLink}>
-        ← Volver al listado
-      </Link>
+      {/* Navigation Buttons */}
+      <div className={styles.navigationButtons}>
+        <Link href="/sorteos" className={styles.backLink}>
+          <FiArrowLeft className={styles.backIcon} />
+          Volver al listado
+        </Link>
+        <Link href="/" className={styles.homeLink}>
+          <FiHome className={styles.homeIcon} />
+          Volver a inicio
+        </Link>
+      </div>
 
       {/* Main Content */}
       <div className={styles.content}>
@@ -190,6 +214,15 @@ export default function RaffleDetailPage() {
             {raffle.shop?.description && (
               <p className={styles.shopDescription}>{raffle.shop.description}</p>
             )}
+            
+            {/* Social Media */}
+            {raffle.shop?.socialMedia && (
+              <div className={styles.socialMedia}>
+                <p className={styles.socialLabel}>Síguenos en redes sociales:</p>
+                <p className={styles.socialLinks}>{raffle.shop.socialMedia}</p>
+              </div>
+            )}
+            
             <Link href={`/tienda/${raffle.shop?.id}`}>
               <button className={styles.viewShopButton}>Ver otros sorteos</button>
             </Link>
@@ -208,6 +241,57 @@ export default function RaffleDetailPage() {
               <span className={styles.valueLabel}>Valor del producto</span>
               <span className={styles.valueAmount}>S/ {Number(raffle.productValue).toFixed(2)}</span>
             </div>
+
+            {/* Delivery and Pickup Info */}
+            <div className={styles.deliveryInfo}>
+              <h4 className={styles.deliveryTitle}>Entrega del premio</h4>
+              <div className={styles.deliveryOptions}>
+                {raffle.product?.hasDelivery ? (
+                  <div className={styles.deliveryOption}>
+                    <span className={styles.deliveryIcon}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="1" y="3" width="15" height="13"></rect>
+                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                      </svg>
+                    </span>
+                    <div>
+                      <p className={styles.deliveryOptionTitle}>Envío a domicilio</p>
+                      {raffle.product?.deliveryZones && (
+                        <p className={styles.deliveryOptionText}>
+                          Zonas de cobertura: {raffle.product.deliveryZones}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+                
+                {raffle.product?.pickupInStore ? (
+                  <div className={styles.deliveryOption}>
+                    <span className={styles.deliveryIcon}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10"></path>
+                        <path d="M3 10h14v10c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V10z"></path>
+                        <path d="M8 14h4"></path>
+                      </svg>
+                    </span>
+                    <div>
+                      <p className={styles.deliveryOptionTitle}>Recojo en tienda</p>
+                      <p className={styles.deliveryOptionText}>
+                        Disponible para recojo en las instalaciones de la tienda
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {!raffle.product?.hasDelivery && !raffle.product?.pickupInStore && (
+                  <p className={styles.deliveryOptionText}>
+                    Consulta con la tienda sobre las opciones de entrega disponibles.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Raffle Rules */}
@@ -215,17 +299,30 @@ export default function RaffleDetailPage() {
             <h3 className={styles.sectionTitle}>Cómo funciona este sorteo</h3>
             <div className={styles.rulesList}>
               <div className={styles.rule}>
-                <span className={styles.ruleIcon}>🎫</span>
+                <span className={styles.ruleIcon}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="9" x2="15" y2="9"></line>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                  </svg>
+                </span>
                 <div>
-                  <p className={styles.ruleTitle}>Tickets y participación</p>
+                  <p className={styles.ruleTitle}>Tickets limitados</p>
                   <p className={styles.ruleText}>
-                    Por cada producto de S/ {Number(raffle.productValue).toFixed(2)} se generan{' '}
-                    <strong>{Math.floor(Number(raffle.productValue) * 2)}</strong> tickets.
+                    Los tickets disponibles para este sorteo son limitados. Compra los tuyos antes de que se agoten.
                   </p>
                 </div>
               </div>
               <div className={styles.rule}>
-                <span className={styles.ruleIcon}>🎲</span>
+                <span className={styles.ruleIcon}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <path d="M12 1v6m0 6v6"></path>
+                    <path d="M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24"></path>
+                    <path d="M1 12h6m6 0h6"></path>
+                    <path d="M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path>
+                  </svg>
+                </span>
                 <div>
                   <p className={styles.ruleTitle}>Sorteo automático</p>
                   <p className={styles.ruleText}>
@@ -234,7 +331,12 @@ export default function RaffleDetailPage() {
                 </div>
               </div>
               <div className={styles.rule}>
-                <span className={styles.ruleIcon}>🏆</span>
+                <span className={styles.ruleIcon}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M6 9l6-7 6 7"></path>
+                    <path d="M6 9h12v10c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V9z"></path>
+                  </svg>
+                </span>
                 <div>
                   <p className={styles.ruleTitle}>Ganador aleatorio</p>
                   <p className={styles.ruleText}>
@@ -389,7 +491,7 @@ export default function RaffleDetailPage() {
       {/* Winner Section (if finished) */}
       {isFinished && raffle.winnerTicketId && (
         <div className={styles.winnerSection}>
-          <h2 className={styles.winnerTitle}>🏆 Sorteo finalizado</h2>
+          <h2 className={styles.winnerTitle}>Sorteo finalizado</h2>
           <div className={styles.winnerCard}>
             <div className={styles.winnerInfo}>
               <p className={styles.winnerLabel}>El ganador ha sido seleccionado</p>

@@ -17,6 +17,9 @@ export interface Product {
   category?: string;
   mainImage?: string;
   status: ProductStatus;
+  hasDelivery?: boolean;
+  deliveryZones?: string;
+  pickupInStore?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +34,9 @@ export interface CreateProductDto {
   depth: number;
   category?: string;
   mainImage?: string;
+  hasDelivery?: boolean;
+  deliveryZones?: string;
+  pickupInStore?: boolean;
 }
 
 export interface UpdateProductDto {
@@ -42,4 +48,7 @@ export interface UpdateProductDto {
   depth?: number;
   category?: string;
   mainImage?: string;
+  hasDelivery?: boolean;
+  deliveryZones?: string;
+  pickupInStore?: boolean;
 }

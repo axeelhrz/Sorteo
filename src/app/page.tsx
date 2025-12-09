@@ -1,11 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { FiPlay, FiLock, FiTarget, FiZap, FiAward, FiArrowRight, FiStar } from 'react-icons/fi';
+import { FiPlay, FiLock, FiTarget, FiZap, FiAward, FiArrowRight, FiStar, FiLogIn, FiUserPlus } from 'react-icons/fi';
 import Logo from '@/components/Logo';
+import { useAuthStore } from '@/store/auth-store';
 import styles from './home.module.css';
 
 export default function Home() {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <main className={styles.container}>
       {/* Hero Section */}
@@ -20,12 +23,32 @@ export default function Home() {
             <Link href="/sorteos">
               <button className={styles.primaryButton}>
                 <FiPlay className={styles.buttonIcon} />
-                Explorar sorteos
+                Explorar Sorteos
               </button>
             </Link>
-            <Link href="/register">
-              <button className={styles.secondaryButton}>Registrarse</button>
-            </Link>
+            {!isAuthenticated && (
+              <>
+                <Link href="/register">
+                  <button className={styles.secondaryButton}>
+                    <FiUserPlus className={styles.buttonIcon} />
+                    Registrarse
+                  </button>
+                </Link>
+                <Link href="/login">
+                  <button className={styles.loginButton}>
+                    <FiLogIn className={styles.buttonIcon} />
+                    Iniciar Sesión
+                  </button>
+                </Link>
+              </>
+            )}
+            {isAuthenticated && (
+              <Link href="/dashboard">
+                <button className={styles.secondaryButton}>
+                  Ir a mi Cuenta
+                </button>
+              </Link>
+            )}
           </div>
         </div>
         <div className={styles.heroImage}>
@@ -122,11 +145,34 @@ export default function Home() {
         </p>
         <div className={styles.ctaButtons}>
           <Link href="/sorteos">
-            <button className={styles.ctaPrimaryButton}>Ver sorteos disponibles</button>
+            <button className={styles.ctaPrimaryButton}>
+              <FiPlay className={styles.buttonIcon} />
+              Explorar Sorteos
+            </button>
           </Link>
-          <Link href="/login">
-            <button className={styles.ctaSecondaryButton}>Iniciar sesión</button>
-          </Link>
+          {!isAuthenticated && (
+            <>
+              <Link href="/register">
+                <button className={styles.ctaSecondaryButton}>
+                  <FiUserPlus className={styles.buttonIcon} />
+                  Registrarse
+                </button>
+              </Link>
+              <Link href="/login">
+                <button className={styles.ctaLoginButton}>
+                  <FiLogIn className={styles.buttonIcon} />
+                  Iniciar Sesión
+                </button>
+              </Link>
+            </>
+          )}
+          {isAuthenticated && (
+            <Link href="/dashboard">
+              <button className={styles.ctaSecondaryButton}>
+                Ir a mi Cuenta
+              </button>
+            </Link>
+          )}
         </div>
       </section>
 

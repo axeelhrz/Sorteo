@@ -59,6 +59,9 @@ export default function RaffleCard({ raffle }: RaffleCardProps) {
           <div className={styles.value}>
             <span className={styles.valueLabel}>Valor del producto</span>
             <span className={styles.valueAmount}>S/ {Number(raffle.productValue).toFixed(2)}</span>
+            <span className={styles.ticketInfo}>
+              Tickets: {raffle.totalTickets} disponibles
+            </span>
           </div>
 
           {/* Progress Section */}

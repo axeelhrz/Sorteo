@@ -110,6 +110,11 @@ export default function LoginForm() {
 
         <div className={styles.footer}>
           <p className={styles.footerText}>
+            <Link href="/forgot-password" className={styles.footerLink}>
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </p>
+          <p className={styles.footerText}>
             ¿No tienes una cuenta?{' '}
             <Link href="/register" className={styles.footerLink}>
               Regístrate aquí

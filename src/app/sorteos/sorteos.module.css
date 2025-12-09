@@ -4,6 +4,34 @@
   padding: 40px 20px;
 }
 
+/* Back Button */
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  background: #f5f5f5;
+  color: #333;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.backButton:hover {
+  background: #efefef;
+  border-color: #2196F3;
+  color: #2196F3;
+}
+
+.backIcon {
+  font-size: 18px;
+}
+
 /* Header */
 .header {
   text-align: center;

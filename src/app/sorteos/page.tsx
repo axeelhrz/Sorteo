@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { FiArrowLeft } from 'react-icons/fi';
 import RaffleCard from '@/components/marketplace/RaffleCard';
 import RaffleFilters from '@/components/marketplace/RaffleFilters';
 import EmptyState from '@/components/marketplace/EmptyState';
@@ -98,11 +99,17 @@ export default function SorteosPage() {
 
   return (
     <main className={styles.container}>
+      {/* Back to Home Button */}
+      <Link href="/" className={styles.backButton}>
+        <FiArrowLeft className={styles.backIcon} />
+        Volver a inicio
+      </Link>
+
       {/* Header */}
       <div className={styles.header}>
         <h1 className={styles.title}>Sorteos Disponibles</h1>
         <p className={styles.subtitle}>
-          Descubre increíbles premios y participá en nuestros sorteos
+          Descubre increíbles premios y participa en nuestros sorteos
         </p>
       </div>
 

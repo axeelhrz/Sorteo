@@ -15,6 +15,15 @@ body {
   color: #333;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -69,6 +78,7 @@ button {
   transition: all 0.3s ease;
   width: 100%;
   margin-top: 8px;
+  text-decoration: none;
 }
 
 button:hover:not(:disabled) {
@@ -85,6 +95,14 @@ button:disabled {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+a button {
+  text-decoration: none;
+}
+
+a button:hover {
+  text-decoration: none;
 }
 
 .error-message {

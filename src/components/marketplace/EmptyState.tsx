@@ -14,7 +14,7 @@ export default function EmptyState({ type, onRetry }: EmptyStateProps) {
         return {
           icon: '🎲',
           title: 'No hay sorteos activos',
-          description: 'No hay sorteos activos en este momento. Volvé pronto o seguí a nuestras tiendas para estar al tanto de los próximos lanzamientos.',
+          description: 'No hay sorteos activos en este momento. Vuelve pronto o sigue a nuestras tiendas para estar al tanto de los próximos lanzamientos.',
           showRetry: false,
         };
       case 'no-results':

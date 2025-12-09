@@ -7,13 +7,13 @@ export default function HowItWorks() {
   const steps = [
     {
       number: 1,
-      title: 'Elegís el sorteo',
+      title: 'Elige el sorteo',
       description: 'Explora nuestro catálogo y elige el sorteo que te interesa.',
       icon: FiTarget,
     },
     {
       number: 2,
-      title: 'Comprás tickets',
+      title: 'Compra tickets',
       description: 'Adquiere la cantidad de tickets que desees. Cada ticket es una participación.',
       icon: FiTag,
     },
@@ -36,7 +36,7 @@ export default function HowItWorks() {
       <div className={styles.header}>
         <h2 className={styles.title}>¿Cómo funciona este sorteo?</h2>
         <p className={styles.subtitle}>
-          Entendé el mecanismo en 4 pasos simples
+          Entiende el mecanismo en 4 pasos simples
         </p>
       </div>
 
