@@ -234,7 +234,14 @@ export default function RaffleDetailPage() {
           {/* Product Info */}
           <div className={styles.productSection}>
             <h1 className={styles.productName}>{raffle.product?.name}</h1>
-            <p className={styles.productDescription}>{raffle.product?.description}</p>
+            
+            {/* Product Description */}
+            {raffle.product?.description && (
+              <div className={styles.descriptionBox}>
+                <h3 className={styles.descriptionTitle}>Descripción del producto</h3>
+                <p className={styles.productDescription}>{raffle.product.description}</p>
+              </div>
+            )}
 
             {/* Value */}
             <div className={styles.valueBox}>
@@ -294,6 +301,43 @@ export default function RaffleDetailPage() {
             </div>
           </div>
 
+          {/* Progress Section */}
+          <div className={styles.progressSection}>
+            <h3 className={styles.sectionTitle}>Progreso del sorteo</h3>
+            <div className={styles.progressHeader}>
+              <span className={styles.progressLabel}>Tickets vendidos</span>
+              <span className={styles.progressCount}>
+                {raffle.soldTickets} de {raffle.totalTickets}
+              </span>
+            </div>
+            <div className={styles.progressBar}>
+              <div
+                className={styles.progressFill}
+                style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+              />
+            </div>
+            <div className={styles.progressFooter}>
+              <span className={styles.remainingTickets}>
+                {remainingTickets > 0
+                  ? `${remainingTickets} tickets disponibles`
+                  : 'Todos los tickets vendidos'}
+              </span>
+              <span className={styles.progressPercent}>{Math.round(progressPercentage)}%</span>
+            </div>
+            {estimatedDate && isActive && (
+              <div className={styles.estimatedDate}>
+                <span className={styles.estimatedLabel}>Fecha estimada del sorteo:</span>
+                <span className={styles.estimatedValue}>
+                  {estimatedDate.toLocaleDateString('es-PE', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </span>
+              </div>
+            )}
+          </div>
+
           {/* Raffle Rules */}
           <div className={styles.rulesSection}>
             <h3 className={styles.sectionTitle}>Cómo funciona este sorteo</h3>
@@ -345,43 +389,6 @@ export default function RaffleDetailPage() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Progress Section */}
-          <div className={styles.progressSection}>
-            <h3 className={styles.sectionTitle}>Progreso del sorteo</h3>
-            <div className={styles.progressHeader}>
-              <span className={styles.progressLabel}>Tickets vendidos</span>
-              <span className={styles.progressCount}>
-                {raffle.soldTickets} de {raffle.totalTickets}
-              </span>
-            </div>
-            <div className={styles.progressBar}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-              />
-            </div>
-            <div className={styles.progressFooter}>
-              <span className={styles.remainingTickets}>
-                {remainingTickets > 0
-                  ? `${remainingTickets} tickets disponibles`
-                  : 'Todos los tickets vendidos'}
-              </span>
-              <span className={styles.progressPercent}>{Math.round(progressPercentage)}%</span>
-            </div>
-            {estimatedDate && isActive && (
-              <div className={styles.estimatedDate}>
-                <span className={styles.estimatedLabel}>Fecha estimada del sorteo:</span>
-                <span className={styles.estimatedValue}>
-                  {estimatedDate.toLocaleDateString('es-PE', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Deposit Info */}

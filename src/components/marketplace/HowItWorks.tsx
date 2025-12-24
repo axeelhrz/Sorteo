@@ -7,8 +7,8 @@ export default function HowItWorks() {
   const steps = [
     {
       number: 1,
-      title: 'Elige el sorteo',
-      description: 'Explora nuestro catálogo y elige el sorteo que te interesa.',
+      title: 'Elige la oportunidad',
+      description: 'Explora nuestro catálogo y elige la oportunidad que te interesa.',
       icon: FiTarget,
     },
     {
@@ -19,8 +19,8 @@ export default function HowItWorks() {
     },
     {
       number: 3,
-      title: 'Se realiza el sorteo',
-      description: 'Cuando se venden todos los tickets, se ejecuta el sorteo automáticamente.',
+      title: 'Se realiza la oportunidad',
+      description: 'Cuando se venden todos los tickets, se ejecuta la oportunidad automáticamente.',
       icon: FiPlay,
     },
     {
@@ -34,7 +34,7 @@ export default function HowItWorks() {
   return (
     <section className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>¿Cómo funciona este sorteo?</h2>
+        <h2 className={styles.title}>¿Cómo funciona esta oportunidad?</h2>
         <p className={styles.subtitle}>
           Entiende el mecanismo en 4 pasos simples
         </p>
@@ -63,11 +63,11 @@ export default function HowItWorks() {
       <div className={styles.infoBox}>
         <h3 className={styles.infoTitle}>Información importante</h3>
         <ul className={styles.infoList}>
-          <li>Cada ticket representa una participación en el sorteo.</li>
+          <li>Cada ticket representa una participación en la oportunidad.</li>
           <li>El ganador se elige de forma completamente aleatoria.</li>
           <li>El resultado es transparente y verificable.</li>
           <li>El ganador será notificado por email inmediatamente.</li>
-          <li>Todos los sorteos cumplen con la normativa vigente.</li>
+          <li>Todas las oportunidades cumplen con la normativa vigente.</li>
         </ul>
       </div>
     </section>

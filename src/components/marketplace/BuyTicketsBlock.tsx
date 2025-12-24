@@ -92,12 +92,12 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
     );
   }
 
-  // Si el sorteo no está activo
+  // Si la oportunidad no está activa
   if (raffle.status !== RaffleStatus.ACTIVE) {
     return (
       <div className={styles.blockContainer}>
         <div className={styles.messageBox}>
-          <p>Este sorteo no está disponible para compra</p>
+          <p>Esta oportunidad no está disponible para compra</p>
         </div>
       </div>
     );

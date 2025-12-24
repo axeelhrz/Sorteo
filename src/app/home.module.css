@@ -16,7 +16,6 @@
 .heroLogo {
   margin-bottom: 20px;
   justify-content: center;
-  animation: bounce 3s ease-in-out infinite;
 }
 
 .heroContent {
@@ -106,7 +105,6 @@
 .heroIcon {
   font-size: 200px;
   color: #667eea;
-  animation: bounce 3s ease-in-out infinite;
 }
 
 @keyframes bounce {
@@ -333,6 +331,95 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
+/* FAQs Section */
+.faqSection {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 20px;
+}
+
+.faqTitle {
+  text-align: center;
+  margin: 0 0 16px 0;
+  font-size: 36px;
+  font-weight: 700;
+  color: #333;
+}
+
+.faqSubtitle {
+  text-align: center;
+  margin: 0 0 60px 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.faqCard {
+  background: white;
+  border-radius: 12px;
+  padding: 28px 24px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.faqCard:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+  transform: translateY(-4px);
+}
+
+.faqCardTitle {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.faqCardText {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.faqCTA {
+  text-align: center;
+  padding: 32px;
+  background: #f5f7fa;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+}
+
+.faqCTAText {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+.faqCTAButton {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.faqCTAButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
 /* Shops CTA Section */
 .shopsCTA {
   background: #f5f7fa;
@@ -375,6 +462,37 @@
 .shopsCTAButton:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+/* WhatsApp Button */
+.whatsappButton {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: #25D366;
+  color: white;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.whatsappButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+  background: #20BA5A;
+}
+
+.whatsappIcon {
+  font-size: 20px;
 }
 
 /* Responsive */

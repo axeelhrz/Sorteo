@@ -13,22 +13,22 @@ export default function EmptyState({ type, onRetry }: EmptyStateProps) {
       case 'no-raffles':
         return {
           icon: '🎲',
-          title: 'No hay sorteos activos',
-          description: 'No hay sorteos activos en este momento. Vuelve pronto o sigue a nuestras tiendas para estar al tanto de los próximos lanzamientos.',
+          title: 'No hay oportunidades activas',
+          description: 'No hay oportunidades activas en este momento. Vuelve pronto o sigue a nuestras tiendas para estar al tanto de los próximos lanzamientos.',
           showRetry: false,
         };
       case 'no-results':
         return {
           icon: '🔍',
-          title: 'No encontramos sorteos',
-          description: 'No encontramos sorteos que coincidan con tu búsqueda. Intenta con otros filtros o términos de búsqueda.',
+          title: 'No encontramos oportunidades',
+          description: 'No encontramos oportunidades que coincidan con tu búsqueda. Intenta con otros filtros o términos de búsqueda.',
           showRetry: false,
         };
       case 'error':
         return {
           icon: '⚠️',
           title: 'Ocurrió un problema',
-          description: 'Ocurrió un problema al cargar los sorteos. Intenta nuevamente.',
+          description: 'Ocurrió un problema al cargar las oportunidades. Intenta nuevamente.',
           showRetry: true,
         };
       default:

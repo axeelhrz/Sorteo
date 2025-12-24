@@ -170,13 +170,13 @@ export default function RaffleFilters({
                 disabled={isLoading}
               >
                 <option value="">Todos los estados</option>
-                <option value="active">Activo - Sorteo en curso, puedes comprar tickets</option>
-                <option value="paused">Pausado - Sorteo temporalmente detenido</option>
+                <option value="active">Activo - Oportunidad en curso, puedes comprar tickets</option>
+                <option value="paused">Pausado - Oportunidad temporalmente detenida</option>
                 <option value="sold_out">Agotado - Todos los tickets han sido vendidos</option>
-                <option value="finished">Finalizado - Sorteo completado, ganador ya seleccionado</option>
+                <option value="finished">Finalizado - Oportunidad completada, ganador ya seleccionado</option>
               </select>
               <p className={styles.statusHint}>
-                <strong>Agotado:</strong> Significa que se han vendido todos los tickets disponibles para este sorteo. El sorteo se ejecutará automáticamente cuando se alcance este estado.
+                <strong>Agotado:</strong> Significa que se han vendido todos los tickets disponibles para esta oportunidad. La oportunidad se ejecutará automáticamente cuando se alcance este estado.
               </p>
             </div>
           </div>

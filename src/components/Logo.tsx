@@ -10,16 +10,24 @@ interface LogoProps {
   showText?: boolean;
   className?: string;
   href?: string;
+  imageSize?: number;
 }
 
-export default function Logo({ size = 'medium', showText = true, className = '', href = '/' }: LogoProps) {
+export default function Logo({ size = 'medium', showText = true, className = '', href = '/', imageSize }: LogoProps) {
+  const getImageSize = () => {
+    if (imageSize) return imageSize;
+    return size === 'small' ? 40 : size === 'medium' ? 60 : 80;
+  };
+
+  const imgSize = getImageSize();
+
   const logoContent = (
     <div className={`${styles.logo} ${styles[size]} ${className}`}>
       <Image
         src={logoImage}
         alt="TIKETEA ONLINE"
-        width={size === 'small' ? 40 : size === 'medium' ? 60 : 80}
-        height={size === 'small' ? 40 : size === 'medium' ? 60 : 80}
+        width={imgSize}
+        height={imgSize}
         className={styles.logoImage}
         priority
       />
@@ -37,4 +45,3 @@ export default function Logo({ size = 'medium', showText = true, className = '',
 
   return logoContent;
 }
-

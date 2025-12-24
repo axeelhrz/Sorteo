@@ -107,9 +107,9 @@ export default function SorteosPage() {
 
       {/* Header */}
       <div className={styles.header}>
-        <h1 className={styles.title}>Sorteos Disponibles</h1>
+        <h1 className={styles.title}>Oportunidades Disponibles</h1>
         <p className={styles.subtitle}>
-          Descubre increíbles premios y participa en nuestros sorteos
+          Descubre increíbles premios y participa en nuestras oportunidades
         </p>
       </div>
 
@@ -125,7 +125,7 @@ export default function SorteosPage() {
       {!isLoading && raffles.length > 0 && (
         <div className={styles.resultsInfo}>
           <p>
-            Mostrando <strong>{raffles.length}</strong> de <strong>{totalRaffles}</strong> sorteos
+            Mostrando <strong>{raffles.length}</strong> de <strong>{totalRaffles}</strong> oportunidades
           </p>
         </div>
       )}
@@ -134,7 +134,7 @@ export default function SorteosPage() {
       {isLoading && (
         <div className={styles.loadingContainer}>
           <div className={styles.spinner} />
-          <p>Cargando sorteos...</p>
+          <p>Cargando oportunidades...</p>
         </div>
       )}
 
@@ -192,7 +192,7 @@ export default function SorteosPage() {
       {/* CTA Section */}
       <div className={styles.ctaSection}>
         <h2>¿Eres una tienda?</h2>
-        <p>Crea sorteos y llega a miles de clientes potenciales</p>
+        <p>Crea oportunidades y llega a miles de clientes potenciales</p>
         <Link href="/register">
           <button className={styles.ctaButton}>Registra tu tienda</button>
         </Link>

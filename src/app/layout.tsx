@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import MakeAdminScript from '@/components/MakeAdminScript';
+import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'TIKETEA ONLINE',
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="es">
       <body>
         {children}
+        <Footer />
         <MakeAdminScript />
       </body>
     </html>

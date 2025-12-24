@@ -100,6 +100,35 @@
   font-weight: 500;
 }
 
+/* Social Networks */
+.socialNetworks {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #667eea;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.socialLink:hover {
+  background: #667eea;
+  color: white;
+  transform: scale(1.1);
+}
+
 /* Value */
 .value {
   display: flex;
