@@ -24,7 +24,6 @@ export default function StoreDashboard() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
-  const [isLoading, setIsLoading] = useState(true);
 
   // Mock data - Replace with Firebase calls
   const [stats, setStats] = useState({
@@ -42,7 +41,6 @@ export default function StoreDashboard() {
   }, []);
 
   const loadData = async () => {
-    setIsLoading(true);
     try {
       // TODO: Load data from Firebase
       // const productsData = await firebaseProductService.getShopProducts(user?.shopId);
@@ -58,8 +56,6 @@ export default function StoreDashboard() {
       });
     } catch (error) {
       console.error('Error loading data:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
