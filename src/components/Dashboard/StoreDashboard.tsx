@@ -33,8 +33,8 @@ export default function StoreDashboard() {
     totalRevenue: 0
   });
 
-  const [products, setProducts] = useState<any[]>([]);
-  const [raffles, setRaffles] = useState<any[]>([]);
+  const [products] = useState<any[]>([]);
+  const [raffles] = useState<any[]>([]);
 
   useEffect(() => {
     loadData();
@@ -45,6 +45,9 @@ export default function StoreDashboard() {
       // TODO: Load data from Firebase
       // const productsData = await firebaseProductService.getShopProducts(user?.shopId);
       // const rafflesData = await firebaseRaffleService.getShopRaffles(user?.shopId);
+      // When implementing, uncomment the setters:
+      // const [products, setProducts] = useState<any[]>([]);
+      // const [raffles, setRaffles] = useState<any[]>([]);
       // setProducts(productsData);
       // setRaffles(rafflesData);
       
