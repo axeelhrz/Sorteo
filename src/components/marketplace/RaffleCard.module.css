@@ -6,8 +6,9 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  cursor: pointer;
   height: 100%;
+  position: relative;
+  cursor: pointer;
 }
 
 .card:hover {
@@ -77,14 +78,16 @@
 
 /* Product Info */
 .productInfo {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .productName {
-  margin: 0 0 4px 0;
+  margin: 0 0 8px 0;
   font-size: 16px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #1a1a1a;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -93,40 +96,94 @@
   overflow: hidden;
 }
 
+.shopInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .shopName {
   margin: 0;
   font-size: 13px;
-  color: #666;
+  color: #718096;
   font-weight: 500;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Social Networks */
 .socialNetworks {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #eee;
+  gap: 6px;
+  align-items: center;
+  position: relative;
+  z-index: 10;
 }
 
 .socialLink {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: #f0f0f0;
+  background: #f8f9ff;
   color: #667eea;
-  font-size: 14px;
+  font-size: 13px;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  z-index: 11;
 }
 
 .socialLink:hover {
-  background: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Social Network Specific Colors */
+.socialFacebook {
+  color: #1877F2;
+}
+
+.socialFacebook:hover {
+  background: #1877F2;
   color: white;
-  transform: scale(1.1);
+  border-color: #1877F2;
+}
+
+.socialInstagram {
+  color: #E4405F;
+}
+
+.socialInstagram:hover {
+  background: linear-gradient(135deg, #833AB4 0%, #E4405F 50%, #FCAF45 100%);
+  color: white;
+  border-color: #E4405F;
+}
+
+.socialTwitter {
+  color: #1DA1F2;
+}
+
+.socialTwitter:hover {
+  background: #1DA1F2;
+  color: white;
+  border-color: #1DA1F2;
+}
+
+.socialWhatsapp {
+  color: #25D366;
+}
+
+.socialWhatsapp:hover {
+  background: #25D366;
+  color: white;
+  border-color: #25D366;
 }
 
 /* Value */
@@ -249,6 +306,26 @@
 
   .productName {
     font-size: 15px;
+  }
+
+  .shopInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .shopName {
+    font-size: 12px;
+  }
+
+  .socialNetworks {
+    gap: 8px;
+  }
+
+  .socialLink {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
   }
 
   .valueAmount {

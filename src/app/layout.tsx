@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import MakeAdminScript from '@/components/MakeAdminScript';
+import GlobalHeader from '@/components/GlobalHeader';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
+        <GlobalHeader />
         {children}
         <Footer />
         <MakeAdminScript />

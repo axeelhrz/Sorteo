@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { paymentService } from '@/services/payment-service';
-import { Payment } from '@/types/payment';
+import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
 import styles from './payment-failed.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +25,7 @@ function PaymentFailedContent() {
 
     const fetchPayment = async () => {
       try {
-        const paymentData = await paymentService.getPaymentById(paymentId);
+        const paymentData = await firebasePaymentService.getPaymentById(paymentId);
         setPayment(paymentData);
       } catch (err: any) {
         setError('Error al cargar los datos del pago');

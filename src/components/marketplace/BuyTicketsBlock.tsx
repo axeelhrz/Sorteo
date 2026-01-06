@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Raffle, RaffleStatus } from '@/types/raffle';
 import { useAuth } from '@/hooks/useAuth';
-import { paymentService } from '@/services/payment-service';
+import { firebasePaymentService } from '@/services/firebase-payment-service';
 import styles from './BuyTicketsBlock.module.css';
 
 interface BuyTicketsBlockProps {
@@ -53,7 +53,7 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
 
     try {
       // PASO 5: Crear pago pendiente
-      const payment = await paymentService.createPayment({
+      const payment = await firebasePaymentService.createPayment({
         raffleId: raffle.id,
         amount: totalPrice,
         ticketQuantity: quantity,

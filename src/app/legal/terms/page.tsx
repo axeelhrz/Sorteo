@@ -19,7 +19,7 @@ export default function TermsPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>2. Descripción del Servicio</h2>
           <p>
-            TIKETEA ONLINE es una plataforma digital que facilita la participación en sorteos de productos ofrecidos por tiendas verificadas. Los usuarios compran tickets para participar en sorteos aleatorios donde pueden ganar productos.
+            TIKETEA es una plataforma tecnológica que facilita la publicación y gestión de oportunidades ofrecidas por terceros. No organiza sorteos, no vende productos y no actúa como comerciante final.
           </p>
         </section>
 

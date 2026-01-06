@@ -1,344 +1,327 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { adminService } from '@/services/admin-service';
-import styles from '../admin.module.css';
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { FiCheck, FiX, FiEye, FiClock, FiAlertCircle } from 'react-icons/fi';
+import { paymentService } from '@/services/payment-service';
+import { Payment } from '@/types/payment';
+import styles from './payments.module.css';
 
-interface Payment {
-  id: string;
-  user: { id: string; name: string; email: string };
-  raffle: {
-    id: string;
-    product: { name: string };
-    shop: { name: string };
+interface PaymentWithDetails extends Payment {
+  user?: {
+    name: string;
+    email: string;
   };
-  amount: number;
-  currency: string;
-  status: string;
-  paymentMethod: string | null;
-  ticketQuantity: number;
-  externalTransactionId: string | null;
-  failureReason: string | null;
-  createdAt: string;
-  completedAt: string | null;
-  failedAt: string | null;
+  raffle?: {
+    id: string;
+    product?: {
+      name: string;
+    };
+  };
+  voucherUrl?: string;
+  ocrValidation?: {
+    detectedAmount?: number;
+    confidence?: number;
+    isValid?: boolean;
+  };
 }
 
-export default function PaymentsManagement() {
-  const [payments, setPayments] = useState<Payment[]>([]);
+export default function AdminPaymentsPage() {
+  const [payments, setPayments] = useState<PaymentWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
-  const [showDetail, setShowDetail] = useState(false);
-
-  const limit = 15;
+  const [selectedPayment, setSelectedPayment] = useState<PaymentWithDetails | null>(null);
+  const [validating, setValidating] = useState(false);
+  const [validationNotes, setValidationNotes] = useState('');
 
   useEffect(() => {
-    fetchPayments();
-  }, [page, statusFilter]);
+    loadPendingPayments();
+  }, []);
 
-  const fetchPayments = async () => {
+  const loadPendingPayments = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getAllPayments(
-        limit,
-        page * limit,
-        statusFilter ? { status: statusFilter } : undefined,
-      );
-      setPayments(data.data);
-      setTotal(data.total);
-      setError(null);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar transacciones');
-      console.error('Error:', err);
+      const data = await paymentService.getPendingPayments();
+      setPayments(data as PaymentWithDetails[]);
+    } catch (error) {
+      console.error('Error loading pending payments:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    const labels: { [key: string]: string } = {
-      pending: 'Pendiente',
-      completed: 'Completado',
-      failed: 'Fallido',
-      refunded: 'Reembolsado',
-      cancelled: 'Cancelado',
-    };
-    return labels[status] || status;
-  };
-
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return styles.success;
-      case 'pending':
-        return styles.warning;
-      case 'failed':
-      case 'cancelled':
-        return styles.danger;
-      case 'refunded':
-        return styles.info;
-      default:
-        return '';
+  const handleValidatePayment = async (paymentId: string, approved: boolean) => {
+    try {
+      setValidating(true);
+      await paymentService.validatePayment(paymentId, approved, validationNotes);
+      
+      // Recargar lista
+      await loadPendingPayments();
+      
+      // Cerrar modal
+      setSelectedPayment(null);
+      setValidationNotes('');
+    } catch (error) {
+      console.error('Error validating payment:', error);
+      alert('Error al validar el pago');
+    } finally {
+      setValidating(false);
     }
   };
 
-  const getPaymentMethodLabel = (method: string | null) => {
-    if (!method) return 'N/A';
-    const labels: { [key: string]: string } = {
-      stripe: 'Stripe',
-      mercado_pago: 'Mercado Pago',
-      paypal: 'PayPal',
+  const getStatusBadge = (status: string) => {
+    const statusConfig: { [key: string]: { label: string; color: string } } = {
+      pending: { label: 'Pendiente', color: '#FF9800' },
+      pending_validation: { label: 'En validación', color: '#2196F3' },
+      completed: { label: 'Completado', color: '#4CAF50' },
+      failed: { label: 'Fallido', color: '#F44336' },
+      refunded: { label: 'Reembolsado', color: '#9C27B0' },
     };
-    return labels[method] || method;
+
+    const config = statusConfig[status] || { label: status, color: '#757575' };
+    
+    return (
+      <span className={styles.badge} style={{ backgroundColor: config.color }}>
+        {config.label}
+      </span>
+    );
   };
 
-  if (loading && payments.length === 0) {
+  if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px' }}>
-        <p>Cargando transacciones...</p>
+      <div className={styles.container}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.spinner} />
+          <p>Cargando pagos pendientes...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      <h2 style={{ marginBottom: '20px', color: '#2c3e50' }}>Gestión de Transacciones</h2>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Validación de Pagos</h1>
+        <p className={styles.subtitle}>
+          Revisa y valida los pagos con comprobantes subidos por los usuarios
+        </p>
+      </div>
 
-      {error && (
-        <div style={{ padding: '15px', backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px', marginBottom: '20px' }}>
-          {error}
-        </div>
-      )}
-
-      <div className={styles.tableHeader} style={{ marginBottom: '20px' }}>
-        <div className={styles.filterContainer}>
-          <select
-            className={styles.filterSelect}
-            value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
-              setPage(0);
-            }}
-          >
-            <option value="">Todos los estados</option>
-            <option value="pending">Pendiente</option>
-            <option value="completed">Completado</option>
-            <option value="failed">Fallido</option>
-            <option value="refunded">Reembolsado</option>
-            <option value="cancelled">Cancelado</option>
-          </select>
+      <div className={styles.stats}>
+        <div className={styles.statCard}>
+          <FiClock className={styles.statIcon} />
+          <div className={styles.statContent}>
+            <div className={styles.statNumber}>{payments.length}</div>
+            <div className={styles.statLabel}>Pagos pendientes</div>
+          </div>
         </div>
       </div>
 
       {payments.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <p style={{ color: '#7f8c8d' }}>No hay transacciones registradas</p>
+        <div className={styles.emptyState}>
+          <FiCheck className={styles.emptyIcon} />
+          <h3>No hay pagos pendientes</h3>
+          <p>Todos los pagos han sido validados</p>
         </div>
       ) : (
-        <div className={styles.tableContainer}>
-          <table>
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Sorteo</th>
-                <th>Tienda</th>
-                <th>Monto</th>
-                <th>Tickets</th>
-                <th>Método</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {payments.map((payment) => (
-                <tr key={payment.id}>
-                  <td>
-                    <div>
-                      <p style={{ margin: '0', fontWeight: '600', color: '#2c3e50' }}>{payment.user.name}</p>
-                      <small style={{ color: '#7f8c8d' }}>{payment.user.email}</small>
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      <p style={{ margin: '0', color: '#2c3e50' }}>{payment.raffle.product.name}</p>
-                      <small style={{ color: '#7f8c8d' }}>ID: {payment.raffle.id.substring(0, 8)}...</small>
-                    </div>
-                  </td>
-                  <td>{payment.raffle.shop.name}</td>
-                  <td>
-                    <strong style={{ color: '#27ae60' }}>
-                      S/. {Number(payment.amount).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </strong>
-                  </td>
-                  <td>{payment.ticketQuantity}</td>
-                  <td>{getPaymentMethodLabel(payment.paymentMethod)}</td>
-                  <td>
-                    <span className={`${styles.statusBadge} ${getStatusBadgeColor(payment.status)}`}>
-                      {getStatusLabel(payment.status)}
-                    </span>
-                  </td>
-                  <td>
-                    {new Date(payment.createdAt).toLocaleDateString('es-PE', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </td>
-                  <td>
-                    <div className={styles.actionButtons}>
-                      <button
-                        className={`${styles.btn} ${styles.btnPrimary}`}
-                        onClick={() => {
-                          setSelectedPayment(payment);
-                          setShowDetail(true);
-                        }}
-                      >
-                        Ver
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className={styles.paymentsGrid}>
+          {payments.map((payment) => (
+            <div key={payment.id} className={styles.paymentCard}>
+              <div className={styles.paymentHeader}>
+                <div>
+                  <h3 className={styles.paymentUser}>{payment.user?.name || 'Usuario'}</h3>
+                  <p className={styles.paymentEmail}>{payment.user?.email}</p>
+                </div>
+                {getStatusBadge(payment.status)}
+              </div>
 
-          {/* Pagination */}
-          <div className={styles.pagination}>
-            <button
-              className={styles.paginationBtn}
-              disabled={page === 0}
-              onClick={() => setPage(page - 1)}
-            >
-              ← Anterior
-            </button>
-            <span style={{ padding: '8px 12px' }}>
-              Página {page + 1} de {Math.ceil(total / limit)}
-            </span>
-            <button
-              className={styles.paginationBtn}
-              disabled={page >= Math.ceil(total / limit) - 1}
-              onClick={() => setPage(page + 1)}
-            >
-              Siguiente →
-            </button>
-          </div>
+              <div className={styles.paymentDetails}>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Sorteo:</span>
+                  <span className={styles.detailValue}>
+                    {payment.raffle?.product?.name || 'N/A'}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Tickets:</span>
+                  <span className={styles.detailValue}>{payment.ticketQuantity}</span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Monto:</span>
+                  <span className={styles.detailValue}>
+                    S/. {Number(payment.amount).toFixed(2)}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Método:</span>
+                  <span className={styles.detailValue}>
+                    {payment.paymentMethod?.toUpperCase() || 'N/A'}
+                  </span>
+                </div>
+              </div>
+
+              {payment.ocrValidation && (
+                <div className={styles.ocrSection}>
+                  <div className={styles.ocrHeader}>
+                    <FiAlertCircle className={styles.ocrIcon} />
+                    <span>Validación OCR</span>
+                  </div>
+                  <div className={styles.ocrDetails}>
+                    <div className={styles.ocrRow}>
+                      <span>Monto detectado:</span>
+                      <span className={styles.ocrValue}>
+                        S/. {payment.ocrValidation.detectedAmount?.toFixed(2) || 'N/A'}
+                      </span>
+                    </div>
+                    <div className={styles.ocrRow}>
+                      <span>Confianza:</span>
+                      <span className={styles.ocrValue}>
+                        {payment.ocrValidation.confidence ? 
+                          `${(payment.ocrValidation.confidence * 100).toFixed(0)}%` : 
+                          'N/A'}
+                      </span>
+                    </div>
+                    <div className={styles.ocrRow}>
+                      <span>Estado:</span>
+                      <span className={payment.ocrValidation.isValid ? styles.ocrValid : styles.ocrInvalid}>
+                        {payment.ocrValidation.isValid ? '✓ Válido' : '✗ No válido'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <button
+                className={styles.reviewButton}
+                onClick={() => setSelectedPayment(payment)}
+              >
+                <FiEye className={styles.buttonIcon} />
+                Revisar comprobante
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Detail Modal */}
-      {showDetail && selectedPayment && (
-        <div className={`${styles.modal} ${showDetail ? styles.open : ''}`}>
-          <div className={styles.modalContent}>
+      {/* Modal de revisión */}
+      {selectedPayment && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedPayment(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2>Detalles de la Transacción</h2>
-            </div>
-
-            <div className={styles.modalBody}>
-              <div className={styles.formGroup}>
-                <label>ID de Transacción</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50', wordBreak: 'break-all' }}>{selectedPayment.id}</p>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Usuario</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>
-                  {selectedPayment.user.name} ({selectedPayment.user.email})
-                </p>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Sorteo</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedPayment.raffle.product.name}</p>
-                <small style={{ color: '#7f8c8d' }}>ID: {selectedPayment.raffle.id}</small>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Tienda</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedPayment.raffle.shop.name}</p>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Monto</label>
-                <p style={{ margin: '5px 0', color: '#27ae60', fontSize: '20px', fontWeight: 'bold' }}>
-                  S/. {Number(selectedPayment.amount).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Cantidad de Tickets</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedPayment.ticketQuantity}</p>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Método de Pago</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>{getPaymentMethodLabel(selectedPayment.paymentMethod)}</p>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Estado</label>
-                <p style={{ margin: '5px 0' }}>
-                  <span className={`${styles.statusBadge} ${getStatusBadgeColor(selectedPayment.status)}`}>
-                    {getStatusLabel(selectedPayment.status)}
-                  </span>
-                </p>
-              </div>
-
-              {selectedPayment.externalTransactionId && (
-                <div className={styles.formGroup}>
-                  <label>ID de Transacción Externa</label>
-                  <p style={{ margin: '5px 0', color: '#2c3e50', wordBreak: 'break-all' }}>
-                    {selectedPayment.externalTransactionId}
-                  </p>
-                </div>
-              )}
-
-              {selectedPayment.failureReason && (
-                <div className={styles.formGroup}>
-                  <label>Motivo de Fallo</label>
-                  <p style={{ margin: '5px 0', color: '#e74c3c' }}>{selectedPayment.failureReason}</p>
-                </div>
-              )}
-
-              <div className={styles.formGroup}>
-                <label>Fecha de Creación</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>
-                  {new Date(selectedPayment.createdAt).toLocaleString('es-PE')}
-                </p>
-              </div>
-
-              {selectedPayment.completedAt && (
-                <div className={styles.formGroup}>
-                  <label>Fecha de Completado</label>
-                  <p style={{ margin: '5px 0', color: '#2c3e50' }}>
-                    {new Date(selectedPayment.completedAt).toLocaleString('es-PE')}
-                  </p>
-                </div>
-              )}
-
-              {selectedPayment.failedAt && (
-                <div className={styles.formGroup}>
-                  <label>Fecha de Fallo</label>
-                  <p style={{ margin: '5px 0', color: '#e74c3c' }}>
-                    {new Date(selectedPayment.failedAt).toLocaleString('es-PE')}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className={styles.modalFooter}>
+              <h2>Validar Pago</h2>
               <button
-                className={`${styles.btn} ${styles.btnSecondary}`}
-                onClick={() => setShowDetail(false)}
+                className={styles.closeButton}
+                onClick={() => setSelectedPayment(null)}
               >
-                Cerrar
+                <FiX />
               </button>
+            </div>
+
+            <div className={styles.modalContent}>
+              {/* Información del pago */}
+              <div className={styles.modalSection}>
+                <h3 className={styles.modalSectionTitle}>Información del pago</h3>
+                <div className={styles.modalInfo}>
+                  <div className={styles.modalInfoRow}>
+                    <span>Usuario:</span>
+                    <strong>{selectedPayment.user?.name}</strong>
+                  </div>
+                  <div className={styles.modalInfoRow}>
+                    <span>Email:</span>
+                    <strong>{selectedPayment.user?.email}</strong>
+                  </div>
+                  <div className={styles.modalInfoRow}>
+                    <span>Sorteo:</span>
+                    <strong>{selectedPayment.raffle?.product?.name}</strong>
+                  </div>
+                  <div className={styles.modalInfoRow}>
+                    <span>Tickets:</span>
+                    <strong>{selectedPayment.ticketQuantity}</strong>
+                  </div>
+                  <div className={styles.modalInfoRow}>
+                    <span>Monto esperado:</span>
+                    <strong className={styles.expectedAmount}>
+                      S/. {Number(selectedPayment.amount).toFixed(2)}
+                    </strong>
+                  </div>
+                  <div className={styles.modalInfoRow}>
+                    <span>Método:</span>
+                    <strong>{selectedPayment.paymentMethod?.toUpperCase()}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Validación OCR */}
+              {selectedPayment.ocrValidation && (
+                <div className={styles.modalSection}>
+                  <h3 className={styles.modalSectionTitle}>Resultado OCR</h3>
+                  <div className={styles.ocrResult}>
+                    <div className={styles.ocrResultRow}>
+                      <span>Monto detectado:</span>
+                      <strong className={selectedPayment.ocrValidation.isValid ? styles.validAmount : styles.invalidAmount}>
+                        S/. {selectedPayment.ocrValidation.detectedAmount?.toFixed(2) || 'N/A'}
+                      </strong>
+                    </div>
+                    <div className={styles.ocrResultRow}>
+                      <span>Confianza del OCR:</span>
+                      <strong>
+                        {selectedPayment.ocrValidation.confidence ? 
+                          `${(selectedPayment.ocrValidation.confidence * 100).toFixed(0)}%` : 
+                          'N/A'}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Comprobante */}
+              <div className={styles.modalSection}>
+                <h3 className={styles.modalSectionTitle}>Comprobante de pago</h3>
+                {selectedPayment.voucherUrl ? (
+                  <div className={styles.voucherContainer}>
+                    <Image
+                      src={selectedPayment.voucherUrl}
+                      alt="Comprobante"
+                      width={600}
+                      height={400}
+                      className={styles.voucherImage}
+                    />
+                  </div>
+                ) : (
+                  <p className={styles.noVoucher}>No hay comprobante disponible</p>
+                )}
+              </div>
+
+              {/* Notas de validación */}
+              <div className={styles.modalSection}>
+                <h3 className={styles.modalSectionTitle}>Notas (opcional)</h3>
+                <textarea
+                  className={styles.notesTextarea}
+                  placeholder="Agrega notas sobre esta validación..."
+                  value={validationNotes}
+                  onChange={(e) => setValidationNotes(e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              {/* Acciones */}
+              <div className={styles.modalActions}>
+                <button
+                  className={styles.rejectButton}
+                  onClick={() => handleValidatePayment(selectedPayment.id, false)}
+                  disabled={validating}
+                >
+                  <FiX className={styles.buttonIcon} />
+                  {validating ? 'Procesando...' : 'Rechazar'}
+                </button>
+                <button
+                  className={styles.approveButton}
+                  onClick={() => handleValidatePayment(selectedPayment.id, true)}
+                  disabled={validating}
+                >
+                  <FiCheck className={styles.buttonIcon} />
+                  {validating ? 'Procesando...' : 'Aprobar y asignar tickets'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -346,4 +329,3 @@ export default function PaymentsManagement() {
     </div>
   );
 }
-

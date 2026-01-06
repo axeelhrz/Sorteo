@@ -28,18 +28,19 @@ export default function TermsPage() {
           2. Descripción del Servicio
         </h2>
         <p style={{ color: '#555', lineHeight: '1.6' }}>
-          TIKETEA ONLINE es una plataforma digital que conecta a tiendas (vendedores) con usuarios (compradores) 
-          para participar en oportunidades de compra de productos mediante un sistema de tickets. La Plataforma:
+          TIKETEA es una plataforma tecnológica que facilita la publicación y gestión de oportunidades ofrecidas por terceros. No organiza sorteos, no vende productos y no actúa como comerciante final.
+        </p>
+        <p style={{ color: '#555', lineHeight: '1.6', marginTop: '15px' }}>
+          La Plataforma proporciona las herramientas tecnológicas para que terceros (tiendas y comerciantes) puedan:
         </p>
         <ul style={{ color: '#555', lineHeight: '1.8', marginLeft: '20px', marginTop: '10px' }}>
-          <li>Facilita la creación y gestión de oportunidades</li>
-          <li>Procesa pagos de manera segura</li>
-          <li>Ejecuta sorteos de forma aleatoria y verificable</li>
-          <li>Notifica a ganadores y coordina entregas</li>
+          <li>Publicar y gestionar sus propias oportunidades</li>
+          <li>Procesar pagos de manera segura a través de pasarelas de pago integradas</li>
+          <li>Ejecutar sorteos de forma aleatoria y verificable mediante algoritmos criptográficos</li>
+          <li>Comunicarse con los participantes y coordinar entregas</li>
         </ul>
         <p style={{ color: '#555', lineHeight: '1.6', marginTop: '15px' }}>
-          <strong>Importante:</strong> La Plataforma no es propietaria de los productos ni responsable de su entrega. 
-          Las tiendas son responsables de cumplir con la entrega de premios.
+          <strong>Importante:</strong> TIKETEA actúa únicamente como intermediario tecnológico. Los terceros que publican oportunidades son los únicos responsables de la veracidad de la información, la calidad de los productos y el cumplimiento de las entregas.
         </p>
       </section>
 

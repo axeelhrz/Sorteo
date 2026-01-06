@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { FiArrowLeft } from 'react-icons/fi';
 import RaffleCard from '@/components/marketplace/RaffleCard';
 import RaffleFilters from '@/components/marketplace/RaffleFilters';
 import EmptyState from '@/components/marketplace/EmptyState';
@@ -99,19 +98,17 @@ export default function SorteosPage() {
 
   return (
     <main className={styles.container}>
-      {/* Back to Home Button */}
-      <Link href="/" className={styles.backButton}>
-        <FiArrowLeft className={styles.backIcon} />
-        Volver a inicio
-      </Link>
-
       {/* Header */}
       <div className={styles.header}>
-        <h1 className={styles.title}>Oportunidades Disponibles</h1>
-        <p className={styles.subtitle}>
-          Descubre increíbles premios y participa en nuestras oportunidades
-        </p>
+        <div className={styles.headerContent}>
+          <span className={styles.headerTag}>Explora y participa</span>
+          <h1 className={styles.title}>Oportunidades Disponibles</h1>
+          <p className={styles.subtitle}>
+            Descubre productos de alto valor con tickets de bajo costo. Tú decides cuánto participar.
+          </p>
+        </div>
       </div>
+
 
       {/* Filters */}
       <RaffleFilters
@@ -190,13 +187,15 @@ export default function SorteosPage() {
       <HowItWorks />
 
       {/* CTA Section */}
-      <div className={styles.ctaSection}>
-        <h2>¿Eres una tienda?</h2>
-        <p>Crea oportunidades y llega a miles de clientes potenciales</p>
-        <Link href="/register">
-          <button className={styles.ctaButton}>Registra tu tienda</button>
-        </Link>
-      </div>
+      <section className={styles.ctaSection}>
+        <div className={styles.ctaContent}>
+          <h2 className={styles.ctaTitle}>¿Eres una tienda?</h2>
+          <p className={styles.ctaText}>Crea oportunidades y llega a miles de clientes potenciales</p>
+          <Link href="/register" className={styles.ctaButton}>
+            Registra tu tienda
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

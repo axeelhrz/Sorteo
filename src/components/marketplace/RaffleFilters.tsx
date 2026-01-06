@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { FiSearch } from 'react-icons/fi';
+import { FiSearch, FiFilter, FiX } from 'react-icons/fi';
 import { RaffleFilters as RaffleFiltersType } from '@/services/public-raffle-service';
 import styles from './RaffleFilters.module.css';
 
@@ -21,7 +21,6 @@ export default function RaffleFilters({
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [shopId, setShopId] = useState('');
-  const [status, setStatus] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'closest' | 'price-asc' | 'price-desc'>('newest');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -30,20 +29,19 @@ export default function RaffleFilters({
       search: search || undefined,
       category: category || undefined,
       shopId: shopId || undefined,
-      status: status || undefined,
       sortBy,
       page: 1,
     };
 
     onFiltersChange(filters);
-  }, [search, category, shopId, status, sortBy, onFiltersChange]);
+  }, [search, category, shopId, sortBy, onFiltersChange]);
 
   const handleReset = () => {
     setSearch('');
     setCategory('');
     setShopId('');
-    setStatus('');
     setSortBy('newest');
+    setShowAdvanced(false);
     onFiltersChange({ sortBy: 'newest', page: 1 });
   };
 
@@ -52,133 +50,116 @@ export default function RaffleFilters({
     handleApplyFilters();
   };
 
-  return (
-    <div className={styles.container}>
-      {/* Search Bar */}
-      <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
-        <div className={styles.searchInputWrapper}>
-          <input
-            type="text"
-            placeholder="Buscar productos o tiendas..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className={styles.searchInput}
-            disabled={isLoading}
-          />
-          <button type="submit" className={styles.searchButton} disabled={isLoading} title="Buscar">
-            <FiSearch className={styles.searchIcon} />
-          </button>
-        </div>
-      </form>
+  const handleSortChange = (value: string) => {
+    setSortBy(value as any);
+    onFiltersChange({
+      search: search || undefined,
+      category: category || undefined,
+      shopId: shopId || undefined,
+      sortBy: value as any,
+      page: 1,
+    });
+  };
 
-      {/* Sort and Filters Toggle */}
-      <div className={styles.controlsRow}>
-        <div className={styles.sortControl}>
-          <label htmlFor="sortBy" className={styles.label}>
-            Ordenar por:
-          </label>
+  return (
+    <div className={styles.filtersWrapper}>
+      <div className={styles.mainFilters}>
+        {/* Search Bar */}
+        <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
+          <div className={styles.searchBox}>
+            <FiSearch className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder="Buscar productos o tiendas..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className={styles.searchInput}
+              disabled={isLoading}
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch('');
+                  onFiltersChange({ sortBy, page: 1 });
+                }}
+                className={styles.clearButton}
+              >
+                <FiX />
+              </button>
+            )}
+          </div>
+        </form>
+
+        {/* Controls */}
+        <div className={styles.controls}>
           <select
-            id="sortBy"
             value={sortBy}
-            onChange={(e) => {
-              setSortBy(e.target.value as any);
-              onFiltersChange({
-                sortBy: e.target.value as any,
-                page: 1,
-              });
-            }}
-            className={styles.select}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className={styles.sortSelect}
             disabled={isLoading}
           >
             <option value="newest">Más recientes</option>
-            <option value="closest">Más cerca de completarse</option>
-            <option value="price-asc">Menor precio</option>
-            <option value="price-desc">Mayor precio</option>
+            <option value="closest">Próximos a finalizar</option>
+            <option value="price-asc">Precio: Menor a mayor</option>
+            <option value="price-desc">Precio: Mayor a menor</option>
           </select>
-        </div>
 
-        <button
-          type="button"
-          className={`${styles.toggleButton} ${showAdvanced ? styles.active : ''}`}
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          disabled={isLoading}
-        >
-          {showAdvanced ? 'Cerrar filtros' : 'Más filtros'}
-        </button>
+          <button
+            type="button"
+            className={`${styles.filterButton} ${showAdvanced ? styles.active : ''}`}
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            disabled={isLoading}
+          >
+            <FiFilter />
+            <span>Filtros</span>
+          </button>
+        </div>
       </div>
 
       {/* Advanced Filters */}
       {showAdvanced && (
         <div className={styles.advancedFilters}>
-          {/* Category Filter */}
-          {categories.length > 0 && (
-            <div className={styles.filterGroup}>
-              <label htmlFor="category" className={styles.label}>
-                Categoría
-              </label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className={styles.select}
-                disabled={isLoading}
-              >
-                <option value="">Todas las categorías</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className={styles.filterGrid}>
+            {/* Category Filter */}
+            {categories.length > 0 && (
+              <div className={styles.filterItem}>
+                <label className={styles.filterLabel}>Categoría</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className={styles.filterSelect}
+                  disabled={isLoading}
+                >
+                  <option value="">Todas</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-          {/* Shop Filter */}
-          {shops.length > 0 && (
-            <div className={styles.filterGroup}>
-              <label htmlFor="shop" className={styles.label}>
-                Tienda
-              </label>
-              <select
-                id="shop"
-                value={shopId}
-                onChange={(e) => setShopId(e.target.value)}
-                className={styles.select}
-                disabled={isLoading}
-              >
-                <option value="">Todas las tiendas</option>
-                {shops.map((shop) => (
-                  <option key={shop.id} value={shop.id}>
-                    {shop.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Status Filter */}
-          <div className={styles.filterGroup}>
-            <label htmlFor="status" className={styles.label}>
-              Estado
-            </label>
-            <div className={styles.statusContainer}>
-              <select
-                id="status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className={styles.select}
-                disabled={isLoading}
-              >
-                <option value="">Todos los estados</option>
-                <option value="active">Activo - Oportunidad en curso, puedes comprar tickets</option>
-                <option value="paused">Pausado - Oportunidad temporalmente detenida</option>
-                <option value="sold_out">Agotado - Todos los tickets han sido vendidos</option>
-                <option value="finished">Finalizado - Oportunidad completada, ganador ya seleccionado</option>
-              </select>
-              <p className={styles.statusHint}>
-                <strong>Agotado:</strong> Significa que se han vendido todos los tickets disponibles para esta oportunidad. La oportunidad se ejecutará automáticamente cuando se alcance este estado.
-              </p>
-            </div>
+            {/* Shop Filter */}
+            {shops.length > 0 && (
+              <div className={styles.filterItem}>
+                <label className={styles.filterLabel}>Tienda</label>
+                <select
+                  value={shopId}
+                  onChange={(e) => setShopId(e.target.value)}
+                  className={styles.filterSelect}
+                  disabled={isLoading}
+                >
+                  <option value="">Todas</option>
+                  {shops.map((shop) => (
+                    <option key={shop.id} value={shop.id}>
+                      {shop.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -189,7 +170,7 @@ export default function RaffleFilters({
               className={styles.applyButton}
               disabled={isLoading}
             >
-              Aplicar filtros
+              Aplicar
             </button>
             <button
               type="button"
@@ -197,7 +178,7 @@ export default function RaffleFilters({
               className={styles.resetButton}
               disabled={isLoading}
             >
-              Limpiar
+              Limpiar todo
             </button>
           </div>
         </div>

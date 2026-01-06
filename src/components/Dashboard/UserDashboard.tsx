@@ -115,11 +115,11 @@ export default function UserDashboard() {
     }
 
     try {
-      const { paymentService } = await import('@/services/payment-service');
+      const { firebasePaymentService } = await import('@/services/firebase-payment-service');
       const productValue = raffle.productValue || raffle.product?.value || 0;
       const totalPrice = quantity * productValue;
 
-      const payment = await paymentService.createPayment({
+      const payment = await firebasePaymentService.createPayment({
         raffleId: raffle.id,
         amount: totalPrice,
         ticketQuantity: quantity,
@@ -127,7 +127,7 @@ export default function UserDashboard() {
 
       router.push(`/checkout?paymentId=${payment.id}`);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al procesar la compra');
+      setError(err.message || 'Error al procesar la compra');
     }
   };
 

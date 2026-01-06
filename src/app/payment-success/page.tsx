@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { paymentService } from '@/services/payment-service';
+import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
 import { raffleService } from '@/services/raffle-service';
-import { Payment } from '@/types/payment';
 import { Raffle } from '@/types/raffle';
 import styles from './payment-success.module.css';
 
@@ -30,7 +29,7 @@ function PaymentSuccessContent() {
     const fetchData = async () => {
       try {
         // Obtener datos del pago
-        const paymentData = await paymentService.getPaymentById(paymentId);
+        const paymentData = await firebasePaymentService.getPaymentById(paymentId);
         setPayment(paymentData);
 
         // Obtener datos del sorteo
@@ -119,7 +118,7 @@ function PaymentSuccessContent() {
 
           <div className={styles.summaryItem}>
             <span>ID de transacción:</span>
-            <span className={styles.value}>{payment.externalTransactionId}</span>
+            <span className={styles.value}>{payment.transactionId || payment.id}</span>
           </div>
         </div>
 

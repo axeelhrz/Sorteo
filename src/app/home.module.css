@@ -1,577 +1,823 @@
 .container {
   width: 100%;
+  min-height: 100vh;
+  background: #f8f9ff;
 }
 
 /* Hero Section */
 .hero {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.heroWrapper {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 60px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 60px;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 80px 20px;
-}
-
-.heroLogo {
-  margin-bottom: 20px;
-  justify-content: center;
+  z-index: 1;
 }
 
 .heroContent {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 24px;
+}
+
+.heroLogoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.heroLogo {
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.heroTag {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  backdrop-filter: blur(10px);
+  margin-bottom: 8px;
 }
 
 .heroTitle {
   margin: 0;
-  font-size: 48px;
-  font-weight: 700;
-  color: #333;
-  line-height: 1.2;
+  font-size: 56px;
+  font-weight: 900;
+  color: white;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 700px;
 }
 
 .heroSubtitle {
   margin: 0;
   font-size: 20px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.95);
   line-height: 1.6;
+  font-weight: 500;
+  max-width: 650px;
+}
+
+.heroDescription {
+  margin: 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.7;
+  max-width: 600px;
 }
 
 .heroCTA {
   display: flex;
   gap: 16px;
-  flex-wrap: wrap;
-  justify-content: center;
+  margin-top: 16px;
 }
 
 .primaryButton,
-.secondaryButton,
-.loginButton {
-  padding: 14px 32px;
+.secondaryButton {
+  padding: 16px 32px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 .primaryButton {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  background: white;
+  color: #667eea;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .primaryButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  background: #f8f9ff;
 }
 
 .secondaryButton {
-  background: #f8f9ff;
-  color: #667eea;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .secondaryButton:hover {
-  background: #f0f7ff;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
 }
 
-.loginButton {
-  background: #2196F3;
-  color: white;
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+.buttonIconRight {
+  font-size: 18px;
+  transition: transform 0.3s ease;
 }
 
-.loginButton:hover {
-  background: #1976D2;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(33, 150, 243, 0.4);
+.primaryButton:hover .buttonIconRight {
+  transform: translateX(4px);
 }
 
-.heroImage {
+.heroStats {
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 400px;
+  justify-content: flex-start;
+  gap: 40px;
+  margin-top: 40px;
+  padding: 24px 32px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: fit-content;
 }
 
-.heroIcon {
-  font-size: 200px;
-  color: #667eea;
+.statItem {
+  text-align: center;
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-30px);
-  }
+.statNumber {
+  font-size: 32px;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-.buttonIcon {
-  margin-right: 8px;
-  vertical-align: middle;
+.statLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statDivider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Features Section */
 .features {
-  background: #f5f7fa;
-  padding: 80px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 40px;
 }
 
-.featuresTitle {
+.features .sectionHeader {
   text-align: center;
-  margin: 0 0 60px 0;
-  font-size: 36px;
-  font-weight: 700;
-  color: #333;
+  margin-bottom: 64px;
+}
+
+.features .sectionTag {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(102, 126, 234, 0.08);
+  border-radius: 50px;
+  color: #667eea;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+}
+
+.features .sectionTitle {
+  margin: 0 0 16px 0;
+  font-size: 42px;
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -1px;
+}
+
+.features .sectionSubtitle {
+  margin: 0;
+  font-size: 17px;
+  color: #718096;
+  max-width: 650px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 32px;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
 .featureCard {
   background: white;
-  border-radius: 12px;
-  padding: 32px 24px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  border-radius: 20px;
+  padding: 48px 36px;
+  text-align: left;
+  border: 2px solid #f0f0f0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .featureCard:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.12);
+  border-color: #667eea;
 }
 
 .featureIcon {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 32px;
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #667eea;
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #f0f7ff 0%, #e3f2fd 100%);
+  color: white;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 16px;
-  margin: 0 auto 16px;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.25);
 }
 
 .featureTitle {
   margin: 0 0 12px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.3px;
 }
 
 .featureText {
   margin: 0;
+  font-size: 15px;
+  color: #718096;
+  line-height: 1.7;
+}
+
+/* Share Section */
+.shareSection {
+  max-width: 1200px;
+  margin: 0 auto 80px;
+  padding: 0 40px;
+}
+
+.shareSectionContent {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 24px;
+  padding: 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.shareSectionContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.shareIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: white;
+  font-size: 32px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.shareTitle {
+  margin: 0 0 16px 0;
+  font-size: 32px;
+  font-weight: 800;
+  color: white;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.8px;
+}
+
+.shareText {
+  margin: 0 0 28px 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.7;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.shareHighlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.shareHighlightIcon {
+  font-size: 18px;
+  color: white;
+}
+
+.shareHighlight span {
   font-size: 14px;
-  color: #666;
-  line-height: 1.6;
+  font-weight: 600;
+  color: white;
 }
 
 /* How It Works Section */
 .howItWorks {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 20px;
+  padding: 100px 40px;
 }
 
-.howItWorksTitle {
+.howItWorks .sectionHeader {
   text-align: center;
-  margin: 0 0 60px 0;
-  font-size: 36px;
-  font-weight: 700;
-  color: #333;
+  margin-bottom: 64px;
 }
 
-.stepsContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.step {
-  flex: 1;
-  min-width: 200px;
-  text-align: center;
-}
-
-.stepNumber {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 50%;
-  font-size: 28px;
-  font-weight: 700;
+.howItWorks .sectionTag {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(102, 126, 234, 0.08);
+  border-radius: 50px;
+  color: #667eea;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   margin-bottom: 16px;
 }
 
+.howItWorks .sectionTitle {
+  margin: 0 0 16px 0;
+  font-size: 42px;
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -1px;
+}
+
+.howItWorks .sectionSubtitle {
+  margin: 0;
+  font-size: 17px;
+  color: #718096;
+  max-width: 650px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.stepsContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 48px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.step {
+  text-align: left;
+  position: relative;
+  padding: 40px;
+  background: white;
+  border-radius: 20px;
+  border: 2px solid #f0f0f0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.step:hover {
+  border-color: #667eea;
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.12);
+  transform: translateY(-8px);
+}
+
+.stepNumber {
+  display: inline-block;
+  font-size: 56px;
+  font-weight: 900;
+  color: #f0f0f0;
+  line-height: 1;
+  margin-bottom: 20px;
+  letter-spacing: -2px;
+}
+
 .stepTitle {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.3px;
 }
 
 .stepText {
   margin: 0;
-  font-size: 14px;
-  color: #666;
-  line-height: 1.5;
-}
-
-.arrow {
-  font-size: 32px;
-  color: #2196F3;
-  font-weight: bold;
-  display: none;
-  align-items: center;
-  justify-content: center;
+  font-size: 15px;
+  color: #718096;
+  line-height: 1.7;
 }
 
 /* CTA Section */
 .cta {
+  max-width: 1200px;
+  margin: 80px auto;
+  padding: 0 40px;
+}
+
+.ctaContent {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   text-align: center;
-  padding: 80px 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  border-radius: 12px;
+  padding: 80px 60px;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ctaContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+  opacity: 0.3;
 }
 
 .ctaTitle {
   margin: 0 0 16px 0;
-  font-size: 36px;
-  font-weight: 700;
+  font-size: 48px;
+  font-weight: 800;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -1px;
 }
 
 .ctaText {
-  margin: 0 0 32px 0;
+  margin: 0 0 40px 0;
   font-size: 18px;
   opacity: 0.95;
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .ctaButtons {
   display: flex;
   gap: 16px;
   justify-content: center;
-  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .ctaPrimaryButton,
-.ctaSecondaryButton,
-.ctaLoginButton {
-  padding: 14px 32px;
+.ctaSecondaryButton {
+  padding: 16px 32px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
 }
 
 .ctaPrimaryButton {
   background: white;
   color: #667eea;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .ctaPrimaryButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 }
 
 .ctaSecondaryButton {
   background: rgba(255, 255, 255, 0.15);
   color: white;
   backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .ctaSecondaryButton:hover {
   background: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.ctaLoginButton {
-  background: white;
-  color: #2196F3;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.ctaLoginButton:hover {
-  background: #f0f7ff;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-}
-
-/* FAQs Section */
-.faqSection {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 80px 20px;
-}
-
-.faqTitle {
-  text-align: center;
-  margin: 0 0 16px 0;
-  font-size: 36px;
-  font-weight: 700;
-  color: #333;
-}
-
-.faqSubtitle {
-  text-align: center;
-  margin: 0 0 60px 0;
-  font-size: 16px;
-  color: #666;
-}
-
-.faqGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  margin-bottom: 40px;
-}
-
-.faqCard {
-  background: white;
-  border-radius: 12px;
-  padding: 28px 24px;
-  border: 1px solid #e0e0e0;
-  transition: all 0.3s ease;
-}
-
-.faqCard:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
-  transform: translateY(-4px);
-}
-
-.faqCardTitle {
-  margin: 0 0 12px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-}
-
-.faqCardText {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-  line-height: 1.6;
-}
-
-.faqCTA {
-  text-align: center;
-  padding: 32px;
-  background: #f5f7fa;
-  border-radius: 12px;
-  border-left: 4px solid #667eea;
-}
-
-.faqCTAText {
-  margin: 0 0 16px 0;
-  font-size: 16px;
-  color: #333;
-  font-weight: 600;
-}
-
-.faqCTAButton {
-  padding: 12px 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.faqCTAButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-/* Shops CTA Section */
-.shopsCTA {
-  background: #f5f7fa;
-  text-align: center;
-  padding: 80px 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  border-radius: 12px;
-}
-
-.shopsCTATitle {
-  margin: 0 0 16px 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: #333;
-}
-
-.shopsCTAText {
-  margin: 0 0 32px 0;
-  font-size: 16px;
-  color: #666;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.6;
-}
-
-.shopsCTAButton {
-  padding: 14px 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.shopsCTAButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-}
 
 /* WhatsApp Button */
 .whatsappButton {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: 32px;
+  right: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 14px 24px;
+  width: 60px;
+  height: 60px;
   background: #25D366;
   color: white;
-  border-radius: 50px;
+  border-radius: 50%;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-  transition: all 0.3s ease;
-  z-index: 100;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
 }
 
 .whatsappButton:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(37, 211, 102, 0.5);
   background: #20BA5A;
 }
 
 .whatsappIcon {
-  font-size: 20px;
+  font-size: 28px;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
   .hero {
+    border-radius: 0 0 16px 16px;
+  }
+
+  .heroWrapper {
+    padding: 60px 40px;
     grid-template-columns: 1fr;
     gap: 40px;
-    padding: 60px 20px;
   }
 
-  .heroImage {
-    height: 300px;
+  .heroLogoContainer {
+    order: -1;
   }
 
-  .heroIcon {
-    font-size: 150px;
+  .heroTitle {
+    font-size: 44px;
+  }
+
+  .heroStats {
+    gap: 24px;
+    padding: 24px;
+  }
+
+  .statNumber {
+    font-size: 28px;
+  }
+
+  .featureGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .shareSectionContent {
+    padding: 40px 32px;
+  }
+
+  .shareTitle {
+    font-size: 24px;
+  }
+
+  .shareText {
+    font-size: 15px;
   }
 
   .stepsContainer {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
-  .arrow {
-    display: block;
-    transform: rotate(90deg);
+  .step {
+    padding: 28px;
+  }
+
+  .ctaContent {
+    padding: 60px 40px;
   }
 }
 
 @media (max-width: 768px) {
+  .hero {
+    border-radius: 0 0 12px 12px;
+  }
+
+  .heroWrapper {
+    padding: 48px 24px;
+  }
+
+  .heroContent {
+    align-items: center;
+    text-align: center;
+  }
+
   .heroTitle {
     font-size: 36px;
+    letter-spacing: -1px;
   }
 
   .heroSubtitle {
     font-size: 18px;
   }
 
-  .heroCTA {
-    flex-direction: column;
+  .heroDescription {
+    font-size: 15px;
   }
 
-  .primaryButton,
-  .secondaryButton,
-  .loginButton {
+  .heroCTA {
+    flex-direction: column;
     width: 100%;
   }
 
-  .featuresTitle,
-  .howItWorksTitle,
-  .ctaTitle,
-  .shopsCTATitle {
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+  }
+
+  .heroStats {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .statDivider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .features,
+  .howItWorks {
+    padding: 60px 24px;
+  }
+
+  .sectionTitle {
+    font-size: 36px;
+  }
+
+  .sectionSubtitle {
+    font-size: 16px;
+  }
+
+  .shareSection {
+    padding: 0 24px;
+  }
+
+  .shareSectionContent {
+    padding: 36px 28px;
+  }
+
+  .shareIcon {
+    width: 64px;
+    height: 64px;
     font-size: 28px;
   }
 
-  .featureGrid {
-    grid-template-columns: 1fr;
+  .shareTitle {
+    font-size: 22px;
+  }
+
+  .shareText {
+    font-size: 14px;
+  }
+
+  .shareHighlight {
+    padding: 12px 24px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .shareHighlight span {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .stepNumber {
+    font-size: 40px;
+  }
+
+  .stepTitle {
+    font-size: 18px;
+  }
+
+  .stepText {
+    font-size: 14px;
+  }
+
+  .ctaContent {
+    padding: 48px 32px;
+  }
+
+  .ctaTitle {
+    font-size: 36px;
   }
 
   .ctaButtons {
     flex-direction: column;
-  }
-
-  .ctaPrimaryButton,
-  .ctaSecondaryButton,
-  .ctaLoginButton {
     width: 100%;
   }
 
-  .features,
-  .howItWorks,
-  .cta,
-  .shopsCTA {
-    padding: 60px 20px;
+  .ctaPrimaryButton,
+  .ctaSecondaryButton {
+    width: 100%;
+  }
+
+  .whatsappButton {
+    width: 56px;
+    height: 56px;
+    bottom: 24px;
+    right: 24px;
+  }
+
+  .whatsappIcon {
+    font-size: 24px;
   }
 }
 
 @media (max-width: 480px) {
-  .hero {
-    padding: 40px 16px;
+  .heroWrapper {
+    padding: 40px 20px;
   }
 
   .heroTitle {
@@ -582,25 +828,103 @@
     font-size: 16px;
   }
 
-  .heroImage {
-    height: 200px;
+  .heroDescription {
+    font-size: 14px;
   }
 
-  .heroIcon {
-    font-size: 100px;
+  .heroTag {
+    font-size: 12px;
+    padding: 6px 16px;
   }
 
-  .stepNumber {
-    width: 50px;
-    height: 50px;
+  .primaryButton,
+  .secondaryButton {
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+
+  .statNumber {
     font-size: 24px;
   }
 
+  .statLabel {
+    font-size: 11px;
+  }
+
+  .features,
+  .howItWorks {
+    padding: 48px 20px;
+  }
+
+  .sectionTitle {
+    font-size: 28px;
+  }
+
+  .sectionSubtitle {
+    font-size: 15px;
+  }
+
+  .shareSection {
+    padding: 0 20px;
+  }
+
+  .shareSectionContent {
+    padding: 32px 24px;
+  }
+
+  .shareIcon {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .shareTitle {
+    font-size: 20px;
+  }
+
+  .shareText {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .shareHighlight {
+    padding: 12px 20px;
+  }
+
+  .shareHighlightIcon {
+    font-size: 18px;
+  }
+
+  .shareHighlight span {
+    font-size: 13px;
+  }
+
+  .step {
+    padding: 24px;
+  }
+
+  .stepNumber {
+    font-size: 36px;
+  }
+
   .stepTitle {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .stepText {
-    font-size: 13px;
+    font-size: 14px;
+  }
+
+  .ctaContent {
+    padding: 40px 24px;
+  }
+
+  .ctaTitle {
+    font-size: 28px;
+  }
+
+  .ctaText {
+    font-size: 16px;
   }
 }

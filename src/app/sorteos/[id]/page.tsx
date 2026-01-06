@@ -245,8 +245,11 @@ export default function RaffleDetailPage() {
 
             {/* Value */}
             <div className={styles.valueBox}>
-              <span className={styles.valueLabel}>Valor del producto</span>
-              <span className={styles.valueAmount}>S/ {Number(raffle.productValue).toFixed(2)}</span>
+              <span className={styles.valueLabel}>Valor de Ticket</span>
+              <span className={styles.valueAmount}>S/ {(Number(raffle.productValue) / raffle.totalTickets).toFixed(2)}</span>
+              <span className={styles.valueSubtext}>
+                Valor total del producto: S/ {Number(raffle.productValue).toFixed(2)}
+              </span>
             </div>
 
             {/* Delivery and Pickup Info */}
