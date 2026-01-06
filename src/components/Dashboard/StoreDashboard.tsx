@@ -13,8 +13,7 @@ import {
   FiEdit2,
   FiTrash2,
   FiEye,
-  FiGrid,
-  FiList
+  FiGrid
 } from 'react-icons/fi';
 import Logo from '@/components/Logo';
 import styles from './StoreDashboard.module.css';
