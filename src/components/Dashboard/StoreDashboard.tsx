@@ -18,7 +18,7 @@ import {
 import Logo from '@/components/Logo';
 import styles from './StoreDashboard.module.css';
 
-type TabType = 'overview' | 'products' | 'raffles';
+type TabType = 'overview' | 'raffles';
 
 export default function StoreDashboard() {
   const router = useRouter();
@@ -33,7 +33,6 @@ export default function StoreDashboard() {
     totalRevenue: 0
   });
 
-  const [products] = useState<any[]>([]);
   const [raffles] = useState<any[]>([]);
 
   useEffect(() => {
@@ -72,14 +71,8 @@ export default function StoreDashboard() {
     }
   };
 
-  const handleCreateProduct = () => {
-    // TODO: Open create product modal
-    console.log('Create product');
-  };
-
   const handleCreateRaffle = () => {
-    // TODO: Open create raffle modal
-    console.log('Create raffle');
+    router.push('/panel/sorteos/crear');
   };
 
   return (
@@ -123,13 +116,6 @@ export default function StoreDashboard() {
           >
             <FiGrid />
             <span>Resumen</span>
-          </button>
-          <button
-            className={`${styles.tab} ${activeTab === 'products' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('products')}
-          >
-            <FiPackage />
-            <span>Productos</span>
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'raffles' ? styles.tabActive : ''}`}
@@ -192,90 +178,17 @@ export default function StoreDashboard() {
             <div className={styles.quickActions}>
               <h2 className={styles.sectionTitle}>Acciones Rápidas</h2>
               <div className={styles.actionsGrid}>
-                <button className={styles.actionCard} onClick={handleCreateProduct}>
-                  <div className={styles.actionIcon}>
-                    <FiPlus />
-                  </div>
-                  <div className={styles.actionContent}>
-                    <span className={styles.actionTitle}>Crear Producto</span>
-                    <span className={styles.actionDesc}>Agrega un nuevo producto a tu catálogo</span>
-                  </div>
-                </button>
-
                 <button className={styles.actionCard} onClick={handleCreateRaffle}>
                   <div className={styles.actionIcon}>
                     <FiPlus />
                   </div>
                   <div className={styles.actionContent}>
                     <span className={styles.actionTitle}>Crear Sorteo</span>
-                    <span className={styles.actionDesc}>Inicia un nuevo sorteo con tus productos</span>
+                    <span className={styles.actionDesc}>Crea un sorteo y su producto asociado</span>
                   </div>
                 </button>
               </div>
             </div>
-          </div>
-        )}
-
-        {activeTab === 'products' && (
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Mis Productos</h2>
-              <button className={styles.createBtn} onClick={handleCreateProduct}>
-                <FiPlus />
-                <span>Nuevo Producto</span>
-              </button>
-            </div>
-
-            {products.length === 0 ? (
-              <div className={styles.emptyState}>
-                <FiPackage className={styles.emptyIcon} />
-                <h3>No tienes productos</h3>
-                <p>Comienza creando tu primer producto para poder crear sorteos</p>
-                <button className={styles.createBtn} onClick={handleCreateProduct}>
-                  <FiPlus />
-                  <span>Crear Producto</span>
-                </button>
-              </div>
-            ) : (
-              <div className={styles.tableWrapper}>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>Producto</th>
-                      <th>Categoría</th>
-                      <th>Precio</th>
-                      <th>Estado</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((product) => (
-                      <tr key={product.id}>
-                        <td>{product.name}</td>
-                        <td>{product.category}</td>
-                        <td>S/. {product.price}</td>
-                        <td>
-                          <span className={styles.badge}>{product.status}</span>
-                        </td>
-                        <td>
-                          <div className={styles.actions}>
-                            <button className={styles.actionBtn}>
-                              <FiEye />
-                            </button>
-                            <button className={styles.actionBtn}>
-                              <FiEdit2 />
-                            </button>
-                            <button className={styles.actionBtn}>
-                              <FiTrash2 />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
           </div>
         )}
 
