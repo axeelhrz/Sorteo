@@ -16,3 +16,13 @@ build/
 .env
 .env.*
 .DS_Store
+
+node_modules/
+.next/
+out/
+dist/
+build/
+.env
+.env.*
+*.log
+.DS_Store
