@@ -11,6 +11,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  shopId?: string; // Optional shop ID for organizers
 }
 
 export interface AuthResponse {

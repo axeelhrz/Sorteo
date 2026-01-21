@@ -13,8 +13,12 @@ import {
   FiEdit2,
   FiTrash2,
   FiEye,
-  FiGrid
+  FiGrid,
+  FiX
 } from 'react-icons/fi';
+import { CreateRaffleForm } from '@/components/ShopPanel/CreateRaffleForm';
+import { firebaseShopService } from '@/services/firebase-shop-service';
+import { Shop } from '@/types/shop';
 import styles from './StoreDashboard.module.css';
 
 type TabType = 'overview' | 'raffles';
@@ -23,6 +27,9 @@ export default function StoreDashboard() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [shop, setShop] = useState<Shop | null>(null);
+  const [, setLoadingShop] = useState(true);
 
   // Mock data - Replace with Firebase calls
   const [stats, setStats] = useState({
@@ -36,7 +43,22 @@ export default function StoreDashboard() {
 
   useEffect(() => {
     loadData();
-  }, []);
+    loadShop();
+  }, [user]);
+
+  const loadShop = async () => {
+    if (!user?.shopId) return;
+    
+    try {
+      setLoadingShop(true);
+      const shopData = await firebaseShopService.getShopById(user.shopId);
+      setShop(shopData);
+    } catch (error) {
+      console.error('Error loading shop:', error);
+    } finally {
+      setLoadingShop(false);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -71,7 +93,16 @@ export default function StoreDashboard() {
   };
 
   const handleCreateRaffle = () => {
-    router.push('/panel/sorteos/crear');
+    setShowCreateModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+  };
+
+  const handleRaffleCreated = () => {
+    setShowCreateModal(false);
+    loadData(); // Reload data after creating raffle
   };
 
   return (
@@ -255,6 +286,27 @@ export default function StoreDashboard() {
           </div>
         )}
       </main>
+
+      {/* Create Raffle Modal */}
+      {showCreateModal && shop && (
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+          <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Crear Nuevo Sorteo</h2>
+              <button className={styles.modalCloseBtn} onClick={handleCloseModal}>
+                <FiX />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <CreateRaffleForm 
+                shop={shop} 
+                onSuccess={handleRaffleCreated}
+                onCancel={handleCloseModal}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,6 +10,8 @@ import styles from '@/app/panel/panel.module.css';
 
 interface CreateRaffleFormProps {
   shop: Shop;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 interface ProductFormData {
@@ -26,7 +28,7 @@ interface ProductFormData {
   pickupDistrict: string;
 }
 
-export function CreateRaffleForm({ shop }: CreateRaffleFormProps) {
+export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleFormProps) {
   const router = useRouter();
   const [specialConditions, setSpecialConditions] = useState('');
   const [loading, setLoading] = useState(false);
@@ -198,9 +200,18 @@ export function CreateRaffleForm({ shop }: CreateRaffleFormProps) {
       });
 
       setSuccess(true);
-      setTimeout(() => {
-        router.push(`/panel/sorteos/${raffle.id}`);
-      }, 1500);
+      
+      // If onSuccess callback is provided (modal mode), call it
+      if (onSuccess) {
+        setTimeout(() => {
+          onSuccess();
+        }, 1500);
+      } else {
+        // Otherwise redirect (standalone page mode)
+        setTimeout(() => {
+          router.push(`/panel/sorteos/${raffle.id}`);
+        }, 1500);
+      }
     } catch (err: any) {
       setError(err.message || 'Error al crear el sorteo y producto');
     } finally {
@@ -490,7 +501,12 @@ export function CreateRaffleForm({ shop }: CreateRaffleFormProps) {
             ? 'Creando sorteo...'
             : 'Crear sorteo'}
         </button>
-        <button type="button" className={styles.secondaryButton} onClick={() => router.back()} disabled={loading}>
+        <button 
+          type="button" 
+          className={styles.secondaryButton} 
+          onClick={() => onCancel ? onCancel() : router.back()} 
+          disabled={loading}
+        >
           Cancelar
         </button>
       </div>
