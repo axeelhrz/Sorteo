@@ -42,8 +42,8 @@ export default function ActiveRaffles() {
         page * limit,
         shopFilter || undefined,
       );
-      setRaffles(data[0]);
-      setTotal(data[1]);
+      setRaffles(data.data);
+      setTotal(data.total);
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar sorteos');

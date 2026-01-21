@@ -48,7 +48,7 @@ export default function ShopsManagement() {
       const data = await adminService.getAllShops(
         limit,
         page * limit,
-        statusFilter || undefined,
+        statusFilter ? { status: statusFilter } : undefined,
       );
       setShops(data.data);
       setTotal(data.total);

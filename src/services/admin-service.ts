@@ -352,4 +352,209 @@ export const adminService = {
       throw error;
     }
   },
+
+  /**
+   * Get dashboard statistics (admin only)
+   * TODO: Implement proper Firestore queries for dashboard stats
+   */
+  async getDashboardStats(): Promise<{
+    users: { total: number };
+    shops: { total: number; pending: number; verified: number; blocked: number };
+    raffles: {
+      pending: number;
+      active: number;
+      finished: number;
+      cancelled: number;
+      rejected: number;
+    };
+    tickets: { totalSold: number };
+    payments: {
+      total: number;
+      completed: number;
+      pending: number;
+      failed: number;
+      refunded: number;
+      totalRevenue: number;
+    };
+  }> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would query Firestore for actual statistics
+      console.warn('getDashboardStats is not fully implemented yet');
+      return {
+        users: { total: 0 },
+        shops: { total: 0, pending: 0, verified: 0, blocked: 0 },
+        raffles: {
+          pending: 0,
+          active: 0,
+          finished: 0,
+          cancelled: 0,
+          rejected: 0,
+        },
+        tickets: { totalSold: 0 },
+        payments: {
+          total: 0,
+          completed: 0,
+          pending: 0,
+          failed: 0,
+          refunded: 0,
+          totalRevenue: 0,
+        },
+      };
+    } catch (error) {
+      console.error('Error getting dashboard stats:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get active raffles (admin only)
+   * TODO: Implement proper Firestore query for active raffles
+   */
+  async getActiveRaffles(
+    _limit: number,
+    _offset: number,
+    _shopId?: string
+  ): Promise<{ data: any[]; total: number }> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would query Firestore for active raffles
+      // Parameters: limit, offset, shopId will be used for pagination and filtering
+      console.warn('getActiveRaffles is not fully implemented yet');
+      return { data: [], total: 0 };
+    } catch (error) {
+      console.error('Error getting active raffles:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Cancel raffle (admin only)
+   * TODO: Implement proper Firestore update for raffle cancellation
+   */
+  async cancelRaffle(_raffleId: string, _reason: string): Promise<void> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would update the raffle status to cancelled in Firestore
+      console.warn('cancelRaffle is not fully implemented yet');
+    } catch (error) {
+      console.error('Error cancelling raffle:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Execute raffle (admin only)
+   * TODO: Implement proper raffle execution logic
+   */
+  async executeRaffle(_raffleId: string): Promise<void> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would:
+      // 1. Select a random winner from sold tickets
+      // 2. Update raffle status to finished
+      // 3. Notify the winner
+      console.warn('executeRaffle is not fully implemented yet');
+    } catch (error) {
+      console.error('Error executing raffle:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get all shops/organizers (admin only)
+   * TODO: Implement proper Firestore query for shops
+   */
+  async getAllShops(
+    _limit: number,
+    _offset: number,
+    _filters?: { status?: string }
+  ): Promise<{ data: any[]; total: number }> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would query Firestore for shops
+      // Parameters: limit, offset, filters will be used for pagination and filtering
+      console.warn('getAllShops is not fully implemented yet');
+      return { data: [], total: 0 };
+    } catch (error) {
+      console.error('Error getting all shops:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Verify shop/organizer (admin only)
+   * TODO: Implement proper Firestore update for shop verification
+   */
+  async verifyShop(_shopId: string): Promise<void> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would update the shop status to verified in Firestore
+      console.warn('verifyShop is not fully implemented yet');
+    } catch (error) {
+      console.error('Error verifying shop:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Block shop/organizer (admin only)
+   * TODO: Implement proper Firestore update for shop blocking
+   */
+  async blockShop(_shopId: string, _reason: string): Promise<void> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would update the shop status to blocked in Firestore
+      console.warn('blockShop is not fully implemented yet');
+    } catch (error) {
+      console.error('Error blocking shop:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Unblock shop/organizer (admin only)
+   * TODO: Implement proper Firestore update for shop unblocking
+   */
+  async unblockShop(_shopId: string): Promise<void> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would update the shop status to active in Firestore
+      console.warn('unblockShop is not fully implemented yet');
+    } catch (error) {
+      console.error('Error unblocking shop:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get shop detail with statistics (admin only)
+   * TODO: Implement proper Firestore query for shop details
+   */
+  async getShopDetail(_shopId: string): Promise<any> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would query Firestore for shop details and statistics
+      console.warn('getShopDetail is not fully implemented yet');
+      return null;
+    } catch (error) {
+      console.error('Error getting shop detail:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Change shop status (admin only)
+   * TODO: Implement proper Firestore update for shop status change
+   */
+  async changeShopStatus(_shopId: string, _newStatus: string, _reason?: string): Promise<void> {
+    try {
+      // This is a placeholder implementation
+      // In a real application, you would update the shop status in Firestore
+      console.warn('changeShopStatus is not fully implemented yet');
+    } catch (error) {
+      console.error('Error changing shop status:', error);
+      throw error;
+    }
+  },
 };

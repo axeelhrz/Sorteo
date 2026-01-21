@@ -216,10 +216,41 @@ export default function RaffleDetailPage() {
             )}
             
             {/* Social Media */}
-            {raffle.shop?.socialMedia && (
+            {raffle.shop?.socialMedia && Object.keys(raffle.shop.socialMedia).length > 0 && (
               <div className={styles.socialMedia}>
                 <p className={styles.socialLabel}>Síguenos en redes sociales:</p>
-                <p className={styles.socialLinks}>{raffle.shop.socialMedia}</p>
+                <div className={styles.socialLinks}>
+                  {raffle.shop.socialMedia.facebook && (
+                    <a href={raffle.shop.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                      Facebook
+                    </a>
+                  )}
+                  {raffle.shop.socialMedia.instagram && (
+                    <a href={raffle.shop.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                      Instagram
+                    </a>
+                  )}
+                  {raffle.shop.socialMedia.twitter && (
+                    <a href={raffle.shop.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                      Twitter
+                    </a>
+                  )}
+                  {raffle.shop.socialMedia.tiktok && (
+                    <a href={raffle.shop.socialMedia.tiktok} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                      TikTok
+                    </a>
+                  )}
+                  {raffle.shop.socialMedia.whatsapp && (
+                    <a href={`https://wa.me/${raffle.shop.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                      WhatsApp
+                    </a>
+                  )}
+                  {raffle.shop.socialMedia.website && (
+                    <a href={raffle.shop.socialMedia.website} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                      Sitio Web
+                    </a>
+                  )}
+                </div>
               </div>
             )}
             

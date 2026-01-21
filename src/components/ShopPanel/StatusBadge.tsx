@@ -1,11 +1,11 @@
 'use client';
 
-import { ShopStatus } from '@/types/shop';
+import { OrganizerStatus } from '@/types/shop';
 import { RaffleStatus } from '@/types/raffle';
 import styles from '@/app/panel/panel.module.css';
 
 interface StatusBadgeProps {
-  status: ShopStatus | RaffleStatus;
+  status: OrganizerStatus | RaffleStatus;
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {

@@ -107,7 +107,22 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
             </div>
             <div className={styles.raffleDetailItem}>
               <div className={styles.raffleDetailItemLabel}>Redes sociales</div>
-              <div className={styles.raffleDetailItemValue}>{shop.socialMedia || 'No especificado'}</div>
+              <div className={styles.raffleDetailItemValue}>
+                {shop.socialMedia && typeof shop.socialMedia === 'object' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {shop.socialMedia.facebook && <span>Facebook: {shop.socialMedia.facebook}</span>}
+                    {shop.socialMedia.instagram && <span>Instagram: {shop.socialMedia.instagram}</span>}
+                    {shop.socialMedia.twitter && <span>Twitter: {shop.socialMedia.twitter}</span>}
+                    {shop.socialMedia.tiktok && <span>TikTok: {shop.socialMedia.tiktok}</span>}
+                    {shop.socialMedia.whatsapp && <span>WhatsApp: {shop.socialMedia.whatsapp}</span>}
+                    {shop.socialMedia.website && <span>Website: {shop.socialMedia.website}</span>}
+                  </div>
+                ) : shop.socialMedia ? (
+                  String(shop.socialMedia)
+                ) : (
+                  'No especificado'
+                )}
+              </div>
             </div>
           </div>
 
@@ -186,7 +201,7 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
             <input
               type="text"
               name="socialMedia"
-              value={formData.socialMedia || ''}
+              value={typeof formData.socialMedia === 'string' ? formData.socialMedia : ''}
               onChange={handleChange}
               className={styles.formInput}
               placeholder="@usuario o enlace"
