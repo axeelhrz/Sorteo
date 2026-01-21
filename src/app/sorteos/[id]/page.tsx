@@ -456,14 +456,16 @@ export default function RaffleDetailPage() {
                       </span>
                     ))}
                   </div>
-                  <p className={styles.participationDate}>
-                    Comprado{userTickets.length > 1 ? 's' : ''} el{' '}
-                    {new Date(userTickets[0]?.createdAt || Date.now()).toLocaleDateString('es-PE', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
+                  {userTickets[0]?.createdAt && (
+                    <p className={styles.participationDate}>
+                      Comprado{userTickets.length > 1 ? 's' : ''} el{' '}
+                      {new Date(userTickets[0].createdAt).toLocaleDateString('es-PE', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  )}
                 </div>
               ) : (
                 <p className={styles.participationText}>
