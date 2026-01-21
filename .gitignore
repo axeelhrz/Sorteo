@@ -26,3 +26,5 @@ build/
 .env.*
 *.log
 .DS_Store
+
+.next/
