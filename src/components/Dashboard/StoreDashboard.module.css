@@ -89,12 +89,12 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.875rem;
   background: rgba(255, 255, 255, 0.15);
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -240,19 +240,19 @@
 
 .actionsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.25rem;
-  max-width: 800px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  max-width: 600px;
 }
 
 .actionCard {
   background: white;
   border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
+  border-radius: 0.625rem;
+  padding: 1rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
@@ -265,15 +265,15 @@
 }
 
 .actionIcon {
-  width: 48px;
-  height: 48px;
-  border-radius: 0.625rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   flex-shrink: 0;
 }
 
@@ -284,13 +284,13 @@
 }
 
 .actionTitle {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: #1e293b;
 }
 
 .actionDesc {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: #64748b;
   line-height: 1.4;
 }
@@ -313,12 +313,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
+  padding: 0.5rem 1rem;
   background: #667eea;
   color: white;
   border: none;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;

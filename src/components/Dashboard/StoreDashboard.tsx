@@ -15,7 +15,6 @@ import {
   FiEye,
   FiGrid
 } from 'react-icons/fi';
-import Logo from '@/components/Logo';
 import styles from './StoreDashboard.module.css';
 
 type TabType = 'overview' | 'raffles';
@@ -81,10 +80,9 @@ export default function StoreDashboard() {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerLeft}>
-            <Logo size="small" showText={false} imageSize={36} />
             <div>
               <h1 className={styles.title}>Panel de Organizador</h1>
-              <p className={styles.subtitle}>Gestiona tus productos y sorteos</p>
+              <p className={styles.subtitle}>Gestiona tus sorteos</p>
             </div>
           </div>
           
