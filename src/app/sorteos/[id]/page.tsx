@@ -188,10 +188,10 @@ export default function RaffleDetailPage() {
             </div>
           </div>
 
-          {/* Shop Info */}
-          <div className={styles.shopInfo}>
-            <h3 className={styles.shopTitle}>Tienda</h3>
-            <div className={styles.shopCard}>
+        {/* Shop Info */}
+        <div className={styles.shopInfo}>
+          <h3 className={styles.shopTitle}>Organizador</h3>
+          <div className={styles.shopCard}>
               {raffle.shop?.logo && (
                 <Image
                   src={raffle.shop.logo}
@@ -204,10 +204,10 @@ export default function RaffleDetailPage() {
               <div className={styles.shopDetails}>
                 <h4 className={styles.shopName}>{raffle.shop?.name}</h4>
                 {raffle.shop?.status === 'verified' && (
-                  <span className={styles.verifiedBadge}>
-                    <FiCheckCircle className={styles.verifiedIcon} />
-                    Tienda verificada
-                  </span>
+              <span className={styles.verifiedBadge}>
+                <FiCheckCircle className={styles.verifiedIcon} />
+                Organizador verificado
+              </span>
                 )}
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function RaffleDetailPage() {
               </div>
             )}
             
-            <Link href={`/tienda/${raffle.shop?.id}`}>
+            <Link href={`/organizador/${raffle.shop?.id}`}>
               <button className={styles.viewShopButton}>Ver otros sorteos</button>
             </Link>
           </div>
@@ -287,19 +287,19 @@ export default function RaffleDetailPage() {
                       </svg>
                     </span>
                     <div>
-                      <p className={styles.deliveryOptionTitle}>Recojo en tienda</p>
-                      <p className={styles.deliveryOptionText}>
-                        Disponible para recojo en las instalaciones de la tienda
-                      </p>
+                <p className={styles.deliveryOptionTitle}>Recojo en local</p>
+                <p className={styles.deliveryOptionText}>
+                  Disponible para recojo en las instalaciones del organizador
+                </p>
                     </div>
                   </div>
                 ) : null}
 
-                {!raffle.product?.hasDelivery && !raffle.product?.pickupInStore && (
-                  <p className={styles.deliveryOptionText}>
-                    Consulta con la tienda sobre las opciones de entrega disponibles.
-                  </p>
-                )}
+            {!raffle.product?.hasDelivery && !raffle.product?.pickupInStore && (
+              <p className={styles.deliveryOptionText}>
+                Consulta con el organizador sobre las opciones de entrega disponibles.
+              </p>
+            )}
               </div>
             </div>
           </div>
@@ -399,10 +399,10 @@ export default function RaffleDetailPage() {
             <div className={styles.depositInfo}>
               <FiLock className={styles.depositIcon} />
               <div>
-                <p className={styles.depositTitle}>Depósito de garantía</p>
-                <p className={styles.depositText}>
-                  Esta tienda tiene un depósito de garantía para asegurar la entrega del premio.
-                </p>
+            <p className={styles.depositTitle}>Depósito de garantía</p>
+            <p className={styles.depositText}>
+              Este organizador tiene un depósito de garantía para asegurar la entrega del premio.
+            </p>
               </div>
             </div>
           )}
@@ -521,11 +521,11 @@ export default function RaffleDetailPage() {
       {/* How It Works */}
       <HowItWorks />
 
-      {/* Related Raffles */}
-      <div className={styles.relatedSection}>
-        <h2 className={styles.relatedTitle}>Otros sorteos de esta tienda</h2>
-        <p className={styles.relatedText}>
-          <Link href={`/tienda/${raffle.shop?.id}`}>
+        {/* Related Raffles */}
+        <div className={styles.relatedSection}>
+          <h2 className={styles.relatedTitle}>Otros sorteos de este organizador</h2>
+          <p className={styles.relatedText}>
+            <Link href={`/organizador/${raffle.shop?.id}`}>
             Ver todos los sorteos de {raffle.shop?.name} →
           </Link>
         </p>

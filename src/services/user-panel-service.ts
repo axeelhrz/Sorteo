@@ -48,7 +48,7 @@ export const userPanelService = {
         raffleTitle: raffle.product?.name || 'Sorteo sin nombre',
         raffleImage: raffle.product?.mainImage,
         raffleStatus: raffle.status.toLowerCase() as any,
-        shopName: raffle.shop?.name || 'Tienda desconocida',
+        shopName: raffle.shop?.name || 'Organizador desconocido',
         ticketCount: 0, // Se obtendría de los tickets del usuario
         ticketNumbers: [], // Se obtendría de los tickets del usuario
         ticketsRemaining: raffle.totalTickets - raffle.soldTickets,

@@ -142,9 +142,9 @@ export default function SupportPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué tipos de reclamos puedo crear?</h4>
-              <p>
-                Puedes crear reclamos por: premio no entregado, producto diferente, problemas de compra, comportamiento de tienda, fraude en sorteo, problemas técnicos y errores de pago.
-              </p>
+            <p>
+              Puedes crear reclamos por: premio no entregado, producto diferente, problemas de compra, comportamiento de organizador, fraude en sorteo, problemas técnicos y errores de pago.
+            </p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Puedo adjuntar evidencia a mi reclamo?</h4>

@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FaFacebook, FaInstagram, FaTwitter, FaWhatsapp } from 'react-icons/fa';
+import { FiArrowRight } from 'react-icons/fi';
 import { Raffle, RaffleStatus } from '@/types/raffle';
+import { SocialMediaLinks } from '@/components/SocialMediaLinks';
 import styles from './RaffleCard.module.css';
 
 interface RaffleCardProps {
@@ -19,7 +20,14 @@ export default function RaffleCard({ raffle }: RaffleCardProps) {
   const getStatusBadge = () => {
     switch (raffle.status) {
       case RaffleStatus.ACTIVE:
-        return <span className={`${styles.badge} ${styles.badgeActive}`}>Activo</span>;
+        return (
+          <span className={`${styles.badge} ${styles.badgeActive}`}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'white' }}></span>
+              Activo
+            </span>
+          </span>
+        );
       case RaffleStatus.SOLD_OUT:
         return <span className={`${styles.badge} ${styles.badgeSoldOut}`}>Agotado</span>;
       case RaffleStatus.FINISHED:
@@ -29,36 +37,25 @@ export default function RaffleCard({ raffle }: RaffleCardProps) {
     }
   };
 
-  const getSocialIcon = (platform: string) => {
-    switch (platform?.toLowerCase()) {
-      case 'facebook':
-        return <FaFacebook />;
-      case 'instagram':
-        return <FaInstagram />;
-      case 'twitter':
-        return <FaTwitter />;
-      case 'whatsapp':
-        return <FaWhatsapp />;
-      default:
-        return null;
-    }
-  };
-
   const handleCardClick = () => {
     router.push(`/sorteos/${raffle.id}`);
   };
+
+  // Determinar qué imagen mostrar (miniatura del sorteo o imagen del producto)
+  const displayImage = raffle.thumbnail || raffle.product?.mainImage;
 
   return (
     <div className={styles.card} onClick={handleCardClick}>
       {/* Image Container */}
       <div className={styles.imageContainer}>
-        {raffle.product?.mainImage ? (
+        {displayImage ? (
           <Image
-            src={raffle.product.mainImage}
-            alt={raffle.product.name}
+            src={displayImage}
+            alt={raffle.product?.name || 'Sorteo'}
             fill
             className={styles.image}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={false}
           />
         ) : (
           <div className={styles.imagePlaceholder}>
@@ -66,6 +63,13 @@ export default function RaffleCard({ raffle }: RaffleCardProps) {
           </div>
         )}
         {getStatusBadge()}
+        
+        {/* Thumbnail Badge */}
+        {raffle.thumbnail && (
+          <div className={styles.thumbnailBadge}>
+            <span>Imagen destacada</span>
+          </div>
+        )}
       </div>
 
       {/* Content Container */}
@@ -74,25 +78,16 @@ export default function RaffleCard({ raffle }: RaffleCardProps) {
         <div className={styles.productInfo}>
           <h3 className={styles.productName}>{raffle.product?.name || 'Producto'}</h3>
           <div className={styles.shopInfo}>
-            <p className={styles.shopName}>{raffle.shop?.name || 'Tienda'}</p>
-            {/* Social Networks */}
-            {raffle.shop && (raffle.shop as any).socialNetworks && Object.keys((raffle.shop as any).socialNetworks).length > 0 && (
-              <div className={styles.socialNetworks}>
-                {Object.entries((raffle.shop as any).socialNetworks).map(([platform, url]: [string, any]) => 
-                  url ? (
-                    <a
-                      key={platform}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`${styles.socialLink} ${styles[`social${platform.charAt(0).toUpperCase() + platform.slice(1)}`]}`}
-                      onClick={(e) => e.stopPropagation()}
-                      title={`Visitar ${platform}`}
-                    >
-                      {getSocialIcon(platform)}
-                    </a>
-                  ) : null
-                )}
+            <p className={styles.shopName}>{raffle.shop?.name || 'Organizador'}</p>
+            
+            {/* Social Media Links */}
+            {raffle.shop?.socialMedia && (
+              <div className={styles.socialMediaContainer} onClick={(e) => e.stopPropagation()}>
+                <SocialMediaLinks 
+                  socialMedia={raffle.shop.socialMedia} 
+                  size="small"
+                  variant="colored"
+                />
               </div>
             )}
           </div>
@@ -130,7 +125,10 @@ export default function RaffleCard({ raffle }: RaffleCardProps) {
 
         {/* CTA Button */}
         <button className={styles.ctaButton}>
-          {raffle.status === RaffleStatus.ACTIVE ? 'Ver oportunidad' : 'Ver detalles'}
+          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            {raffle.status === RaffleStatus.ACTIVE ? 'Ver oportunidad' : 'Ver detalles'}
+            <FiArrowRight size={16} style={{ transition: 'transform 0.2s ease' }} />
+          </span>
         </button>
       </div>
     </div>

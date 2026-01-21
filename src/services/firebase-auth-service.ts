@@ -38,6 +38,7 @@ const convertFirebaseUserToUser = async (firebaseUser: FirebaseUser): Promise<Us
       // Si no existe el documento, crear uno básico
       const basicUser: User = {
         id: firebaseUser.uid,
+        uid: firebaseUser.uid,
         name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario',
         email: firebaseUser.email || '',
         role: UserRole.USER,
@@ -48,6 +49,7 @@ const convertFirebaseUserToUser = async (firebaseUser: FirebaseUser): Promise<Us
     const userData = userDoc.data();
     return {
       id: firebaseUser.uid,
+      uid: firebaseUser.uid,
       name: userData.name || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario',
       email: firebaseUser.email || '',
       role: (userData.role as UserRole) || UserRole.USER,
@@ -57,6 +59,7 @@ const convertFirebaseUserToUser = async (firebaseUser: FirebaseUser): Promise<Us
     // Retornar usuario básico si hay error
     return {
       id: firebaseUser.uid,
+      uid: firebaseUser.uid,
       name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario',
       email: firebaseUser.email || '',
       role: UserRole.USER,
@@ -91,23 +94,18 @@ export const firebaseAuthService = {
         updatedAt: serverTimestamp(),
       };
 
-      // Si es una tienda, crear también el documento de la tienda
+      // Si es un organizador, crear también el documento del organizador
       if (data.role === UserRole.SHOP && data.shopName) {
-        // Crear documento de tienda primero para obtener su ID
+        // Crear documento de organizador primero para obtener su ID
         const shopData = {
           userId: firebaseUser.uid,
-          name: data.shopName,
-          description: '',
-          status: 'pending',
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
         };
-        
-        // Crear tienda y obtener su ID
+
+        // Crear organizador y obtener su ID
         const shopRef = await addDoc(collection(db, 'shops'), shopData);
         userData.shopId = shopRef.id;
-        
-        // Crear el usuario con referencia a la tienda
+
+        // Crear el usuario con referencia al organizador
         await setDoc(doc(db, 'users', firebaseUser.uid), userData);
       } else {
         // Solo crear el usuario

@@ -51,7 +51,7 @@ const convertProductDoc = (docSnap: QueryDocumentSnapshot<DocumentData>): Produc
 
 export const firebaseProductService = {
   /**
-   * Obtiene productos por tienda (para marketplace)
+   * Obtiene productos por organizador (para marketplace)
    */
   async getProductsByShop(shopId: string): Promise<Product[]> {
     try {
@@ -73,7 +73,7 @@ export const firebaseProductService = {
   },
 
   /**
-   * Obtiene productos activos por tienda
+   * Obtiene productos activos por organizador
    */
   async getActiveProductsByShop(shopId: string): Promise<Product[]> {
     return this.getProductsByShop(shopId);
@@ -216,4 +216,3 @@ export const firebaseProductService = {
     }
   },
 };
-

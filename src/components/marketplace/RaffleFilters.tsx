@@ -68,11 +68,11 @@ export default function RaffleFilters({
         <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
           <div className={styles.searchBox}>
             <FiSearch className={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder="Buscar productos o tiendas..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+          <input
+            type="text"
+            placeholder="Buscar productos o organizadores..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
               className={styles.searchInput}
               disabled={isLoading}
             />
@@ -105,15 +105,15 @@ export default function RaffleFilters({
             <option value="price-desc">Precio: Mayor a menor</option>
           </select>
 
-          <button
-            type="button"
-            className={`${styles.filterButton} ${showAdvanced ? styles.active : ''}`}
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            disabled={isLoading}
-          >
-            <FiFilter />
-            <span>Filtros</span>
-          </button>
+        <button
+          type="button"
+          className={`${styles.filterButton} ${showAdvanced ? styles.active : ''}`}
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          disabled={isLoading}
+          title="Filtros"
+        >
+          <FiFilter />
+        </button>
         </div>
       </div>
 
@@ -142,11 +142,11 @@ export default function RaffleFilters({
             )}
 
             {/* Shop Filter */}
-            {shops.length > 0 && (
-              <div className={styles.filterItem}>
-                <label className={styles.filterLabel}>Tienda</label>
-                <select
-                  value={shopId}
+        {shops.length > 0 && (
+          <div className={styles.filterItem}>
+            <label className={styles.filterLabel}>Organizador</label>
+            <select
+              value={shopId}
                   onChange={(e) => setShopId(e.target.value)}
                   className={styles.filterSelect}
                   disabled={isLoading}

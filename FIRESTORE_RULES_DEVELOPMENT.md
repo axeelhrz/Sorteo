@@ -120,9 +120,9 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
     
-    // Tiendas (lectura pública)
-    match /shops/{shopId} {
-      allow read: if true;
+// Organizadores (lectura pública)
+match /shops/{shopId} {
+  allow read: if true;
       allow write: if request.auth != null;
     }
   }

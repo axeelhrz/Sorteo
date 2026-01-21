@@ -1,13 +1,13 @@
 .footer {
-  background: #1a1a2e;
-  color: #e0e0e0;
-  margin-top: 80px;
+  background: #111827;
+  color: #d1d5db;
+  margin-top: 100px;
 }
 
 /* Main Footer Content */
 .footerContent {
-  padding: 60px 20px;
-  background: #1a1a2e;
+  padding: 64px 20px;
+  background: #111827;
 }
 
 .container {
@@ -26,11 +26,11 @@
 
 .columnTitle {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   color: #ffffff;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .linkList {
@@ -43,15 +43,17 @@
 }
 
 .linkList li a {
-  color: #b0b0b0;
+  color: #9ca3af;
   text-decoration: none;
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: inline-block;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .linkList li a:hover {
-  color: #667eea;
+  color: #6366f1;
   transform: translateX(4px);
 }
 
@@ -71,22 +73,26 @@
 
 .contactIcon {
   font-size: 16px;
-  color: #667eea;
+  color: #6366f1;
   flex-shrink: 0;
 }
 
 .contactItem a {
-  color: #b0b0b0;
+  color: #9ca3af;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .contactItem a:hover {
-  color: #667eea;
+  color: #6366f1;
 }
 
 .contactItem span {
-  color: #b0b0b0;
+  color: #9ca3af;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 /* Social Links */
@@ -102,24 +108,24 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(99, 102, 241, 0.1);
   border-radius: 50%;
-  color: #667eea;
+  color: #6366f1;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-size: 18px;
 }
 
 .socialLink:hover {
-  background: #667eea;
+  background: #6366f1;
   color: white;
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
 /* Trust Section */
 .trustSection {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 40px 20px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  padding: 48px 20px;
 }
 
 .trustContainer {
@@ -146,23 +152,26 @@
 
 .trustText h4 {
   margin: 0 0 4px 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: white;
+  letter-spacing: -0.01em;
 }
 
 .trustText p {
   margin: 0;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 /* Bottom Footer */
 .bottomFooter {
-  background: #0f0f1e;
+  background: #0f172a;
   padding: 24px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .bottomContainer {
@@ -178,7 +187,9 @@
 .copyright {
   margin: 0;
   font-size: 13px;
-  color: #808080;
+  color: #6b7280;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .bottomLinks {
@@ -187,15 +198,16 @@
 }
 
 .bottomLinks a {
-  color: #667eea;
+  color: #6366f1;
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
+  letter-spacing: -0.01em;
 }
 
 .bottomLinks a:hover {
-  color: #764ba2;
+  color: #8b5cf6;
 }
 
 /* Responsive */
@@ -272,7 +284,7 @@
   }
 
   .columnTitle {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .linkList li a {

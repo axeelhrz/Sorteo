@@ -3,12 +3,18 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import UserPanelLayout from '@/components/UserPanel/UserPanelLayout';
+import { DeliveryConfirmation } from '@/components/UserPanel/DeliveryConfirmation';
 import { userPanelService } from '@/services/user-panel-service';
+import { winnerVerificationService } from '@/services/winner-verification-service';
+import { useAuthStore } from '@/store/auth-store';
 import type { UserWonRaffle } from '@/types/user-panel';
+import type { WinnerInfo } from '@/types/raffle';
 import styles from './won-raffles.module.css';
 
 export default function WonRafflesPage() {
+  const { user } = useAuthStore();
   const [wonRaffles, setWonRaffles] = useState<UserWonRaffle[]>([]);
+  const [winnersInfo, setWinnersInfo] = useState<Map<string, WinnerInfo>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,6 +24,20 @@ export default function WonRafflesPage() {
         setLoading(true);
         const data = await userPanelService.getWonRaffles();
         setWonRaffles(data);
+        
+        // Cargar información del ganador para cada sorteo
+        const winnersMap = new Map<string, WinnerInfo>();
+        for (const raffle of data) {
+          try {
+            const winnerInfo = await winnerVerificationService.getWinnerInfo(raffle.raffleId);
+            if (winnerInfo) {
+              winnersMap.set(raffle.raffleId, winnerInfo);
+            }
+          } catch (err) {
+            console.error(`Error loading winner info for raffle ${raffle.raffleId}:`, err);
+          }
+        }
+        setWinnersInfo(winnersMap);
       } catch (err) {
         console.error('Error fetching won raffles:', err);
         setError('Error al cargar tus sorteos ganados');
@@ -28,6 +48,30 @@ export default function WonRafflesPage() {
 
     fetchWonRaffles();
   }, []);
+
+  const handleConfirmSuccess = async () => {
+    // Recargar sorteos ganados
+    try {
+      const data = await userPanelService.getWonRaffles();
+      setWonRaffles(data);
+      
+      // Recargar información del ganador
+      const winnersMap = new Map<string, WinnerInfo>();
+      for (const raffle of data) {
+        try {
+          const winnerInfo = await winnerVerificationService.getWinnerInfo(raffle.raffleId);
+          if (winnerInfo) {
+            winnersMap.set(raffle.raffleId, winnerInfo);
+          }
+        } catch (err) {
+          console.error(`Error loading winner info for raffle ${raffle.raffleId}:`, err);
+        }
+      }
+      setWinnersInfo(winnersMap);
+    } catch (err) {
+      console.error('Error reloading won raffles:', err);
+    }
+  };
 
   if (loading) {
     return (
@@ -132,8 +176,18 @@ export default function WonRafflesPage() {
                     </div>
                   )}
 
+                  {/* Componente de Confirmación de Entrega */}
+                  {winnersInfo.get(raffle.raffleId) && user && (
+                    <DeliveryConfirmation
+                      raffleId={raffle.raffleId}
+                      winnerInfo={winnersInfo.get(raffle.raffleId)!}
+                      userId={user.id}
+                      onConfirmSuccess={handleConfirmSuccess}
+                    />
+                  )}
+
                   <div className={styles.actions}>
-                    {raffle.deliveryStatus !== 'delivered' && raffle.canCreateComplaint && (
+                    {raffle.canCreateComplaint && (
                       <Link
                         href={`/user-panel/support?raffleId=${raffle.raffleId}`}
                         className={styles.complaintButton}
@@ -141,18 +195,8 @@ export default function WonRafflesPage() {
                         📋 Abrir Reclamo
                       </Link>
                     )}
-                    {raffle.deliveryStatus !== 'delivered' && (
-                      <button
-                        className={styles.markReceivedButton}
-                        onClick={() => {
-                          // Implementar marcar como recibido
-                        }}
-                      >
-                        ✅ Marcar como Recibido
-                      </button>
-                    )}
                     <Link
-                      href={`/user-panel/won-raffles/${raffle.raffleId}`}
+                      href={`/sorteos/${raffle.raffleId}/winner`}
                       className={styles.viewDetailsButton}
                     >
                       Ver Detalles →

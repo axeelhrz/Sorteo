@@ -1,0 +1,186 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Sizes */
+.small {
+  gap: 8px;
+}
+
+.medium {
+  gap: 12px;
+}
+
+.large {
+  gap: 16px;
+}
+
+/* Link Base */
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.link:hover {
+  transform: translateY(-2px);
+}
+
+/* Default Variant */
+.default {
+  background: #f3f4f6;
+  color: #4b5563;
+  width: 40px;
+  height: 40px;
+}
+
+.default:hover {
+  background: #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.small .default {
+  width: 32px;
+  height: 32px;
+}
+
+.large .default {
+  width: 48px;
+  height: 48px;
+}
+
+/* Colored Variant */
+.colored {
+  color: white;
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.colored:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  filter: brightness(1.1);
+}
+
+.small .colored {
+  width: 32px;
+  height: 32px;
+}
+
+.large .colored {
+  width: 48px;
+  height: 48px;
+}
+
+/* Outlined Variant */
+.outlined {
+  background: white;
+  border: 2px solid;
+  width: 40px;
+  height: 40px;
+}
+
+.outlined:hover {
+  background: rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.small .outlined {
+  width: 32px;
+  height: 32px;
+  border-width: 1.5px;
+}
+
+.large .outlined {
+  width: 48px;
+  height: 48px;
+  border-width: 2.5px;
+}
+
+/* Icon Sizes */
+.icon {
+  font-size: 18px;
+}
+
+.small .icon {
+  font-size: 14px;
+}
+
+.large .icon {
+  font-size: 22px;
+}
+
+/* With Labels */
+.link:has(.label) {
+  border-radius: 24px;
+  padding: 8px 16px;
+  width: auto;
+  height: auto;
+}
+
+.small .link:has(.label) {
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.large .link:has(.label) {
+  padding: 10px 20px;
+  border-radius: 28px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.small .label {
+  font-size: 12px;
+}
+
+.large .label {
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    gap: 10px;
+  }
+
+  .link {
+    width: 36px;
+    height: 36px;
+  }
+
+  .icon {
+    font-size: 16px;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    gap: 8px;
+  }
+
+  .link {
+    width: 32px;
+    height: 32px;
+  }
+
+  .icon {
+    font-size: 14px;
+  }
+}

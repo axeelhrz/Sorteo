@@ -1,0 +1,457 @@
+.container {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+/* Banners de Estado */
+.confirmedBanner,
+.pendingBanner,
+.deadlineBanner,
+.expiredBanner {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.confirmedBanner {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.pendingBanner {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+}
+
+.deadlineBanner {
+  background: #d1ecf1;
+  border: 1px solid #bee5eb;
+}
+
+.deadlineUrgent {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+}
+
+.expiredBanner {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.confirmedIcon,
+.pendingIcon,
+.deadlineIcon,
+.expiredIcon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.confirmedIcon {
+  color: #28a745;
+}
+
+.pendingIcon {
+  color: #856404;
+}
+
+.deadlineIcon {
+  color: #0c5460;
+}
+
+.expiredIcon {
+  color: #721c24;
+}
+
+.confirmedTitle,
+.pendingTitle,
+.deadlineTitle,
+.expiredTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.confirmedTitle {
+  color: #155724;
+}
+
+.pendingTitle {
+  color: #856404;
+}
+
+.deadlineTitle {
+  color: #0c5460;
+}
+
+.expiredTitle {
+  color: #721c24;
+}
+
+.confirmedText,
+.pendingText,
+.deadlineText,
+.expiredText {
+  font-size: 14px;
+  margin: 0;
+}
+
+.confirmedText {
+  color: #155724;
+}
+
+.pendingText {
+  color: #856404;
+}
+
+.deadlineText {
+  color: #0c5460;
+}
+
+.expiredText {
+  color: #721c24;
+}
+
+/* Sección de Evidencia */
+.evidenceSection {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+}
+
+.sectionSubtitle {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin: 0 0 20px 0;
+}
+
+.evidenceTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 16px 0;
+}
+
+.evidenceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.evidenceImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.evidenceImage:hover {
+  transform: scale(1.05);
+}
+
+.evidenceImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imageOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.evidenceImage:hover .imageOverlay {
+  opacity: 1;
+}
+
+.imageOverlay svg {
+  width: 32px;
+  height: 32px;
+}
+
+.imageOverlay span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.evidenceNotes {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.evidenceNotes strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #2c3e50;
+}
+
+.evidenceNotes p {
+  margin: 0;
+  color: #495057;
+  line-height: 1.6;
+}
+
+.evidenceInfo {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.evidenceInfo p {
+  margin: 0;
+}
+
+/* Sección de Confirmación */
+.confirmSection {
+  background: #f8f9fa;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.confirmTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 12px 0;
+}
+
+.confirmText {
+  font-size: 14px;
+  color: #495057;
+  margin: 0 0 20px 0;
+  line-height: 1.6;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.confirmButton {
+  flex: 1;
+  min-width: 200px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.confirmButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.confirmButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.complaintButton {
+  flex: 1;
+  min-width: 200px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #495057;
+  background: white;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.complaintButton:hover:not(:disabled) {
+  border-color: #adb5bd;
+  background: #f8f9fa;
+}
+
+.complaintButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Modal de Imagen */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modalClose {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modalClose:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.modalImage {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .confirmedBanner,
+  .pendingBanner,
+  .deadlineBanner,
+  .expiredBanner {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .evidenceGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .confirmSection {
+    padding: 16px;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+  }
+
+  .confirmButton,
+  .complaintButton {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .modalClose {
+    top: 10px;
+    right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .evidenceGrid {
+    grid-template-columns: 1fr;
+  }
+}

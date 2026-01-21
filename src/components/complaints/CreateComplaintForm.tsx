@@ -30,7 +30,7 @@ export default function CreateComplaintForm({
     [ComplaintType.PRIZE_NOT_DELIVERED]: 'No entrega del premio',
     [ComplaintType.DIFFERENT_PRODUCT]: 'Producto diferente al ofertado',
     [ComplaintType.PURCHASE_PROBLEM]: 'Problema en la compra',
-    [ComplaintType.SHOP_BEHAVIOR]: 'Problema con la tienda',
+    [ComplaintType.ORGANIZER_BEHAVIOR]: 'Problema con el organizador',
     [ComplaintType.RAFFLE_FRAUD]: 'Fraude o irregularidad',
     [ComplaintType.TECHNICAL_ISSUE]: 'Problema técnico',
     [ComplaintType.PAYMENT_ERROR]: 'Error de pago',

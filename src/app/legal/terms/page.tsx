@@ -56,9 +56,9 @@ export default function TermsPage() {
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>6. Entrega de Premios</h2>
-          <p>
-            Las tiendas tienen 30 días para entregar el premio después de que se ejecute el sorteo. TIKETEA ONLINE no es responsable de la entrega, pero garantiza que las tiendas cumplan o se toman acciones.
-          </p>
+        <p>
+          Los organizadores tienen 30 días para entregar el premio después de que se ejecute el sorteo. TIKETEA ONLINE no es responsable de la entrega, pero garantiza que los organizadores cumplan o se toman acciones.
+        </p>
         </section>
 
         <section className={styles.section}>

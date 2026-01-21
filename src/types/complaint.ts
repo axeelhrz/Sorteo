@@ -2,7 +2,8 @@ export enum ComplaintType {
   PRIZE_NOT_DELIVERED = 'prize_not_delivered',
   DIFFERENT_PRODUCT = 'different_product',
   PURCHASE_PROBLEM = 'purchase_problem',
-  SHOP_BEHAVIOR = 'shop_behavior',
+  ORGANIZER_BEHAVIOR = 'organizer_behavior',
+  SHOP_BEHAVIOR = 'organizer_behavior', // Alias para compatibilidad
   RAFFLE_FRAUD = 'raffle_fraud',
   TECHNICAL_ISSUE = 'technical_issue',
   PAYMENT_ERROR = 'payment_error',
@@ -18,7 +19,8 @@ export enum ComplaintStatus {
 
 export enum ComplaintResolution {
   RESOLVED_USER_FAVOR = 'resolved_user_favor',
-  RESOLVED_SHOP_FAVOR = 'resolved_shop_favor',
+  RESOLVED_ORGANIZER_FAVOR = 'resolved_organizer_favor',
+  RESOLVED_SHOP_FAVOR = 'resolved_organizer_favor', // Alias para compatibilidad
   RESOLVED_PLATFORM_FAVOR = 'resolved_platform_favor',
   REJECTED = 'rejected',
   CANCELLED = 'cancelled',
@@ -28,7 +30,7 @@ export interface ComplaintMessage {
   id: string;
   complaintId: string;
   senderId: string;
-  senderType: 'user' | 'admin' | 'shop';
+  senderType: 'user' | 'admin' | 'organizer' | 'shop';
   message: string;
   sender: {
     id: string;
@@ -59,7 +61,8 @@ export interface Complaint {
   id: string;
   complaintNumber: string;
   userId: string;
-  shopId?: string;
+  organizerId?: string;
+  shopId?: string; // Alias para compatibilidad
   raffleId?: string;
   paymentId?: string;
   type: ComplaintType;
@@ -77,7 +80,11 @@ export interface Complaint {
     name: string;
     email: string;
   };
-  shop?: {
+  organizer?: {
+    id: string;
+    name: string;
+  };
+  shop?: { // Alias para compatibilidad
     id: string;
     name: string;
   };

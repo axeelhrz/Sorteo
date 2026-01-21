@@ -12,13 +12,13 @@ La página "Explorar Sorteos" permite a los usuarios descubrir y participar en s
 - **Diseño:** Botón con icono de flecha hacia atrás
 
 ### 2. Mejoras en el Buscador
-- **Placeholder mejorado:** "Buscar productos o tiendas..." (más claro y conciso)
+- **Placeholder mejorado:** "Buscar productos o organizadores..." (más claro y conciso)
 - **Tamaño del botón:** Aumentado para mejor visibilidad
   - Padding: 12px 24px
   - Font-size: 24px
   - Min-width: 64px
   - Min-height: 48px
-- **Funcionalidad:** Busca en nombres de productos y tiendas
+- **Funcionalidad:** Busca en nombres de productos y organizadores
 - **Efectos:** Hover con escala y sombra para mejor feedback visual
 
 ### 3. Clarificación de Estados
@@ -40,7 +40,7 @@ El estado "Agotado" indica que se han vendido todos los tickets disponibles para
 
 ### 4. Filtro de Precio Removido
 - **Cambio:** Se removió el filtro de precio mínimo y máximo
-- **Razón:** La búsqueda y filtrado por categoría y tienda son suficientes para encontrar sorteos. El filtro de precio no era necesario ya que el valor del producto se muestra claramente en cada tarjeta.
+- **Razón:** La búsqueda y filtrado por categoría y organizador son suficientes para encontrar sorteos. El filtro de precio no era necesario ya que el valor del producto se muestra claramente en cada tarjeta.
 - **Alternativa:** Los usuarios pueden ver el valor del producto en cada tarjeta de sorteo
 
 ### 5. Estructura de Datos en Tarjetas de Sorteo
@@ -52,7 +52,7 @@ Cada tarjeta de sorteo muestra la siguiente información:
 │  [Imagen del Producto]  [Badge] │
 ├─────────────────────────────────┤
 │ Nombre del Producto             │
-│ Nombre de la Tienda             │
+│ Nombre del Organizador          │
 ├─────────────────────────────────┤
 │ Valor del producto              │
 │ S/ 299.99                       │
@@ -69,7 +69,7 @@ Cada tarjeta de sorteo muestra la siguiente información:
 
 **Elementos mostrados:**
 1. **Nombre del producto:** Título principal del sorteo
-2. **Nombre de la tienda:** Identificación del vendedor
+2. **Nombre del organizador:** Identificación del vendedor
 3. **Valor del ticket/producto:** Precio en soles peruanos (S/)
 4. **Tickets vendidos:** Contador de tickets vendidos vs. total
 5. **Barra de avance:** Visualización gráfica del progreso
@@ -80,14 +80,14 @@ Cada tarjeta de sorteo muestra la siguiente información:
 
 Todo el contenido utiliza **español neutro/peruano** con términos como:
 - "Sorteos" en lugar de "Rifas"
-- "Tienda" para identificar vendedores
+- "Organizador" para identificar vendedores
 - "Tickets" para los boletos
 - "S/" para la moneda (Soles peruanos)
 
 ## Filtros Disponibles
 
 ### Filtros Principales
-- **Búsqueda:** Por nombre de producto o tienda
+- **Búsqueda:** Por nombre de producto o organizador
 - **Ordenar por:**
   - Más recientes
   - Más cerca de completarse
@@ -96,7 +96,7 @@ Todo el contenido utiliza **español neutro/peruano** con términos como:
 
 ### Filtros Avanzados (Más filtros)
 - **Categoría:** Filtrar por tipo de producto
-- **Tienda:** Filtrar por tienda específica
+- **Organizador:** Filtrar por organizador específico
 - **Estado:** Filtrar por estado del sorteo
   - Activo
   - Pausado

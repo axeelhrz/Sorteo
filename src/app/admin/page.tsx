@@ -104,11 +104,11 @@ export default function AdminDashboard() {
           <div className={styles.value}>{stats.users.total}</div>
         </div>
 
-        {/* Tiendas */}
+        {/* Organizadores */}
         <div className={styles.statCard}>
           <div className={styles.statHeader}>
             <FiShoppingBag className={styles.statIcon} />
-            <h3>Tiendas Totales</h3>
+            <h3>Organizadores Totales</h3>
           </div>
           <div className={styles.value}>{stats.shops.total}</div>
         </div>
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
         <div className={`${styles.statCard} ${styles.warning}`}>
           <div className={styles.statHeader}>
             <FiClock className={styles.statIcon} />
-            <h3>Tiendas Pendientes</h3>
+            <h3>Organizadores Pendientes</h3>
           </div>
           <div className={styles.value}>{stats.shops.pending}</div>
         </div>
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
         <div className={`${styles.statCard} ${styles.success}`}>
           <div className={styles.statHeader}>
             <FiCheckCircle className={styles.statIcon} />
-            <h3>Tiendas Verificadas</h3>
+            <h3>Organizadores Verificados</h3>
           </div>
           <div className={styles.value}>{stats.shops.verified}</div>
         </div>
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
         <div className={`${styles.statCard} ${styles.danger}`}>
           <div className={styles.statHeader}>
             <FiXCircle className={styles.statIcon} />
-            <h3>Tiendas Bloqueadas</h3>
+            <h3>Organizadores Bloqueados</h3>
           </div>
           <div className={styles.value}>{stats.shops.blocked}</div>
         </div>
@@ -249,7 +249,7 @@ export default function AdminDashboard() {
           <li>Revisar y aprobar/rechazar sorteos pendientes de aprobación</li>
           <li>Monitorear sorteos activos y su progreso</li>
           <li>Verificar sorteos finalizados y ganadores</li>
-          <li>Gestionar el estado de las tiendas</li>
+          <li>Gestionar el estado de los organizadores</li>
           <li>Ver información de usuarios registrados</li>
           <li>Consultar el registro de auditoría de acciones administrativas</li>
         </ul>

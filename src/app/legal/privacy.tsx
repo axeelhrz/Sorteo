@@ -69,7 +69,7 @@ export default function PrivacyPage() {
           <li>Pasarela de pago (solo referencia de transacción)</li>
           <li>Proveedores de email (para notificaciones)</li>
           <li>Autoridades legales (si es requerido por ley)</li>
-          <li>Tiendas (solo nombre y email si ganas un sorteo)</li>
+          <li>Organizadores (solo nombre y email si ganas un sorteo)</li>
         </ul>
       </section>
 

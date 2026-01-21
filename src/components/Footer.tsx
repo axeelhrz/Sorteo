@@ -51,18 +51,18 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: For Shops */}
+          {/* Column 3: For Organizers */}
           <div className={styles.column}>
-            <h3 className={styles.columnTitle}>Para Tiendas</h3>
+            <h3 className={styles.columnTitle}>Para Organizadores</h3>
             <ul className={styles.linkList}>
               <li>
-                <Link href="/register">Registrar Tienda</Link>
+                <Link href="/register">Registrar Organizador</Link>
               </li>
               <li>
                 <Link href="/panel">Panel de Control</Link>
               </li>
               <li>
-                <Link href="/faq">Guía de Tiendas</Link>
+                <Link href="/faq">Guía de Organizadores</Link>
               </li>
               <li>
                 <Link href="/admin">Administración</Link>
@@ -149,7 +149,7 @@ export default function Footer() {
             <div className={styles.trustIcon}>✓</div>
             <div className={styles.trustText}>
               <h4>Verificado</h4>
-              <p>Tiendas y usuarios verificados</p>
+              <p>Organizadores y usuarios verificados</p>
             </div>
           </div>
           <div className={styles.trustItem}>

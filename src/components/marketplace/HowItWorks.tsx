@@ -1,74 +1,83 @@
 'use client';
 
-import { FiTarget, FiTag, FiPlay, FiAward } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiZap, FiTrendingUp } from 'react-icons/fi';
 import styles from './HowItWorks.module.css';
 
 export default function HowItWorks() {
   const steps = [
     {
-      number: 1,
-      title: 'Elige la oportunidad',
-      description: 'Explora nuestro catálogo y elige la oportunidad que te interesa.',
-      icon: FiTarget,
+      number: '01',
+      title: 'Explora',
+      description: 'Descubre oportunidades únicas en nuestro catálogo curado',
+      icon: FiSearch,
     },
     {
-      number: 2,
-      title: 'Compra tickets',
-      description: 'Adquiere la cantidad de tickets que desees. Cada ticket es una participación.',
-      icon: FiTag,
+      number: '02',
+      title: 'Participa',
+      description: 'Adquiere tickets y aumenta tus probabilidades de ganar',
+      icon: FiShoppingCart,
     },
     {
-      number: 3,
-      title: 'Se realiza la oportunidad',
-      description: 'Cuando se venden todos los tickets, se ejecuta la oportunidad automáticamente.',
-      icon: FiPlay,
+      number: '03',
+      title: 'Sorteo',
+      description: 'El sistema ejecuta el sorteo automáticamente al completarse',
+      icon: FiZap,
     },
     {
-      number: 4,
-      title: 'Se publica el ganador',
-      description: 'El ticket ganador se elige de forma aleatoria y se publica en la plataforma.',
-      icon: FiAward,
+      number: '04',
+      title: 'Gana',
+      description: 'El ganador se elige aleatoriamente y recibe notificación',
+      icon: FiTrendingUp,
     },
+  ];
+
+  const features = [
+    'Sistema de selección completamente aleatorio',
+    'Resultados transparentes y verificables',
+    'Notificación inmediata por email',
+    'Cumplimiento normativo garantizado',
   ];
 
   return (
     <section className={styles.container}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>¿Cómo funciona esta oportunidad?</h2>
-        <p className={styles.subtitle}>
-          Entiende el mecanismo en 4 pasos simples
-        </p>
-      </div>
+      <div className={styles.content}>
+        {/* Header */}
+        <div className={styles.header}>
+          <span className={styles.badge}>Proceso</span>
+          <h2 className={styles.title}>Cómo funciona</h2>
+          <p className={styles.subtitle}>
+            Un proceso simple y transparente en 4 pasos
+          </p>
+        </div>
 
-      <div className={styles.stepsContainer}>
-        {steps.map((step, index) => {
-          const IconComponent = step.icon;
-          return (
-            <div key={step.number} className={styles.step}>
-              <div className={styles.stepIcon}>
-                <IconComponent />
-              </div>
-              <div className={styles.stepContent}>
-                <h3 className={styles.stepTitle}>
-                  Paso {step.number}: {step.title}
-                </h3>
+        {/* Steps Grid */}
+        <div className={styles.stepsGrid}>
+          {steps.map((step) => {
+            const IconComponent = step.icon;
+            return (
+              <div key={step.number} className={styles.stepCard}>
+                <div className={styles.stepNumber}>{step.number}</div>
+                <div className={styles.stepIconWrapper}>
+                  <IconComponent className={styles.stepIcon} />
+                </div>
+                <h3 className={styles.stepTitle}>{step.title}</h3>
                 <p className={styles.stepDescription}>{step.description}</p>
               </div>
-              {index < steps.length - 1 && <div className={styles.connector} />}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      <div className={styles.infoBox}>
-        <h3 className={styles.infoTitle}>Información importante</h3>
-        <ul className={styles.infoList}>
-          <li>Cada ticket representa una participación en la oportunidad.</li>
-          <li>El ganador se elige de forma completamente aleatoria.</li>
-          <li>El resultado es transparente y verificable.</li>
-          <li>El ganador será notificado por email inmediatamente.</li>
-          <li>Todas las oportunidades cumplen con la normativa vigente.</li>
-        </ul>
+        {/* Features List */}
+        <div className={styles.featuresSection}>
+          <div className={styles.featuresGrid}>
+            {features.map((feature, index) => (
+              <div key={index} className={styles.featureItem}>
+                <div className={styles.featureCheck}>✓</div>
+                <span className={styles.featureText}>{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

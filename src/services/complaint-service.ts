@@ -44,7 +44,7 @@ export const complaintService = {
   },
 
   /**
-   * Obtener reclamos de una tienda
+   * Obtener reclamos de un organizador
    */
   async getShopComplaints(
     shopId: string,

@@ -123,7 +123,7 @@ export default function ActiveRaffles() {
           <input
             type="text"
             className={styles.filterInput}
-            placeholder="Filtrar por ID de tienda..."
+            placeholder="Filtrar por ID de organizador..."
             value={shopFilter}
             onChange={(e) => {
               setShopFilter(e.target.value);
@@ -142,7 +142,7 @@ export default function ActiveRaffles() {
           <table>
             <thead>
               <tr>
-                <th>Tienda</th>
+                <th>Organizador</th>
                 <th>Producto</th>
                 <th>Valor</th>
                 <th>Tickets Vendidos</th>

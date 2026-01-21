@@ -41,13 +41,13 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
         socialMedia: formData.socialMedia,
       });
 
-      setMessage({ type: 'success', text: 'Tienda actualizada correctamente' });
+      setMessage({ type: 'success', text: 'Organizador actualizado correctamente' });
       onUpdate(updated);
       setIsEditing(false);
     } catch (error: any) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.message || 'Error al actualizar la tienda',
+        text: error.response?.data?.message || 'Error al actualizar el organizador',
       });
     } finally {
       setLoading(false);
@@ -57,11 +57,11 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
   const getStatusMessage = () => {
     switch (shop.status) {
       case ShopStatus.PENDING:
-        return 'Tu tienda está en revisión. Nos pondremos en contacto pronto.';
+        return 'Tu organizador está en revisión. Nos pondremos en contacto pronto.';
       case ShopStatus.BLOCKED:
-        return 'Tu tienda ha sido bloqueada. No puedes crear nuevos sorteos.';
+        return 'Tu organizador ha sido bloqueado. No puedes crear nuevos sorteos.';
       case ShopStatus.VERIFIED:
-        return 'Tu tienda está verificada y activa.';
+        return 'Tu organizador está verificado y activo.';
       default:
         return '';
     }
@@ -70,7 +70,7 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
   return (
     <div className={styles.raffleDetail}>
       <div className={styles.raffleDetailHeader}>
-        <h1 className={styles.raffleDetailTitle}>Mi tienda</h1>
+        <h1 className={styles.raffleDetailTitle}>Mi organizador</h1>
         <StatusBadge status={shop.status} />
       </div>
 
@@ -127,7 +127,7 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
       ) : (
         <form onSubmit={handleSubmit} className={styles.profileForm}>
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>Nombre de la tienda</label>
+            <label className={styles.formLabel}>Nombre del organizador</label>
             <input
               type="text"
               name="name"

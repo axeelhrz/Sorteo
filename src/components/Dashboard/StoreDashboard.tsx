@@ -90,7 +90,7 @@ export default function StoreDashboard() {
           <div className={styles.headerLeft}>
             <Logo size="small" showText={false} imageSize={36} />
             <div>
-              <h1 className={styles.title}>Panel de Tienda</h1>
+              <h1 className={styles.title}>Panel de Organizador</h1>
               <p className={styles.subtitle}>Gestiona tus productos y sorteos</p>
             </div>
           </div>
@@ -102,7 +102,7 @@ export default function StoreDashboard() {
               </div>
               <div className={styles.userDetails}>
                 <span className={styles.userName}>{user?.name}</span>
-                <span className={styles.userRole}>Tienda</span>
+                <span className={styles.userRole}>Organizador</span>
               </div>
             </div>
             

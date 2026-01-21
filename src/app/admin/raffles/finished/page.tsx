@@ -41,8 +41,8 @@ export default function FinishedRaffles() {
         page * limit,
         shopFilter || undefined,
       );
-      setRaffles(data[0]);
-      setTotal(data[1]);
+      setRaffles(data.data);
+      setTotal(data.total);
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar sorteos');
@@ -81,7 +81,7 @@ export default function FinishedRaffles() {
           <input
             type="text"
             className={styles.filterInput}
-            placeholder="Filtrar por ID de tienda..."
+            placeholder="Filtrar por ID de organizador..."
             value={shopFilter}
             onChange={(e) => {
               setShopFilter(e.target.value);
@@ -100,7 +100,7 @@ export default function FinishedRaffles() {
           <table>
             <thead>
               <tr>
-                <th>Tienda</th>
+                <th>Organizador</th>
                 <th>Producto</th>
                 <th>Valor</th>
                 <th>Tickets Vendidos</th>
@@ -177,7 +177,7 @@ export default function FinishedRaffles() {
 
             <div className={styles.modalBody}>
               <div className={styles.formGroup}>
-                <label>Tienda</label>
+                <label>Organizador</label>
                 <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedRaffle.shop.name}</p>
               </div>
 
@@ -186,10 +186,10 @@ export default function FinishedRaffles() {
                 <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedRaffle.product.name}</p>
               </div>
 
-              <div className={styles.formGroup}>
-                <label>Valor del Producto</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>${selectedRaffle.productValue.toFixed(2)}</p>
-              </div>
+                  <div className={styles.formGroup}>
+                    <label>Valor de Ticket</label>
+                    <p style={{ margin: '5px 0', color: '#2c3e50' }}>${selectedRaffle.productValue.toFixed(2)}</p>
+                  </div>
 
               <div className={styles.formGroup}>
                 <label>Tickets Vendidos</label>

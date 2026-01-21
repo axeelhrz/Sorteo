@@ -2,31 +2,38 @@
   display: flex;
   flex-direction: column;
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   height: 100%;
   position: relative;
   cursor: pointer;
+  border: 1px solid #e5e7eb;
 }
 
 .card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transform: translateY(-4px);
+  border-color: #6366f1;
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
 }
 
 /* Image Container */
 .imageContainer {
   position: relative;
   width: 100%;
-  padding-bottom: 75%;
-  background: #f5f5f5;
+  padding-bottom: 66.67%;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
   overflow: hidden;
 }
 
 .image {
   object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover .image {
+  transform: scale(1.05);
 }
 
 .imagePlaceholder {
@@ -35,9 +42,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-  color: #999;
-  font-size: 14px;
+  background: #f9fafb;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 /* Badge */
@@ -45,26 +54,48 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.2px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 2;
+}
+
+/* Thumbnail Badge */
+.thumbnailBadge {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .badgeActive {
-  background: #4CAF50;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
 }
 
 .badgeSoldOut {
-  background: #FF9800;
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
   color: white;
 }
 
 .badgeFinished {
-  background: #9C27B0;
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
   color: white;
 }
 
@@ -72,28 +103,30 @@
 .content {
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 24px;
   flex: 1;
+  gap: 18px;
 }
 
 /* Product Info */
 .productInfo {
-  margin-bottom: 16px;
+  margin-bottom: 0;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .productName {
-  margin: 0 0 8px 0;
-  font-size: 16px;
+  margin: 0 0 10px 0;
+  font-size: 17px;
   font-weight: 700;
-  color: #1a1a1a;
-  line-height: 1.4;
+  color: #0f172a;
+  line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  letter-spacing: -0.02em;
 }
 
 .shopInfo {
@@ -106,156 +139,106 @@
 .shopName {
   margin: 0;
   font-size: 13px;
-  color: #718096;
+  color: #64748b;
   font-weight: 500;
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0;
 }
 
-/* Social Networks */
-.socialNetworks {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  position: relative;
-  z-index: 10;
-}
-
-.socialLink {
+/* Social Media Container */
+.socialMediaContainer {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #f8f9ff;
-  color: #667eea;
-  font-size: 13px;
-  text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e2e8f0;
-  position: relative;
-  z-index: 11;
-}
-
-.socialLink:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Social Network Specific Colors */
-.socialFacebook {
-  color: #1877F2;
-}
-
-.socialFacebook:hover {
-  background: #1877F2;
-  color: white;
-  border-color: #1877F2;
-}
-
-.socialInstagram {
-  color: #E4405F;
-}
-
-.socialInstagram:hover {
-  background: linear-gradient(135deg, #833AB4 0%, #E4405F 50%, #FCAF45 100%);
-  color: white;
-  border-color: #E4405F;
-}
-
-.socialTwitter {
-  color: #1DA1F2;
-}
-
-.socialTwitter:hover {
-  background: #1DA1F2;
-  color: white;
-  border-color: #1DA1F2;
-}
-
-.socialWhatsapp {
-  color: #25D366;
-}
-
-.socialWhatsapp:hover {
-  background: #25D366;
-  color: white;
-  border-color: #25D366;
+  margin-top: 8px;
 }
 
 /* Value */
 .value {
   display: flex;
   flex-direction: column;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .valueLabel {
-  font-size: 12px;
-  color: #999;
+  font-size: 11px;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 
 .valueAmount {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 700;
-  color: #2196F3;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
 }
 
 .ticketInfo {
   font-size: 11px;
-  color: #999;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-top: 4px;
+  font-weight: 400;
 }
 
 /* Progress Section */
 .progressSection {
-  margin-bottom: 12px;
+  margin-bottom: 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .progressHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .progressLabel {
-  font-size: 12px;
-  color: #666;
-  font-weight: 500;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .progressCount {
   font-size: 12px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: 0;
 }
 
 .progressBar {
   width: 100%;
   height: 8px;
-  background: #e0e0e0;
+  background: #f3f4f6;
   border-radius: 4px;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
+  position: relative;
 }
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #4CAF50 0%, #45a049 100%);
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
   border-radius: 4px;
-  transition: width 0.3s ease;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
 }
 
 .progressFooter {
@@ -263,49 +246,57 @@
   justify-content: space-between;
   align-items: center;
   font-size: 12px;
+  gap: 8px;
 }
 
 .remainingTickets {
-  color: #666;
+  color: #64748b;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .progressPercent {
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #6366f1;
+  letter-spacing: 0;
+  font-size: 13px;
 }
 
 /* CTA Button */
 .ctaButton {
   width: 100%;
-  padding: 12px 16px;
-  background: #2196F3;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: auto;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .ctaButton:hover {
-  background: #1976D2;
-  transform: scale(1.02);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
 }
 
 .ctaButton:active {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .content {
-    padding: 12px;
+    padding: 20px;
+    gap: 14px;
   }
 
   .productName {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .shopInfo {
@@ -323,17 +314,17 @@
   }
 
   .socialLink {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
   }
 
   .valueAmount {
-    font-size: 16px;
+    font-size: 24px;
   }
 
   .ctaButton {
-    padding: 10px 12px;
+    padding: 12px 16px;
     font-size: 13px;
   }
 }

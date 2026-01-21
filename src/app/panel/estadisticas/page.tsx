@@ -84,7 +84,7 @@ export default function StatisticsPage() {
             <>
               <ShopHeader shop={shop} />
               <div className={styles.raffleDetail}>
-                <h1 className={styles.raffleDetailTitle}>Estadísticas de mi tienda</h1>
+                <h1 className={styles.raffleDetailTitle}>Estadísticas de mi organizador</h1>
 
                 {/* Cards de resumen */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
@@ -238,7 +238,3 @@ export default function StatisticsPage() {
     </ProtectedRoute>
   );
 }
-
-
-
-

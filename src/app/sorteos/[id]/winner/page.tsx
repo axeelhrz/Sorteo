@@ -208,7 +208,7 @@ export default function WinnerPage() {
               <h2 className={styles.productName}>{raffle.product?.name}</h2>
               <p className={styles.productDescription}>{raffle.product?.description}</p>
               <div className={styles.valueBox}>
-                <span className={styles.valueLabel}>Valor del producto</span>
+                <span className={styles.valueLabel}>Valor de Ticket</span>
                 <span className={styles.valueAmount}>
                   S/ {Number(raffle.productValue).toFixed(2)}
                 </span>
@@ -216,10 +216,10 @@ export default function WinnerPage() {
             </div>
           </div>
 
-          {/* Shop Info */}
-          <div className={styles.shopCard}>
-            <h3 className={styles.shopTitle}>Tienda</h3>
-            <div className={styles.shopInfo}>
+        {/* Shop Info */}
+        <div className={styles.shopCard}>
+          <h3 className={styles.shopTitle}>Organizador</h3>
+          <div className={styles.shopInfo}>
               {raffle.shop?.logo && (
                 <Image
                   src={raffle.shop.logo}
@@ -232,10 +232,10 @@ export default function WinnerPage() {
               <div className={styles.shopDetails}>
                 <h4 className={styles.shopName}>{raffle.shop?.name}</h4>
                 {raffle.shop?.status === 'verified' && (
-                  <span className={styles.verifiedBadge}>
-                    <FiCheckCircle className={styles.verifiedIcon} />
-                    Tienda verificada
-                  </span>
+              <span className={styles.verifiedBadge}>
+                <FiCheckCircle className={styles.verifiedIcon} />
+                Organizador verificado
+              </span>
                 )}
               </div>
             </div>
@@ -308,15 +308,15 @@ export default function WinnerPage() {
 
             {isWinner && (
               <div className={styles.winnerMessage}>
-                <p className={styles.winnerMessageText}>
-                  <strong>¡Felicidades!</strong> Has sido seleccionado como ganador de este sorteo.
-                  La tienda se pondrá en contacto contigo para coordinar la entrega del premio.
-                </p>
-                {raffle.shop?.publicEmail && (
-                  <p className={styles.winnerMessageText}>
-                    Si tienes alguna pregunta, puedes contactar a la tienda en:{' '}
-                    <a href={`mailto:${raffle.shop.publicEmail}`} className={styles.contactLink}>
-                      {raffle.shop.publicEmail}
+            <p className={styles.winnerMessageText}>
+              <strong>¡Felicidades!</strong> Has sido seleccionado como ganador de este sorteo.
+              El organizador se pondrá en contacto contigo para coordinar la entrega del premio.
+            </p>
+            {raffle.shop?.publicEmail && (
+              <p className={styles.winnerMessageText}>
+                Si tienes alguna pregunta, puedes contactar al organizador en:{' '}
+                <a href={`mailto:${raffle.shop.publicEmail}`} className={styles.contactLink}>
+                  {raffle.shop.publicEmail}
                     </a>
                   </p>
                 )}
@@ -383,4 +383,3 @@ export default function WinnerPage() {
     </main>
   );
 }
-

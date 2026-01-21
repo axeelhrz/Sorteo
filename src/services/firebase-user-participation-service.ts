@@ -102,9 +102,9 @@ export const firebaseUserParticipationService = {
               }
             }
 
-            // Cargar información de la tienda
-            let shop: Shop | undefined;
-            if (raffleData.shopId) {
+    // Cargar información del organizador
+    let shop: Shop | undefined;
+    if (raffleData.shopId) {
               try {
                 const shopDoc = await getDoc(doc(db, 'shops', raffleData.shopId));
                 if (shopDoc.exists()) {

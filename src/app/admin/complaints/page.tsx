@@ -154,7 +154,7 @@ export default function AdminComplaintsPage() {
               <option value={ComplaintType.PRIZE_NOT_DELIVERED}>No entrega del premio</option>
               <option value={ComplaintType.DIFFERENT_PRODUCT}>Producto diferente</option>
               <option value={ComplaintType.PURCHASE_PROBLEM}>Problema en compra</option>
-              <option value={ComplaintType.SHOP_BEHAVIOR}>Problema con tienda</option>
+              <option value={ComplaintType.ORGANIZER_BEHAVIOR}>Problema con organizador</option>
               <option value={ComplaintType.RAFFLE_FRAUD}>Fraude</option>
               <option value={ComplaintType.TECHNICAL_ISSUE}>Problema técnico</option>
               <option value={ComplaintType.PAYMENT_ERROR}>Error de pago</option>
@@ -257,10 +257,10 @@ function AdminComplaintDetail({
         </p>
         <p>
           <strong>Tipo:</strong> {complaint.type}
-        </p>
-        <p>
-          <strong>Tienda:</strong> {complaint.shop?.name || 'N/A'}
-        </p>
+            </p>
+            <p>
+              <strong>Organizador:</strong> {complaint.shop?.name || 'N/A'}
+            </p>
         <p>
           <strong>Creado:</strong> {new Date(complaint.createdAt).toLocaleDateString('es-ES')}
         </p>
@@ -291,11 +291,11 @@ function AdminComplaintDetail({
             value={formData.resolution}
             onChange={(e) => setFormData({ ...formData, resolution: e.target.value })}
           >
-            <option value="">Seleccionar...</option>
-            <option value="resolved_user_favor">A favor del usuario</option>
-            <option value="resolved_shop_favor">A favor de la tienda</option>
-            <option value="resolved_platform_favor">Resolución parcial</option>
-            <option value="rejected">Rechazado</option>
+                <option value="">Seleccionar...</option>
+                <option value="resolved_user_favor">A favor del usuario</option>
+                <option value="resolved_organizer_favor">A favor del organizador</option>
+                <option value="resolved_platform_favor">Resolución parcial</option>
+                <option value="rejected">Rechazado</option>
           </select>
         </div>
 

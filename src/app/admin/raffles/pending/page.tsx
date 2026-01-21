@@ -136,7 +136,7 @@ export default function PendingRaffles() {
           <table>
             <thead>
               <tr>
-                <th>Tienda</th>
+                <th>Organizador</th>
                 <th>Producto</th>
                 <th>Valor</th>
                 <th>Tickets</th>
@@ -202,7 +202,7 @@ export default function PendingRaffles() {
 
             <div className={styles.modalBody}>
               <div className={styles.formGroup}>
-                <label>Tienda</label>
+                <label>Organizador</label>
                 <p style={{ margin: '5px 0', color: '#2c3e50' }}>
                   {selectedRaffle.shop.name}
                   <span className={`${styles.statusBadge} ${styles[selectedRaffle.shop.status]}`} style={{ marginLeft: '10px' }}>
@@ -221,10 +221,10 @@ export default function PendingRaffles() {
                 <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedRaffle.product.description || 'N/A'}</p>
               </div>
 
-              <div className={styles.formGroup}>
-                <label>Valor del Producto</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>${selectedRaffle.productValue.toFixed(2)}</p>
-              </div>
+                  <div className={styles.formGroup}>
+                    <label>Valor de Ticket</label>
+                    <p style={{ margin: '5px 0', color: '#2c3e50' }}>${selectedRaffle.productValue.toFixed(2)}</p>
+                  </div>
 
               <div className={styles.formGroup}>
                 <label>Total de Tickets</label>
@@ -283,7 +283,7 @@ export default function PendingRaffles() {
 
             <div className={styles.modalBody}>
               <p style={{ color: '#7f8c8d', marginBottom: '15px' }}>
-                Por favor, proporciona un motivo para rechazar este sorteo. La tienda podrá ver este motivo.
+                Por favor, proporciona un motivo para rechazar este sorteo. El organizador podrá ver este motivo.
               </p>
               <div className={styles.formGroup}>
                 <label>Motivo del Rechazo</label>

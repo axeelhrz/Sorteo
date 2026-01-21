@@ -36,6 +36,16 @@ export interface Payment {
   voucherUploadedAt?: string;
   completedAt?: string;
   failedAt?: string;
+  // OCR fields
+  ocrProcessed?: boolean;
+  ocrExtractedAmount?: number;
+  ocrConfidence?: number;
+  ocrValid?: boolean;
+  ocrMessage?: string;
+  ocrProcessedAt?: string;
+  // Approval fields
+  approvedBy?: string;
+  rejectedBy?: string;
 }
 
 const convertTimestamp = (timestamp: any): string => {
@@ -110,6 +120,7 @@ export const firebasePaymentService = {
         voucherUploadedAt: convertTimestamp(data.voucherUploadedAt),
         completedAt: convertTimestamp(data.completedAt),
         failedAt: convertTimestamp(data.failedAt),
+        ocrProcessedAt: convertTimestamp(data.ocrProcessedAt),
       } as Payment;
     } catch (error) {
       console.error('Error fetching payment:', error);
@@ -153,6 +164,7 @@ export const firebasePaymentService = {
         voucherUrl,
         voucherUploadedAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
+        ocrProcessed: false,
       };
 
       await updateDoc(paymentRef, updateData);
@@ -161,6 +173,117 @@ export const firebasePaymentService = {
       return await this.getPaymentById(paymentId);
     } catch (error) {
       console.error('Error confirming payment with voucher:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get all pending validation payments (for admin)
+   */
+  async getPendingValidationPayments(): Promise<Payment[]> {
+    try {
+      const paymentsRef = collection(db, 'payments');
+      const q = query(
+        paymentsRef,
+        where('status', '==', 'pending_validation')
+      );
+      const querySnapshot = await getDocs(q);
+
+      return querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: convertTimestamp(data.createdAt),
+          updatedAt: convertTimestamp(data.updatedAt),
+          voucherUploadedAt: convertTimestamp(data.voucherUploadedAt),
+          completedAt: convertTimestamp(data.completedAt),
+          failedAt: convertTimestamp(data.failedAt),
+          ocrProcessedAt: convertTimestamp(data.ocrProcessedAt),
+        } as Payment;
+      });
+    } catch (error) {
+      console.error('Error fetching pending validation payments:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Approve payment (admin only)
+   */
+  async approvePayment(paymentId: string, adminId: string): Promise<Payment> {
+    try {
+      const paymentRef = doc(db, 'payments', paymentId);
+      const updateData = {
+        status: 'completed',
+        approvedBy: adminId,
+        completedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      await updateDoc(paymentRef, updateData);
+
+      return await this.getPaymentById(paymentId);
+    } catch (error) {
+      console.error('Error approving payment:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Reject payment (admin only)
+   */
+  async rejectPayment(
+    paymentId: string,
+    adminId: string,
+    reason: string
+  ): Promise<Payment> {
+    try {
+      const paymentRef = doc(db, 'payments', paymentId);
+      const updateData = {
+        status: 'failed',
+        rejectedBy: adminId,
+        failureReason: reason,
+        failedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      await updateDoc(paymentRef, updateData);
+
+      return await this.getPaymentById(paymentId);
+    } catch (error) {
+      console.error('Error rejecting payment:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update OCR validation result
+   */
+  async updateOCRValidation(
+    paymentId: string,
+    ocrResult: {
+      extractedAmount?: number;
+      confidence?: number;
+      isValid: boolean;
+      message: string;
+    }
+  ): Promise<void> {
+    try {
+      const paymentRef = doc(db, 'payments', paymentId);
+      const updateData = {
+        ocrProcessed: true,
+        ocrExtractedAmount: ocrResult.extractedAmount || null,
+        ocrConfidence: ocrResult.confidence || null,
+        ocrValid: ocrResult.isValid,
+        ocrMessage: ocrResult.message,
+        ocrProcessedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      await updateDoc(paymentRef, updateData);
+    } catch (error) {
+      console.error('Error updating OCR validation:', error);
       throw error;
     }
   },
@@ -235,6 +358,7 @@ export const firebasePaymentService = {
           voucherUploadedAt: convertTimestamp(data.voucherUploadedAt),
           completedAt: convertTimestamp(data.completedAt),
           failedAt: convertTimestamp(data.failedAt),
+          ocrProcessedAt: convertTimestamp(data.ocrProcessedAt),
         } as Payment;
       });
     } catch (error) {
@@ -266,6 +390,7 @@ export const firebasePaymentService = {
           voucherUploadedAt: convertTimestamp(data.voucherUploadedAt),
           completedAt: convertTimestamp(data.completedAt),
           failedAt: convertTimestamp(data.failedAt),
+          ocrProcessedAt: convertTimestamp(data.ocrProcessedAt),
         } as Payment;
       });
     } catch (error) {

@@ -1,42 +1,43 @@
 /* Filters Wrapper */
 .filtersWrapper {
-  max-width: 1280px;
-  margin: 0 auto 2.5rem;
-  padding: 0 2rem;
+  max-width: 1200px;
+  margin: 0 auto 48px;
+  padding: 0 60px;
 }
 
 /* Main Filters */
 .mainFilters {
   display: flex;
-  gap: 1rem;
-  align-items: stretch;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 /* Search Form */
 .searchForm {
   flex: 1;
+  display: flex;
 }
 
 .searchBox {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 12px;
   background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  padding: 0 1rem;
-  transition: all 0.2s ease;
-  height: 48px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0 16px;
+  transition: all 0.15s ease;
+  height: 44px;
+  width: 100%;
 }
 
 .searchBox:focus-within {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #0f172a;
 }
 
 .searchIcon {
   color: #94a3b8;
-  font-size: 1.125rem;
+  font-size: 16px;
   flex-shrink: 0;
 }
 
@@ -44,9 +45,11 @@
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 0.9375rem;
-  color: #1e293b;
+  font-size: 14px;
+  color: #0f172a;
   outline: none;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .searchInput::placeholder {
@@ -58,99 +61,107 @@
   border: none;
   color: #94a3b8;
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.25rem;
-  transition: all 0.2s ease;
+  border-radius: 4px;
+  transition: all 0.15s ease;
 }
 
 .clearButton:hover {
   color: #64748b;
-  background: #f1f5f9;
+  background: #f9fafb;
 }
 
 /* Controls */
 .controls {
   display: flex;
-  gap: 0.75rem;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 .sortSelect {
   min-width: 200px;
-  padding: 0 2.5rem 0 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 0.9375rem;
+  padding: 0 40px 0 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
   background: white;
-  color: #1e293b;
+  color: #0f172a;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
+  transition: all 0.15s ease;
+  font-weight: 400;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%2364748b' d='M8 11L3 6h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  height: 48px;
+  background-position: right 12px center;
+  height: 44px;
+  letter-spacing: 0;
+  line-height: 44px;
+  box-sizing: border-box;
 }
 
 .sortSelect:hover {
-  border-color: #cbd5e0;
+  border-color: #cbd5e1;
 }
 
 .sortSelect:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #0f172a;
 }
 
 .filterButton {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0 1.25rem;
+  justify-content: center;
+  padding: 0;
   background: white;
-  color: #475569;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  color: #64748b;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  height: 48px;
+  transition: all 0.15s ease;
+  width: 44px;
+  height: 44px;
+  letter-spacing: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  margin: 0;
+  vertical-align: top;
 }
 
 .filterButton:hover {
-  border-color: #cbd5e0;
-  background: #f8fafc;
+  border-color: #cbd5e1;
+  background: #f9fafb;
 }
 
 .filterButton.active {
-  background: #667eea;
+  background: #0f172a;
   color: white;
-  border-color: #667eea;
+  border-color: #0f172a;
 }
 
 .filterButton svg {
-  font-size: 1.125rem;
+  font-size: 18px;
 }
 
 /* Advanced Filters */
 .advancedFilters {
-  margin-top: 1rem;
+  margin-top: 16px;
   background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
   animation: slideDown 0.2s ease;
 }
 
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-0.5rem);
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;
@@ -161,71 +172,74 @@
 .filterGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .filterItem {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .filterLabel {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #475569;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0;
 }
 
 .filterSelect {
-  padding: 0.625rem 2.5rem 0.625rem 0.875rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.5rem;
-  font-size: 0.9375rem;
+  padding: 10px 40px 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
   background: white;
-  color: #1e293b;
+  color: #0f172a;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
+  transition: all 0.15s ease;
+  font-weight: 400;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%2364748b' d='M8 11L3 6h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
+  background-position: right 12px center;
+  letter-spacing: 0;
 }
 
 .filterSelect:hover {
-  border-color: #cbd5e0;
+  border-color: #cbd5e1;
 }
 
 .filterSelect:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #0f172a;
 }
 
 /* Filter Actions */
 .filterActions {
   display: flex;
-  gap: 0.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
 }
 
 .applyButton {
   flex: 1;
-  padding: 0.75rem 1.5rem;
-  background: #667eea;
+  padding: 10px 24px;
+  background: #0f172a;
   color: white;
   border: none;
-  border-radius: 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  letter-spacing: 0;
+  box-shadow: none;
 }
 
 .applyButton:hover:not(:disabled) {
-  background: #5568d3;
+  background: #1e293b;
 }
 
 .applyButton:disabled {
@@ -234,20 +248,21 @@
 }
 
 .resetButton {
-  padding: 0.75rem 1.5rem;
+  padding: 10px 24px;
   background: white;
   color: #64748b;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  letter-spacing: 0;
 }
 
 .resetButton:hover:not(:disabled) {
-  background: #f8fafc;
-  border-color: #cbd5e0;
+  background: #f9fafb;
+  border-color: #cbd5e1;
 }
 
 .resetButton:disabled {
@@ -258,21 +273,23 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .filtersWrapper {
-    padding: 0 1.5rem;
+    padding: 0 40px;
   }
 }
 
 @media (max-width: 768px) {
   .filtersWrapper {
-    padding: 0 1.25rem;
+    padding: 0 24px;
   }
 
   .mainFilters {
     flex-direction: column;
+    gap: 8px;
   }
 
   .controls {
     flex-direction: column;
+    gap: 8px;
   }
 
   .sortSelect {
@@ -301,10 +318,10 @@
 
 @media (max-width: 480px) {
   .filtersWrapper {
-    padding: 0 1rem;
+    padding: 0 20px;
   }
 
   .advancedFilters {
-    padding: 1rem;
+    padding: 16px;
   }
 }

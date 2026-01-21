@@ -30,7 +30,7 @@ export default function CreateRafflePage() {
       const data = await shopService.getMyShop();
       setShop(data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar la tienda');
+      setError(err.response?.data?.message || 'Error al cargar el organizador');
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export default function CreateRafflePage() {
       <div className={styles.panelContainer}>
         <ShopSidebar isBlocked={shop?.status === 'blocked'} />
         <main className={styles.mainContent}>
-          {loading && <div className={styles.alert}>Cargando tienda...</div>}
+          {loading && <div className={styles.alert}>Cargando organizador...</div>}
           {error && (
             <div className={`${styles.alert} ${styles.alertError}`}>
               {error}

@@ -14,7 +14,7 @@ export default function RefundPolicyPage() {
           Los reembolsos se aplican SOLO en los siguientes casos:
         </p>
         <ul>
-          <li>El sorteo es cancelado por la tienda antes de ejecutarse</li>
+          <li>El sorteo es cancelado por el organizador antes de ejecutarse</li>
           <li>Error técnico de la plataforma que impida participar</li>
           <li>Pago duplicado accidental</li>
           <li>Sorteo no ejecutado después de 60 días de vencimiento</li>
@@ -116,15 +116,15 @@ export default function RefundPolicyPage() {
       </section>
 
       <section style={{ marginBottom: '30px' }}>
-        <h2>10. Política de Reembolsos para Tiendas</h2>
+        <h2>10. Política de Reembolsos para Organizadores</h2>
         <p>
-          Si eres tienda y necesitas reembolsar a usuarios:
+          Si eres organizador y necesitas reembolsar a usuarios:
         </p>
         <ul>
           <li>Contacta a soporte con justificación</li>
           <li>Proporciona lista de usuarios afectados</li>
           <li>Nosotros procesamos el reembolso</li>
-          <li>La tienda asume el costo de comisión</li>
+          <li>El organizador asume el costo de comisión</li>
         </ul>
       </section>
     </div>

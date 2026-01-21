@@ -57,10 +57,10 @@ export default function PrivacyPage() {
             No vendemos tu información personal. Sin embargo, podemos compartirla con:
           </p>
           <ul className={styles.list}>
-            <li>Procesadores de pago (para procesar pagos)</li>
-            <li>Tiendas (para coordinar entrega de premios)</li>
-            <li>Proveedores de servicios (hosting, análisis)</li>
-            <li>Autoridades legales (cuando sea requerido por ley)</li>
+          <li>Procesadores de pago (para procesar pagos)</li>
+          <li>Organizadores (para coordinar entrega de premios)</li>
+          <li>Proveedores de servicios (hosting, análisis)</li>
+          <li>Autoridades legales (cuando sea requerido por ley)</li>
           </ul>
         </section>
 

@@ -20,12 +20,12 @@ export default function RefundPolicyPage() {
           <h2 className={styles.sectionTitle}>2. Casos Elegibles para Reembolso</h2>
           <p>Se procesarán reembolsos en los siguientes casos:</p>
           <ul className={styles.list}>
-            <li>La tienda cancela la oportunidad antes de ejecutarse</li>
-            <li>Error técnico de la plataforma que afecte tu compra</li>
-            <li>Pago duplicado o múltiple</li>
-            <li>Orden cancelada antes de que se ejecute el sorteo</li>
-            <li>La tienda no entrega el premio dentro de 30 días</li>
-            <li>El premio llega dañado o defectuoso</li>
+          <li>El organizador cancela la oportunidad antes de ejecutarse</li>
+          <li>Error técnico de la plataforma que afecte tu compra</li>
+          <li>Pago duplicado o múltiple</li>
+          <li>Orden cancelada antes de que se ejecute el sorteo</li>
+          <li>El organizador no entrega el premio dentro de 30 días</li>
+          <li>El premio llega dañado o defectuoso</li>
           </ul>
         </section>
 
@@ -68,17 +68,17 @@ export default function RefundPolicyPage() {
             En algunos casos, se pueden procesar reembolsos parciales:
           </p>
           <ul className={styles.list}>
-            <li>Si solo algunos de tus tickets son afectados</li>
-            <li>Si la tienda entrega un premio parcialmente dañado</li>
-            <li>Si hay un acuerdo mutuo entre tú y la tienda</li>
+          <li>Si solo algunos de tus tickets son afectados</li>
+          <li>Si el organizador entrega un premio parcialmente dañado</li>
+          <li>Si hay un acuerdo mutuo entre tú y el organizador</li>
           </ul>
         </section>
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>7. Depósito de Garantía</h2>
-          <p>
-            Si una tienda cancela una oportunidad, se reembolsa el 100% del depósito de garantía (10% del valor del producto) a los participantes.
-          </p>
+        <p>
+          Si un organizador cancela una oportunidad, se reembolsa el 100% del depósito de garantía (10% del valor de ticket) a los participantes.
+        </p>
         </section>
 
         <section className={styles.section}>
@@ -97,15 +97,15 @@ export default function RefundPolicyPage() {
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>10. Reembolsos por Entrega Fallida</h2>
-          <p>
-            Si la tienda no entrega el premio dentro de 30 días:
-          </p>
-          <ul className={styles.list}>
-            <li>Reporta el problema a nuestro equipo de soporte</li>
-            <li>Proporcionamos 7 días adicionales para que la tienda entregue</li>
-            <li>Si aún no se entrega, procesamos un reembolso completo</li>
-            <li>La tienda es bloqueada de la plataforma</li>
-          </ul>
+        <p>
+          Si el organizador no entrega el premio dentro de 30 días:
+        </p>
+        <ul className={styles.list}>
+          <li>Reporta el problema a nuestro equipo de soporte</li>
+          <li>Proporcionamos 7 días adicionales para que el organizador entregue</li>
+          <li>Si aún no se entrega, procesamos un reembolso completo</li>
+          <li>El organizador es bloqueado de la plataforma</li>
+        </ul>
         </section>
 
         <section className={styles.section}>

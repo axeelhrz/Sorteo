@@ -50,7 +50,7 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
 export const firebaseRaffleWriteService = {
   /**
    * Crea un nuevo sorteo
-   * Calcula automáticamente los tickets como el doble del valor del producto
+   * Calcula automáticamente los tickets como el doble del valor de ticket
    */
   async createRaffle(data: CreateRaffleDto): Promise<Raffle> {
     try {
@@ -63,11 +63,11 @@ export const firebaseRaffleWriteService = {
       const productData = productDoc.data() as Product;
       const productValue = productData.value || 0;
       
-      // Calcular tickets: doble del valor del producto
+      // Calcular tickets: doble del valor de ticket
       const totalTickets = Math.floor(productValue * 2);
 
       if (totalTickets <= 0) {
-        throw new Error('El valor del producto debe ser mayor a 0');
+        throw new Error('El valor de ticket debe ser mayor a 0');
       }
 
       const rafflesRef = collection(db, 'raffles');
@@ -173,4 +173,3 @@ export const firebaseRaffleWriteService = {
     }
   },
 };
-

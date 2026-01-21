@@ -1,11 +1,13 @@
 export enum UserRole {
   ADMIN = 'admin',
-  SHOP = 'shop',
+  ORGANIZER = 'organizer',
+  SHOP = 'organizer', // Alias para compatibilidad
   USER = 'user',
 }
 
 export interface User {
   id: string;
+  uid: string; // Firebase Auth uid (alias for id)
   name: string;
   email: string;
   role: UserRole;

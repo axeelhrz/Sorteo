@@ -16,7 +16,7 @@ const faqItems: FAQItem[] = [
     id: '1',
     category: 'General',
     question: '¿Qué es TIKETEA ONLINE?',
-    answer: 'TIKETEA ONLINE es una plataforma digital que conecta tiendas con usuarios para participar en oportunidades de compra de productos mediante un sistema de tickets. Los usuarios compran tickets y participan en un sorteo aleatorio para ganar el producto.'
+    answer: 'TIKETEA ONLINE es una plataforma digital que conecta organizadores con usuarios para participar en oportunidades de compra de productos mediante un sistema de tickets. Los usuarios compran tickets y participan en un sorteo aleatorio para ganar el producto.'
   },
   {
     id: '2',
@@ -28,7 +28,7 @@ const faqItems: FAQItem[] = [
     id: '3',
     category: 'General',
     question: '¿Cuál es el costo de usar la plataforma?',
-    answer: 'Para usuarios: No hay costo de registro. Solo pagas por los tickets que compres. Para tiendas: Se cobra una comisión del 10% sobre el monto total de tickets vendidos.'
+    answer: 'Para usuarios: No hay costo de registro. Solo pagas por los tickets que compres. Para organizadores: Se cobra una comisión del 10% sobre el monto total de tickets vendidos.'
   },
   {
     id: '4',
@@ -46,10 +46,10 @@ const faqItems: FAQItem[] = [
   },
   {
     id: '6',
-    category: 'Participación',
-    question: '¿Cuál es el precio de cada ticket?',
-    answer: 'El precio de cada ticket varía según la oportunidad y es establecido por la tienda. Puedes ver el precio antes de comprar. Generalmente, el precio del ticket es el valor del producto dividido entre la cantidad de tickets disponibles.'
-  },
+      category: 'Participación',
+      question: '¿Cuál es el precio de cada ticket?',
+      answer: 'El precio de cada ticket varía según la oportunidad y es establecido por el organizador. Puedes ver el precio antes de comprar. El precio del ticket se calcula automáticamente según el valor de ticket configurado por el organizador.'
+    },
   {
     id: '7',
     category: 'Participación',
@@ -98,7 +98,7 @@ const faqItems: FAQItem[] = [
     id: '14',
     category: 'Pagos y Reembolsos',
     question: '¿En qué casos me reembolsan?',
-    answer: 'Se reembolsa en los siguientes casos:\n- La tienda cancela la oportunidad\n- Error técnico de la plataforma\n- Pago duplicado\n- Orden cancelada antes de ejecutarse'
+    answer: 'Se reembolsa en los siguientes casos:\n- El organizador cancela la oportunidad\n- Error técnico de la plataforma\n- Pago duplicado\n- Orden cancelada antes de ejecutarse'
   },
   {
     id: '15',
@@ -112,19 +112,19 @@ const faqItems: FAQItem[] = [
     id: '16',
     category: 'Premios y Entregas',
     question: '¿Cuándo recibiré mi premio si gano?',
-    answer: 'La tienda tiene 30 días para entregar el premio después de que se ejecute la oportunidad. Recibirás instrucciones de entrega por email inmediatamente después de ganar.'
+    answer: 'El organizador tiene 30 días para entregar el premio después de que se ejecute la oportunidad. Recibirás instrucciones de entrega por email inmediatamente después de ganar.'
   },
   {
     id: '17',
     category: 'Premios y Entregas',
     question: '¿Cómo se entrega el premio?',
-    answer: 'La tienda coordina directamente contigo para la entrega. Puede ser por:\n- Recojo en tienda\n- Envío a domicilio\n- Envío por courier\nLa tienda te contactará para coordinar.'
+    answer: 'El organizador coordina directamente contigo para la entrega. Puede ser por:\n- Recojo en local\n- Envío a domicilio\n- Envío por courier\nEl organizador te contactará para coordinar.'
   },
   {
     id: '18',
     category: 'Premios y Entregas',
-    question: '¿Qué pasa si la tienda no entrega el premio?',
-    answer: 'Si la tienda no entrega el premio dentro de 30 días, puedes reportarlo a nuestro equipo de soporte. Investigaremos y tomaremos acciones, incluyendo bloqueo de la tienda y reembolso si es necesario.'
+    question: '¿Qué pasa si el organizador no entrega el premio?',
+    answer: 'Si el organizador no entrega el premio dentro de 30 días, puedes reportarlo a nuestro equipo de soporte. Investigaremos y tomaremos acciones, incluyendo bloqueo del organizador y reembolso si es necesario.'
   },
   {
     id: '19',
@@ -180,10 +180,10 @@ const faqItems: FAQItem[] = [
   },
   {
     id: '27',
-    category: 'Para Tiendas',
-    question: '¿Cuánto cuesta crear una oportunidad?',
-    answer: 'Crear una oportunidad es gratis. Solo pagas una comisión del 10% sobre el monto total de tickets vendidos. Además, debes depositar un 10% del valor del producto como garantía (reembolsable).'
-  },
+      category: 'Para Tiendas',
+      question: '¿Cuánto cuesta crear una oportunidad?',
+      answer: 'Crear una oportunidad es gratis. Solo pagas una comisión del 10% sobre el monto total de tickets vendidos. Además, debes depositar un 10% del valor de ticket como garantía (reembolsable).'
+    },
   {
     id: '28',
     category: 'Para Tiendas',

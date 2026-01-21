@@ -43,11 +43,11 @@ export default function EditProductPage() {
       setShop(shopData);
       setProduct(productData);
 
-      // Validar que el producto pertenece a la tienda
-      if (productData.shopId !== shopData.id) {
-        setError('Este producto no pertenece a tu tienda');
-        return;
-      }
+        // Validar que el producto pertenece al organizador
+        if (productData.shopId !== shopData.id) {
+          setError('Este producto no pertenece a tu organizador');
+          return;
+        }
 
       // Inicializar formulario con datos del producto
       setFormData({
@@ -224,10 +224,10 @@ export default function EditProductPage() {
                   />
                 </div>
 
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>
-                    Valor del producto (S/.) <span style={{ color: 'red' }}>*</span>
-                  </label>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>
+                Valor de Ticket (S/.) <span style={{ color: 'red' }}>*</span>
+              </label>
                   <input
                     type="number"
                     step="0.01"
@@ -405,7 +405,3 @@ export default function EditProductPage() {
     </ProtectedRoute>
   );
 }
-
-
-
-

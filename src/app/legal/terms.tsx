@@ -31,7 +31,7 @@ export default function TermsPage() {
           TIKETEA es una plataforma tecnológica que facilita la publicación y gestión de oportunidades ofrecidas por terceros. No organiza sorteos, no vende productos y no actúa como comerciante final.
         </p>
         <p style={{ color: '#555', lineHeight: '1.6', marginTop: '15px' }}>
-          La Plataforma proporciona las herramientas tecnológicas para que terceros (tiendas y comerciantes) puedan:
+          La Plataforma proporciona las herramientas tecnológicas para que terceros (organizadores y comerciantes) puedan:
         </p>
         <ul style={{ color: '#555', lineHeight: '1.8', marginLeft: '20px', marginTop: '10px' }}>
           <li>Publicar y gestionar sus propias oportunidades</li>
@@ -46,10 +46,10 @@ export default function TermsPage() {
 
       <section style={{ marginBottom: '40px' }}>
         <h2 style={{ fontSize: '22px', fontWeight: '600', marginBottom: '15px', color: '#333' }}>
-          3. Responsabilidades de las Tiendas
+          3. Responsabilidades de los Organizadores
         </h2>
         <p style={{ color: '#555', lineHeight: '1.6', marginBottom: '15px' }}>
-          Las tiendas que utilizan la Plataforma se comprometen a:
+          Los organizadores que utilizan la Plataforma se comprometen a:
         </p>
         <ul style={{ color: '#555', lineHeight: '1.8', marginLeft: '20px' }}>
           <li>Garantizar que los productos descritos son reales, auténticos y están disponibles</li>
@@ -74,7 +74,7 @@ export default function TermsPage() {
           <li>Proporcionar información precisa, completa y actualizada en su perfil</li>
           <li>Mantener la confidencialidad de su contraseña y credenciales</li>
           <li>No participar en oportunidades de forma fraudulenta o engañosa</li>
-          <li>Respetar los derechos de otros usuarios y tiendas</li>
+          <li>Respetar los derechos de otros usuarios y organizadores</li>
           <li>No intentar manipular, interferir o sabotear las oportunidades</li>
           <li>No usar bots, scripts o herramientas automatizadas</li>
           <li>Aceptar los resultados de las oportunidades como finales e inapelables</li>
@@ -87,7 +87,7 @@ export default function TermsPage() {
           5. Política de Reembolsos
         </h2>
         <ul style={{ color: '#555', lineHeight: '1.8', marginLeft: '20px' }}>
-          <li><strong>Reembolso por cancelación:</strong> Si la tienda cancela la oportunidad antes de ejecutarse, 
+          <li><strong>Reembolso por cancelación:</strong> Si el organizador cancela la oportunidad antes de ejecutarse, 
           se reembolsa el 100% del monto pagado</li>
           <li><strong>Reembolso por error técnico:</strong> Si hay un error técnico de la Plataforma, se reembolsa el 100%</li>
           <li><strong>Reembolso por pago duplicado:</strong> Se reembolsa automáticamente dentro de 24 horas</li>
@@ -105,10 +105,10 @@ export default function TermsPage() {
           La Plataforma no es responsable por:
         </p>
         <ul style={{ color: '#555', lineHeight: '1.8', marginLeft: '20px' }}>
-          <li>Incumplimiento de tiendas en la entrega de premios</li>
+          <li>Incumplimiento de organizadores en la entrega de premios</li>
           <li>Calidad, descripción incorrecta o defectos de productos</li>
           <li>Pérdida, daño o robo de productos durante el envío</li>
-          <li>Disputas, reclamos o conflictos entre usuarios y tiendas</li>
+          <li>Disputas, reclamos o conflictos entre usuarios y organizadores</li>
           <li>Errores técnicos, interrupciones o indisponibilidad del servicio</li>
           <li>Pérdida de datos o acceso no autorizado a cuentas</li>
           <li>Daños indirectos, incidentales o consecuentes</li>
@@ -141,12 +141,12 @@ export default function TermsPage() {
           8. Requisitos para Crear Oportunidades
         </h2>
         <ul style={{ color: '#555', lineHeight: '1.8', marginLeft: '20px' }}>
-          <li><strong>Valor mínimo del producto:</strong> S/. 50</li>
-          <li><strong>Dimensiones mínimas:</strong> 15cm x 15cm x 15cm</li>
-          <li><strong>Depósito de garantía:</strong> 10% del valor del producto (reembolsable)</li>
+              <li><strong>Valor mínimo de ticket:</strong> S/. 50</li>
+              <li><strong>Dimensiones mínimas:</strong> 15cm x 15cm x 15cm</li>
+              <li><strong>Depósito de garantía:</strong> 10% del valor de ticket (reembolsable)</li>
           <li><strong>Aprobación previa:</strong> Revisión manual antes de publicación</li>
           <li><strong>Documentación:</strong> Fotos claras y descripción detallada</li>
-          <li><strong>Verificación de tienda:</strong> Tienda debe estar verificada y activa</li>
+          <li><strong>Verificación de organizador:</strong> El organizador debe estar verificado y activo</li>
         </ul>
       </section>
 
@@ -160,7 +160,7 @@ export default function TermsPage() {
           <li>Los resultados son finales, inapelables e irreversibles</li>
           <li>Se genera un certificado de auditoría para cada ejecución</li>
           <li>El ganador es notificado por email inmediatamente</li>
-          <li>La tienda tiene 30 días para entregar el premio</li>
+          <li>El organizador tiene 30 días para entregar el premio</li>
         </ul>
       </section>
 

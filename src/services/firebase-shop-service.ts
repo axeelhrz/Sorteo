@@ -36,7 +36,7 @@ const convertShopDoc = (docSnap: QueryDocumentSnapshot<DocumentData>): Shop => {
 
 export const firebaseShopService = {
   /**
-   * Obtiene una tienda por ID (para marketplace)
+   * Obtiene un organizador por ID (para marketplace)
    */
   async getShopById(id: string): Promise<Shop> {
     try {
@@ -52,7 +52,7 @@ export const firebaseShopService = {
   },
 
   /**
-   * Obtiene todas las tiendas verificadas (para marketplace)
+   * Obtiene todos los organizadores verificados (para marketplace)
    */
   async getVerifiedShops(): Promise<Shop[]> {
     try {
@@ -69,7 +69,7 @@ export const firebaseShopService = {
   },
 
   /**
-   * Obtiene todas las tiendas (para marketplace)
+   * Obtiene todos los organizadores (para marketplace)
    */
   async getAllShops(): Promise<Shop[]> {
     try {
@@ -84,4 +84,3 @@ export const firebaseShopService = {
     }
   },
 };
-

@@ -17,8 +17,8 @@ export default function RegisterForm() {
     name: '',
     email: '',
     password: '',
-    role: 'user' as UserRole,
-    shopName: '',
+    role: UserRole.USER,
+    organizerName: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,7 @@ export default function RegisterForm() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === 'role' ? value as UserRole : value,
     }));
   };
 
@@ -35,9 +35,9 @@ export default function RegisterForm() {
     e.preventDefault();
     setError('');
 
-    // Validar que si el rol es shop, se proporcione el nombre de la tienda
-    if (formData.role === 'shop' && !formData.shopName.trim()) {
-      setError('El nombre de la tienda es requerido');
+    // Validar que si el rol es organizador, se proporcione el nombre del organizador
+    if (formData.role === UserRole.ORGANIZER && !formData.organizerName.trim()) {
+      setError('El nombre del organizador es requerido');
       return;
     }
 
@@ -50,7 +50,7 @@ export default function RegisterForm() {
         email: formData.email,
         password: formData.password,
         role: formData.role as UserRole,
-        shopName: formData.role === 'shop' ? formData.shopName.trim() : undefined,
+        shopName: formData.role === UserRole.ORGANIZER ? formData.organizerName.trim() : undefined,
       };
 
       const { user, token } = await firebaseAuthService.register(registerData);
@@ -146,30 +146,30 @@ export default function RegisterForm() {
               onChange={handleChange}
               className={styles.select}
             >
-              <option value="user">Usuario</option>
-              <option value="shop">Tienda</option>
+              <option value={UserRole.USER}>Usuario</option>
+              <option value={UserRole.ORGANIZER}>Organizador</option>
             </select>
           </div>
 
-          {formData.role === 'shop' && (
+          {formData.role === UserRole.ORGANIZER && (
           <div className={styles.formGroup}>
-            <label htmlFor="shopName" className={styles.label}>
+            <label htmlFor="organizerName" className={styles.label}>
               <FiShoppingBag className={styles.labelIcon} />
-              Nombre de la Tienda
+              Nombre del Organizador
             </label>
               <input
                 type="text"
-                id="shopName"
-                name="shopName"
-                value={formData.shopName}
+                id="organizerName"
+                name="organizerName"
+                value={formData.organizerName}
                 onChange={handleChange}
                 required
                 minLength={3}
                 className={styles.input}
-                placeholder="Ej: Mi Tienda de Sorteos"
+                placeholder="Ej: Mi Organizador de Sorteos"
               />
               <small className={styles.helpText}>
-                Este será el nombre de tu tienda en la plataforma
+                Este será el nombre público de tu organizador en la plataforma
               </small>
             </div>
           )}

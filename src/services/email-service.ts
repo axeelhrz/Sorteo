@@ -6,6 +6,28 @@ export interface RegistrationEmailData {
   role: string;
 }
 
+export interface WinnerNotificationEmailData {
+  email: string;
+  name: string;
+  raffleId: string;
+  raffleTitle: string;
+  productName: string;
+  productDescription: string;
+  productValue: number;
+  ticketNumber: number;
+  verificationCode: string;
+  shopName: string;
+  shopEmail?: string;
+  shopPhone?: string;
+  shopSocialMedia?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    whatsapp?: string;
+  };
+  winDate: Date;
+}
+
 /**
  * Servicio de correos
  * Nota: Requiere configuración de Cloud Functions en Firebase
@@ -82,6 +104,129 @@ export const emailService = {
     } catch (error: any) {
       console.error('Error sending password change confirmation:', error);
       // No lanzar error para no bloquear el cambio de contraseña
+    }
+  },
+
+  /**
+   * Envía correo de notificación al ganador del sorteo
+   * Incluye toda la información relevante del sorteo, producto, organizador y código de verificación
+   */
+  async sendWinnerNotificationEmail(data: WinnerNotificationEmailData): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-winner-notification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          name: data.name,
+          raffleId: data.raffleId,
+          raffleTitle: data.raffleTitle,
+          productName: data.productName,
+          productDescription: data.productDescription,
+          productValue: data.productValue,
+          ticketNumber: data.ticketNumber,
+          verificationCode: data.verificationCode,
+          shopName: data.shopName,
+          shopEmail: data.shopEmail,
+          shopPhone: data.shopPhone,
+          shopSocialMedia: data.shopSocialMedia,
+          winDate: data.winDate.toISOString(),
+        }),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending winner notification email:', response.statusText);
+        throw new Error('Error al enviar correo de notificación al ganador');
+      }
+    } catch (error: any) {
+      console.error('Error sending winner notification email:', error);
+      throw new Error('Error al enviar correo de notificación al ganador');
+    }
+  },
+
+  /**
+   * Envía correo cuando el pago está siendo validado
+   */
+  async sendPaymentValidationEmail(data: {
+    email: string;
+    name: string;
+    ticketQuantity: number;
+    amount: number;
+    paymentMethod: string;
+  }): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-payment-validation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending payment validation email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending payment validation email:', error);
+    }
+  },
+
+  /**
+   * Envía correo cuando la validación OCR falla
+   */
+  async sendPaymentValidationFailedEmail(data: {
+    email: string;
+    name: string;
+    ticketQuantity: number;
+    amount: number;
+    paymentMethod: string;
+    reason: string;
+    paymentId: string;
+  }): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-payment-validation-failed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending payment validation failed email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending payment validation failed email:', error);
+    }
+  },
+
+  /**
+   * Envía correo cuando el pago es aprobado
+   */
+  async sendPaymentApprovedEmail(data: {
+    email: string;
+    name: string;
+    raffleName: string;
+    ticketQuantity: number;
+    amount: number;
+    paymentMethod: string;
+  }): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-payment-approved', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending payment approved email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending payment approved email:', error);
     }
   },
 };

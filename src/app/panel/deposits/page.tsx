@@ -72,7 +72,7 @@ export default function DepositsPage() {
       const shopData = await shopService.getMyShop();
       setShop(shopData);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar la tienda');
+      setError(err.response?.data?.message || 'Error al cargar el organizador');
       setLoading(false);
     }
   };
@@ -277,7 +277,3 @@ export default function DepositsPage() {
     </ProtectedRoute>
   );
 }
-
-
-
-

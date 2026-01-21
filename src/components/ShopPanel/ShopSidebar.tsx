@@ -20,14 +20,7 @@ export function ShopSidebar({ isBlocked = false }: ShopSidebarProps) {
           href="/panel/tienda"
           className={`${styles.navLink} ${isActive('/panel/tienda') ? styles.active : ''}`}
         >
-          📋 Mi tienda
-        </Link>
-
-        <Link
-          href="/panel/productos"
-          className={`${styles.navLink} ${isActive('/panel/productos') ? styles.active : ''}`}
-        >
-          📦 Mis productos
+          📋 Mi organizador
         </Link>
 
         <Link

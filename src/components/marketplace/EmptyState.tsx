@@ -1,5 +1,6 @@
 'use client';
 
+import { FiAlertCircle, FiSearch, FiInbox } from 'react-icons/fi';
 import styles from './EmptyState.module.css';
 
 interface EmptyStateProps {
@@ -12,28 +13,28 @@ export default function EmptyState({ type, onRetry }: EmptyStateProps) {
     switch (type) {
       case 'no-raffles':
         return {
-          icon: '🎲',
+          icon: FiInbox,
           title: 'No hay oportunidades activas',
-          description: 'No hay oportunidades activas en este momento. Vuelve pronto o sigue a nuestras tiendas para estar al tanto de los próximos lanzamientos.',
+          description: 'No hay oportunidades disponibles en este momento. Vuelve pronto para descubrir nuevas oportunidades.',
           showRetry: false,
         };
       case 'no-results':
         return {
-          icon: '🔍',
-          title: 'No encontramos oportunidades',
-          description: 'No encontramos oportunidades que coincidan con tu búsqueda. Intenta con otros filtros o términos de búsqueda.',
+          icon: FiSearch,
+          title: 'Sin resultados',
+          description: 'No encontramos oportunidades que coincidan con tu búsqueda. Intenta ajustar los filtros.',
           showRetry: false,
         };
       case 'error':
         return {
-          icon: '⚠️',
-          title: 'Ocurrió un problema',
-          description: 'Ocurrió un problema al cargar las oportunidades. Intenta nuevamente.',
+          icon: FiAlertCircle,
+          title: 'Error al cargar',
+          description: 'No pudimos cargar las oportunidades. Por favor, intenta nuevamente.',
           showRetry: true,
         };
       default:
         return {
-          icon: '📦',
+          icon: FiInbox,
           title: 'Sin datos',
           description: 'No hay datos disponibles.',
           showRetry: false,
@@ -42,10 +43,13 @@ export default function EmptyState({ type, onRetry }: EmptyStateProps) {
   };
 
   const content = getContent();
+  const IconComponent = content.icon;
 
   return (
     <div className={styles.container}>
-      <div className={styles.icon}>{content.icon}</div>
+      <div className={styles.iconWrapper}>
+        <IconComponent className={styles.icon} />
+      </div>
       <h2 className={styles.title}>{content.title}</h2>
       <p className={styles.description}>{content.description}</p>
       {content.showRetry && onRetry && (

@@ -81,10 +81,10 @@ export default function AdminLayout({
             <FiCheckCircle className={styles.navIcon} />
             <span>Sorteos Finalizados</span>
           </Link>
-          <Link href="/admin/shops" className={styles.navItem}>
-            <FiShoppingBag className={styles.navIcon} />
-            <span>Tiendas</span>
-          </Link>
+        <Link href="/admin/shops" className={styles.navItem}>
+          <FiShoppingBag className={styles.navIcon} />
+          <span>Organizadores</span>
+        </Link>
           <Link href="/admin/users" className={styles.navItem}>
             <FiUsers className={styles.navIcon} />
             <span>Usuarios</span>

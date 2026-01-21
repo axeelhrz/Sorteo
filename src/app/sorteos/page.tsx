@@ -189,10 +189,10 @@ export default function SorteosPage() {
       {/* CTA Section */}
       <section className={styles.ctaSection}>
         <div className={styles.ctaContent}>
-          <h2 className={styles.ctaTitle}>¿Eres una tienda?</h2>
+          <h2 className={styles.ctaTitle}>¿Eres un organizador?</h2>
           <p className={styles.ctaText}>Crea oportunidades y llega a miles de clientes potenciales</p>
           <Link href="/register" className={styles.ctaButton}>
-            Registra tu tienda
+            Registra tu organizador
           </Link>
         </div>
       </section>

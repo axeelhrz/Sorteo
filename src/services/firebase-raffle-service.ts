@@ -274,13 +274,13 @@ export const firebaseRaffleService = {
   },
 
   /**
-   * Obtiene sorteos de una tienda específica (para el dashboard de la tienda)
+   * Obtiene sorteos de un organizador específico (para el dashboard del organizador)
    * Incluye todos los estados: borradores, pendientes, activos, finalizados, etc.
    */
   async getRafflesByShop(shopId: string, filters?: Omit<RaffleFilters, 'shopId'>): Promise<PaginatedRaffles> {
     try {
       const rafflesRef = collection(db, 'raffles');
-      // Obtener TODOS los sorteos de la tienda (sin filtro de status)
+      // Obtener TODOS los sorteos del organizador (sin filtro de status)
       let q = query(rafflesRef, where('shopId', '==', shopId));
 
       const allDocs = await getDocs(q);
@@ -356,7 +356,7 @@ export const firebaseRaffleService = {
   },
 
   /**
-   * Obtiene tiendas con sorteos activos
+   * Obtiene organizadores con sorteos activos
    */
   async getShopsWithActiveRaffles(): Promise<Array<{ id: string; name: string }>> {
     try {
@@ -372,17 +372,17 @@ export const firebaseRaffleService = {
         }
       });
 
-      // Obtener información de las tiendas
-      const shops: Array<{ id: string; name: string }> = [];
-      for (const shopId of shopIds) {
+    // Obtener información de los organizadores
+    const shops: Array<{ id: string; name: string }> = [];
+    for (const shopId of shopIds) {
         try {
           const shopDoc = await getDoc(doc(db, 'shops', shopId));
           if (shopDoc.exists()) {
             const shopData = shopDoc.data();
-            shops.push({
-              id: shopDoc.id,
-              name: shopData.name || 'Tienda sin nombre',
-            });
+      shops.push({
+        id: shopDoc.id,
+        name: shopData.name || 'Organizador sin nombre',
+      });
           }
         } catch (error) {
           console.error(`Error loading shop ${shopId}:`, error);

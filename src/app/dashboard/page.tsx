@@ -21,7 +21,7 @@ export default function DashboardPage() {
       router.push('/dashboard/admin');
     } else if (user.role === UserRole.USER) {
       router.push('/dashboard/user');
-    } else if (user.role === UserRole.SHOP) {
+    } else if (user.role === UserRole.ORGANIZER || user.role === UserRole.SHOP) {
       router.push('/dashboard/store');
     } else {
       router.push('/login');

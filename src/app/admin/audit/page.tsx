@@ -1,20 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { adminService } from '@/services/admin-service';
+import { auditService, AuditLog } from '@/services/audit-service';
 import styles from '../admin.module.css';
-
-interface AuditLog {
-  id: string;
-  admin: { id: string; name: string; email: string };
-  action: string;
-  entityType: string;
-  entityId: string;
-  previousStatus: string;
-  newStatus: string;
-  reason: string;
-  createdAt: string;
-}
 
 export default function AuditLogs() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -36,11 +24,13 @@ export default function AuditLogs() {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getAuditLogs(limit, page * limit, {
+      const data = await auditService.getAllLogs({
         action: actionFilter || undefined,
         entityType: entityTypeFilter || undefined,
+        limit,
+        offset: page * limit,
       });
-      setLogs(data.data);
+      setLogs(data.logs);
       setTotal(data.total);
       setError(null);
     } catch (err: any) {
@@ -56,9 +46,12 @@ export default function AuditLogs() {
       raffle_approved: 'Sorteo Aprobado',
       raffle_rejected: 'Sorteo Rechazado',
       raffle_cancelled: 'Sorteo Cancelado',
-      shop_status_changed: 'Estado de Tienda Cambiado',
-      shop_verified: 'Tienda Verificada',
-      shop_blocked: 'Tienda Bloqueada',
+      organizer_status_changed: 'Estado de Organizador Cambiado',
+      shop_status_changed: 'Estado de Organizador Cambiado', // Alias para compatibilidad
+      organizer_verified: 'Organizador Verificado',
+      shop_verified: 'Organizador Verificado', // Alias para compatibilidad
+      organizer_blocked: 'Organizador Bloqueado',
+      shop_blocked: 'Organizador Bloqueado', // Alias para compatibilidad
       user_suspended: 'Usuario Suspendido',
     };
     return labels[action] || action;
@@ -101,10 +94,10 @@ export default function AuditLogs() {
           >
             <option value="">Todas las acciones</option>
             <option value="raffle_approved">Sorteo Aprobado</option>
-            <option value="raffle_rejected">Sorteo Rechazado</option>
-            <option value="raffle_cancelled">Sorteo Cancelado</option>
-            <option value="shop_verified">Tienda Verificada</option>
-            <option value="shop_blocked">Tienda Bloqueada</option>
+              <option value="raffle_rejected">Sorteo Rechazado</option>
+              <option value="raffle_cancelled">Sorteo Cancelado</option>
+              <option value="organizer_verified">Organizador Verificado</option>
+              <option value="organizer_blocked">Organizador Bloqueado</option>
           </select>
 
           <select
@@ -115,10 +108,10 @@ export default function AuditLogs() {
               setPage(0);
             }}
           >
-            <option value="">Todas las entidades</option>
-            <option value="raffle">Sorteo</option>
-            <option value="shop">Tienda</option>
-            <option value="user">Usuario</option>
+              <option value="">Todas las entidades</option>
+              <option value="raffle">Sorteo</option>
+              <option value="organizer">Organizador</option>
+              <option value="user">Usuario</option>
           </select>
         </div>
       </div>

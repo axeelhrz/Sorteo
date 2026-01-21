@@ -34,7 +34,7 @@ export default function UsersManagement() {
       const data = await adminService.getAllUsers(
         limit,
         page * limit,
-        roleFilter || undefined,
+        roleFilter ? { role: roleFilter } : undefined,
       );
       setUsers(data.data);
       setTotal(data.total);
@@ -51,6 +51,7 @@ export default function UsersManagement() {
     switch (role) {
       case 'admin':
         return styles.danger;
+      case 'organizer':
       case 'shop':
         return styles.warning;
       default:
@@ -62,8 +63,9 @@ export default function UsersManagement() {
     switch (role) {
       case 'admin':
         return 'Administrador';
+      case 'organizer':
       case 'shop':
-        return 'Tienda';
+        return 'Organizador';
       case 'user':
         return 'Usuario';
       default:
@@ -99,10 +101,10 @@ export default function UsersManagement() {
               setPage(0);
             }}
           >
-            <option value="">Todos los roles</option>
-            <option value="admin">Administrador</option>
-            <option value="shop">Tienda</option>
-            <option value="user">Usuario</option>
+          <option value="">Todos los roles</option>
+          <option value="admin">Administrador</option>
+          <option value="organizer">Organizador</option>
+          <option value="user">Usuario</option>
           </select>
         </div>
       </div>

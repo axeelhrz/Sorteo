@@ -43,7 +43,7 @@ export default function CreateProductPage() {
   const loadShop = async () => {
     setLoadingShop(true);
     try {
-      // Buscar tienda por userId en Firestore
+      // Buscar organizador por userId en Firestore
       if (!user?.id) {
         setError('Usuario no autenticado');
         return;
@@ -75,10 +75,10 @@ export default function CreateProductPage() {
         setShop(shop);
         setFormData((prev) => ({ ...prev, shopId: shop.id }));
       } else {
-        setError('No se encontró tu tienda');
+        setError('No se encontró tu organizador');
       }
     } catch (err: any) {
-      setError(err.message || 'Error al cargar la tienda');
+      setError(err.message || 'Error al cargar el organizador');
     } finally {
       setLoadingShop(false);
     }
@@ -149,7 +149,7 @@ export default function CreateProductPage() {
       <div className={styles.panelContainer}>
         <ShopSidebar isBlocked={shop?.status === 'blocked'} />
         <main className={styles.mainContent}>
-          {loadingShop && <div className={styles.alert}>Cargando tienda...</div>}
+          {loadingShop && <div className={styles.alert}>Cargando organizador...</div>}
           {error && !loadingShop && (
             <div className={`${styles.alert} ${styles.alertError}`}>
               {error}
@@ -199,10 +199,10 @@ export default function CreateProductPage() {
                       />
                     </div>
 
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>
-                        Valor del producto (S/.) <span style={{ color: 'red' }}>*</span>
-                      </label>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>
+                Valor de Ticket (S/.) <span style={{ color: 'red' }}>*</span>
+              </label>
                       <input
                         type="number"
                         step="0.01"
@@ -423,4 +423,3 @@ export default function CreateProductPage() {
     </ProtectedRoute>
   );
 }
-

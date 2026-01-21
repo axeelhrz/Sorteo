@@ -28,13 +28,13 @@ service cloud.firestore {
     }
     
     // ============================================
-    // REGLAS PARA TIENDAS
+    // REGLAS PARA ORGANIZADORES
     // ============================================
     match /shops/{shopId} {
       // Lectura pública para el marketplace
       allow read: if true;
       
-      // El dueño de la tienda puede crear/actualizar su tienda
+      // El dueño del organizador puede crear/actualizar su organizador
       allow create: if request.auth != null && 
         request.resource.data.userId == request.auth.uid;
       
@@ -54,12 +54,12 @@ service cloud.firestore {
       // Lectura pública para el marketplace
       allow read: if true;
       
-      // Solo el dueño de la tienda puede crear productos
+      // Solo el dueño del organizador puede crear productos
       allow create: if request.auth != null && 
         exists(/databases/$(database)/documents/shops/$(request.resource.data.shopId)) &&
         get(/databases/$(database)/documents/shops/$(request.resource.data.shopId)).data.userId == request.auth.uid;
       
-      // Solo el dueño de la tienda puede actualizar sus productos
+      // Solo el dueño del organizador puede actualizar sus productos
       allow update: if request.auth != null && 
         exists(/databases/$(database)/documents/shops/$(resource.data.shopId)) &&
         get(/databases/$(database)/documents/shops/$(resource.data.shopId)).data.userId == request.auth.uid;
@@ -78,12 +78,12 @@ service cloud.firestore {
       // Lectura pública para el marketplace
       allow read: if true;
       
-      // Solo el dueño de la tienda puede crear sorteos
+      // Solo el dueño del organizador puede crear sorteos
       allow create: if request.auth != null && 
         exists(/databases/$(database)/documents/shops/$(request.resource.data.shopId)) &&
         get(/databases/$(database)/documents/shops/$(request.resource.data.shopId)).data.userId == request.auth.uid;
       
-      // Solo el dueño de la tienda o admin puede actualizar sorteos
+      // Solo el dueño del organizador o admin puede actualizar sorteos
       allow update: if request.auth != null && 
         (exists(/databases/$(database)/documents/shops/$(resource.data.shopId)) &&
          get(/databases/$(database)/documents/shops/$(resource.data.shopId)).data.userId == request.auth.uid ||
@@ -233,4 +233,3 @@ service cloud.firestore {
 - Las reglas simplificadas son solo para desarrollo rápido
 - Siempre prueba las reglas en el simulador de Firebase antes de publicar
 - Las reglas se aplican inmediatamente después de publicar
-

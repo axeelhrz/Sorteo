@@ -54,7 +54,7 @@ export default function ShopsManagement() {
       setTotal(data.total);
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar tiendas');
+      setError(err.response?.data?.message || 'Error al cargar organizadores');
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -67,7 +67,7 @@ export default function ShopsManagement() {
       setSelectedShop(data);
       setShowDetail(true);
     } catch (err: any) {
-      alert('Error al cargar detalles de la tienda');
+      alert('Error al cargar detalles del organizador');
       console.error('Error:', err);
     }
   };
@@ -81,7 +81,7 @@ export default function ShopsManagement() {
     try {
       setActionLoading(true);
       await adminService.changeShopStatus(selectedShop.id, newStatus, statusReason);
-      alert('Estado de la tienda actualizado exitosamente');
+      alert('Estado del organizador actualizado exitosamente');
       setShowStatusModal(false);
       setNewStatus('');
       setStatusReason('');
@@ -98,14 +98,14 @@ export default function ShopsManagement() {
   if (loading && shops.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '40px' }}>
-        <p>Cargando tiendas...</p>
+        <p>Cargando organizadores...</p>
       </div>
     );
   }
 
-  return (
-    <div>
-      <h2 style={{ marginBottom: '20px', color: '#2c3e50' }}>Gestión de Tiendas</h2>
+    return (
+      <div>
+        <h2 style={{ marginBottom: '20px', color: '#2c3e50' }}>Gestión de Organizadores</h2>
 
       {error && (
         <div style={{ padding: '15px', backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px', marginBottom: '20px' }}>
@@ -133,7 +133,7 @@ export default function ShopsManagement() {
 
       {shops.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <p style={{ color: '#7f8c8d' }}>No hay tiendas</p>
+          <p style={{ color: '#7f8c8d' }}>No hay organizadores</p>
         </div>
       ) : (
         <div className={styles.tableContainer}>
@@ -203,7 +203,7 @@ export default function ShopsManagement() {
         <div className={`${styles.modal} ${showDetail ? styles.open : ''}`}>
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
-              <h2>Detalles de la Tienda</h2>
+              <h2>Detalles del Organizador</h2>
             </div>
 
             <div className={styles.modalBody}>
@@ -294,7 +294,7 @@ export default function ShopsManagement() {
         <div className={`${styles.modal} ${showStatusModal ? styles.open : ''}`}>
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
-              <h2>Cambiar Estado de Tienda</h2>
+              <h2>Cambiar Estado de Organizador</h2>
             </div>
 
             <div className={styles.modalBody}>

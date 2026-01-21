@@ -25,7 +25,7 @@ export default function ComplaintDetail({ complaintId,  }: ComplaintDetailProps)
 
   const resolutionLabels: Record<ComplaintResolution, string> = {
     [ComplaintResolution.RESOLVED_USER_FAVOR]: 'A favor del usuario',
-    [ComplaintResolution.RESOLVED_SHOP_FAVOR]: 'A favor de la tienda',
+    [ComplaintResolution.RESOLVED_SHOP_FAVOR]: 'A favor del organizador',
     [ComplaintResolution.RESOLVED_PLATFORM_FAVOR]: 'Resolución parcial',
     [ComplaintResolution.REJECTED]: 'Rechazado',
     [ComplaintResolution.CANCELLED]: 'Cancelado',
@@ -94,7 +94,7 @@ export default function ComplaintDetail({ complaintId,  }: ComplaintDetailProps)
           <span>{complaint.type}</span>
         </div>
         <div className={styles.infoItem}>
-          <label>Tienda:</label>
+          <label>Organizador:</label>
           <span>{complaint.shop?.name || 'N/A'}</span>
         </div>
         <div className={styles.infoItem}>

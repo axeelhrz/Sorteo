@@ -30,9 +30,9 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Reglas para tiendas
-    match /shops/{shopId} {
-      allow read: if true; // Público para lectura
+// Reglas para organizadores
+match /shops/{shopId} {
+  allow read: if true; // Público para lectura
       allow write: if request.auth != null && 
         (resource == null || resource.data.userId == request.auth.uid);
     }
@@ -67,4 +67,3 @@ NEXT_PUBLIC_FIREBASE_APP_ID=tu-app-id
 
 Puedes encontrar estas credenciales en:
 - Firebase Console → Project Settings → General → Your apps → Web app
-

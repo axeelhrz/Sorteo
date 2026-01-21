@@ -19,7 +19,8 @@ export default function StoreDashboardPage() {
       return;
     }
 
-    if (user.role !== UserRole.SHOP) {
+    // Check if user is an organizer (SHOP is an alias for ORGANIZER)
+    if (user.role !== UserRole.ORGANIZER) {
       router.push('/dashboard');
       return;
     }
