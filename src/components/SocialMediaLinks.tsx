@@ -8,6 +8,7 @@ interface SocialMediaLinksProps {
   size?: 'small' | 'medium' | 'large';
   variant?: 'default' | 'colored' | 'outlined';
   showLabels?: boolean;
+  maxLinks?: number;
 }
 
 export const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({
@@ -15,6 +16,7 @@ export const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({
   size = 'medium',
   variant = 'default',
   showLabels = false,
+  maxLinks,
 }) => {
   if (!socialMedia) return null;
 
@@ -59,6 +61,9 @@ export const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({
 
   if (socialLinks.length === 0) return null;
 
+  // Limitar el número de enlaces si se especifica maxLinks
+  const displayedLinks = maxLinks ? socialLinks.slice(0, maxLinks) : socialLinks;
+
   const formatUrl = (url: string, platform: string): string => {
     if (!url) return '';
     
@@ -76,6 +81,7 @@ export const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({
       case 'Twitter':
         return `https://twitter.com/${url.replace('@', '')}`;
       case 'TikTok':
+        // Formato: https://tiktok.com/@username
         return `https://tiktok.com/@${url.replace('@', '')}`;
       case 'WhatsApp':
         // Formato: https://wa.me/51984908819
@@ -88,7 +94,7 @@ export const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({
 
   return (
     <div className={`${styles.container} ${styles[size]}`}>
-      {socialLinks.map((link) => {
+      {displayedLinks.map((link) => {
         const Icon = link.icon;
         const url = formatUrl(link.url!, link.name);
 

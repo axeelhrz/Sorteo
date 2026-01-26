@@ -129,11 +129,11 @@
   letter-spacing: -0.02em;
 }
 
-.shopInfo {
+.shopSection {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 .shopName {
@@ -141,10 +141,6 @@
   font-size: 13px;
   color: #64748b;
   font-weight: 500;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   letter-spacing: 0;
 }
 
@@ -152,7 +148,7 @@
 .socialMediaContainer {
   display: flex;
   align-items: center;
-  margin-top: 8px;
+  gap: 6px;
 }
 
 /* Value */

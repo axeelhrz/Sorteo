@@ -7,7 +7,7 @@
 
 /* Sizes */
 .small {
-  gap: 8px;
+  gap: 6px;
 }
 
 .medium {
@@ -28,6 +28,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 50%;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .link:hover {
@@ -153,7 +154,11 @@
 /* Responsive */
 @media (max-width: 768px) {
   .container {
-    gap: 10px;
+    gap: 8px;
+  }
+
+  .small {
+    gap: 6px;
   }
 
   .link {
@@ -161,8 +166,17 @@
     height: 36px;
   }
 
+  .small .link {
+    width: 30px;
+    height: 30px;
+  }
+
   .icon {
     font-size: 16px;
+  }
+
+  .small .icon {
+    font-size: 12px;
   }
 
   .label {
@@ -172,7 +186,11 @@
 
 @media (max-width: 480px) {
   .container {
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .small {
+    gap: 4px;
   }
 
   .link {
@@ -180,7 +198,16 @@
     height: 32px;
   }
 
+  .small .link {
+    width: 28px;
+    height: 28px;
+  }
+
   .icon {
     font-size: 14px;
+  }
+
+  .small .icon {
+    font-size: 11px;
   }
 }

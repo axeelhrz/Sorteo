@@ -354,4 +354,33 @@ export const emailService = {
       console.error('Error sending payment approved email:', error);
     }
   },
+
+  /**
+   * Envía correo cuando el pago es rechazado
+   */
+  async sendPaymentRejectedEmail(data: {
+    email: string;
+    name: string;
+    amount: number;
+    ticketQuantity: number;
+    paymentMethod: string;
+    rejectionReason: string;
+    paymentId: string;
+  }): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-payment-rejected', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending payment rejected email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending payment rejected email:', error);
+    }
+  },
 };

@@ -239,27 +239,17 @@ function CheckoutContent() {
                   
                   <div className={styles.qrWrapper}>
                     {selectedMethod === 'yape' && (
-                      <Image 
+                      <img 
                         src="/assets/yape.png" 
                         alt="QR YAPE" 
-                        width={2000} 
-                        height={2000}
                         className={styles.qrCode}
-                        priority
-                        quality={100}
-                        unoptimized
                       />
                     )}
                     {selectedMethod === 'plin' && (
-                      <Image 
+                      <img 
                         src="/assets/plin.png" 
                         alt="QR PLIN" 
-                        width={2000} 
-                        height={2000}
                         className={styles.qrCode}
-                        priority
-                        quality={100}
-                        unoptimized
                       />
                     )}
                   </div>
