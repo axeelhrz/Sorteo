@@ -250,9 +250,9 @@ export const adminService = {
       let q = query(rafflesRef, where('status', '==', 'pending_approval'));
       
       const rafflesSnapshot = await getDocs(q);
-      let raffles = rafflesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
+      let raffles: any[] = rafflesSnapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
       }));
 
       // Filter by shop if provided
@@ -266,7 +266,7 @@ export const adminService = {
 
       // Enrich with shop and product data
       const enrichedRaffles = await Promise.all(
-        paginatedRaffles.map(async (raffle) => {
+        paginatedRaffles.map(async (raffle: any) => {
           const shopDoc = await getDoc(doc(db, 'shops', raffle.shopId));
           const productDoc = await getDoc(doc(db, 'products', raffle.productId));
           
