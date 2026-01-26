@@ -1,15 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
 import { Complaint, ComplaintStatus, ComplaintType } from '@/types/complaint';
 import { complaintService } from '@/services/complaint-service';
 import styles from './admin-complaints.module.css';
 
 export default function AdminComplaintsPage() {
-  const router = useRouter();
-  const { user, isLoading: authLoading } = useAuth();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,17 +19,9 @@ export default function AdminComplaintsPage() {
   });
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      router.push('/login');
-    }
-  }, [authLoading, user, router]);
-
-  useEffect(() => {
-    if (user?.role === 'admin') {
-      fetchComplaints();
-      fetchStats();
-    }
-  }, [user, filters]);
+    fetchComplaints();
+    fetchStats();
+  }, [filters]);
 
   const fetchComplaints = async () => {
     try {
@@ -83,10 +71,6 @@ export default function AdminComplaintsPage() {
       setError('Error al exportar reclamos');
     }
   };
-
-  if (authLoading || !user || user.role !== 'admin') {
-    return <div className={styles.loading}>Cargando...</div>;
-  }
 
   return (
     <div className={styles.container}>

@@ -27,18 +27,7 @@ export default function AdminLayout({
   const { user, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Verificar que el usuario es admin
-  if (user?.role !== 'admin') {
-    return (
-      <div className={styles.unauthorized}>
-        <div className={styles.unauthorizedContent}>
-          <h1>No autorizado</h1>
-          <p>No tienes permiso para acceder a esta sección.</p>
-          <button onClick={() => router.push('/')}>Volver al inicio</button>
-        </div>
-      </div>
-    );
-  }
+  // Panel de admin ahora es de acceso público
 
   const handleLogout = async () => {
     try {

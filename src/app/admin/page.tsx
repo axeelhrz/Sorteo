@@ -15,6 +15,8 @@ import {
 import { adminService } from '@/services/admin-service';
 import styles from './admin.module.css';
 
+// Panel de admin ahora es de acceso público
+
 interface DashboardStats {
   users: { total: number };
   shops: { total: number; pending: number; verified: number; blocked: number };
