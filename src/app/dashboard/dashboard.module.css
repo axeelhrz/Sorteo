@@ -178,28 +178,67 @@
   overflow-x: auto;
   position: relative;
   z-index: 10;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 2px solid #f3f4f6;
+  scroll-behavior: smooth;
+}
+
+.tabsContainer::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tabsContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tabsContainer::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.tabsContainer::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .tab {
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
-  padding: 16px 0;
-  margin-bottom: -1px;
+  border-bottom: 3px solid transparent;
+  padding: 16px 20px;
+  margin-bottom: -2px;
   cursor: pointer;
   font-weight: 500;
   color: #64748b;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
   font-size: 14px;
   box-shadow: none;
   letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
 }
 
 .tab:hover {
   color: #0f172a;
-  border-bottom-color: #e5e7eb;
+  border-bottom-color: #cbd5e1;
+}
+
+.tab::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.tab:hover::after {
+  transform: scaleX(1);
 }
 
 .activeTab {
@@ -207,11 +246,26 @@
   color: #0f172a;
   border-bottom-color: #0f172a;
   box-shadow: none;
+  font-weight: 600;
+}
+
+.activeTab::after {
+  transform: scaleX(1);
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 }
 
 .tabIcon {
   font-size: 16px;
-  margin-right: 6px;
+  margin-right: 0;
+  transition: transform 0.2s ease;
+}
+
+.tab:hover .tabIcon {
+  transform: translateY(-2px);
+}
+
+.activeTab .tabIcon {
+  color: #667eea;
 }
 
 .content {
