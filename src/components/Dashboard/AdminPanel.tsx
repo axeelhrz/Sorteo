@@ -3,9 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
-import { FiLogOut, FiUsers, FiShoppingBag, FiClock, FiCheckCircle, FiXCircle, FiPlay, FiTag, FiCreditCard, FiDollarSign, FiBarChart2, FiAlertCircle } from 'react-icons/fi';
+import { FiUsers, FiShoppingBag, FiClock, FiCheckCircle, FiXCircle, FiPlay, FiTag, FiCreditCard, FiDollarSign, FiBarChart2, FiAlertCircle } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
-import Logo from '@/components/Logo';
 import styles from '@/app/dashboard/dashboard.module.css';
 
 interface DashboardStats {
@@ -383,7 +382,6 @@ export default function AdminPanel() {
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerTitle}>
-            <Logo size="small" showText={false} />
             <h1>Panel de Administración</h1>
           </div>
           <div className={styles.userSection}>
@@ -398,7 +396,6 @@ export default function AdminPanel() {
               </div>
             </div>
             <button onClick={handleLogout} className={styles.logoutBtn}>
-              <FiLogOut className={styles.logoutIcon} />
               Cerrar Sesión
             </button>
           </div>
