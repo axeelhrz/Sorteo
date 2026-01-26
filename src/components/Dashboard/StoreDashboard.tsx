@@ -98,6 +98,16 @@ export default function StoreDashboard() {
   };
 
   const handleCreateRaffle = () => {
+    console.log('handleCreateRaffle called');
+    console.log('shop:', shop);
+    console.log('user:', user);
+    
+    if (!shop) {
+      console.error('No shop found. User shopId:', user?.shopId);
+      alert('Error: No se encontró información de la tienda. Por favor, recarga la página.');
+      return;
+    }
+    
     setShowCreateModal(true);
   };
 
@@ -568,7 +578,7 @@ export default function StoreDashboard() {
       </main>
 
       {/* Create Raffle Modal */}
-      {showCreateModal && shop && (
+      {showCreateModal && (
         <div className={styles.modalOverlay} onClick={handleCloseModal}>
           <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
@@ -578,11 +588,28 @@ export default function StoreDashboard() {
               </button>
             </div>
             <div className={styles.modalBody}>
-              <CreateRaffleForm 
-                shop={shop} 
-                onSuccess={handleRaffleCreated}
-                onCancel={handleCloseModal}
-              />
+              {shop ? (
+                <CreateRaffleForm 
+                  shop={shop} 
+                  onSuccess={handleRaffleCreated}
+                  onCancel={handleCloseModal}
+                />
+              ) : (
+                <div style={{ padding: '40px', textAlign: 'center' }}>
+                  <p style={{ color: '#64748b', marginBottom: '20px' }}>
+                    Cargando información de la tienda...
+                  </p>
+                  <div style={{ 
+                    width: '40px', 
+                    height: '40px', 
+                    border: '4px solid #f3f4f6',
+                    borderTop: '4px solid #6366f1',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    margin: '0 auto'
+                  }}></div>
+                </div>
+              )}
             </div>
           </div>
         </div>
