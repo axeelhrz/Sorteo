@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { FiArrowRight, FiZap, FiDollarSign, FiShare2, FiTrendingUp, FiShield, FiCheckCircle } from 'react-icons/fi';
 import RaffleCard from '@/components/marketplace/RaffleCard';
 import RaffleFilters from '@/components/marketplace/RaffleFilters';
 import EmptyState from '@/components/marketplace/EmptyState';
-import HowItWorks from '@/components/marketplace/HowItWorks';
 import { publicRaffleService, RaffleFilters as RaffleFiltersType } from '@/services/public-raffle-service';
 import { Raffle } from '@/types/raffle';
 import styles from './sorteos.module.css';
@@ -25,7 +25,6 @@ export default function SorteosPage() {
     limit: 12,
   });
 
-  // Cargar categorías y tiendas
   useEffect(() => {
     const loadMetadata = async () => {
       try {
@@ -43,20 +42,17 @@ export default function SorteosPage() {
     loadMetadata();
   }, []);
 
-  // Cargar sorteos
   const loadRaffles = useCallback(async (filters: RaffleFiltersType) => {
     setIsLoading(true);
     setError(null);
     try {
-      console.log('🔍 Cargando sorteos activos con filtros:', filters);
       const result = await publicRaffleService.getActiveRaffles(filters);
-      console.log('✅ Sorteos activos cargados:', result.data.length, 'de', result.total);
       setRaffles(result.data);
       setTotalPages(result.totalPages);
       setCurrentPage(result.page);
       setTotalRaffles(result.total);
     } catch (err: any) {
-      console.error('❌ Error loading raffles:', err);
+      console.error('Error loading raffles:', err);
       setError('No pudimos cargar los sorteos. Intenta nuevamente.');
       setRaffles([]);
     } finally {
@@ -64,12 +60,10 @@ export default function SorteosPage() {
     }
   }, []);
 
-  // Cargar sorteos iniciales
   useEffect(() => {
     loadRaffles(currentFilters);
   }, []);
 
-  // Manejar cambios de filtros
   const handleFiltersChange = (newFilters: RaffleFiltersType) => {
     const updatedFilters = {
       ...currentFilters,
@@ -80,7 +74,6 @@ export default function SorteosPage() {
     loadRaffles(updatedFilters);
   };
 
-  // Manejar cambio de página
   const handlePageChange = (page: number) => {
     const updatedFilters = {
       ...currentFilters,
@@ -91,23 +84,22 @@ export default function SorteosPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Manejar reintentar
   const handleRetry = () => {
     loadRaffles(currentFilters);
   };
 
   return (
     <main className={styles.container}>
-      {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <span className={styles.headerTag}>Explora y participa</span>
-          <h1 className={styles.title}>Oportunidades Disponibles</h1>
-          <p className={styles.subtitle}>
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <span className={styles.heroTag}>Explora y participa</span>
+          <h1 className={styles.heroTitle}>Oportunidades Disponibles</h1>
+          <p className={styles.heroSubtitle}>
             Descubre productos de alto valor con tickets de bajo costo. Tú decides cuánto participar.
           </p>
         </div>
-      </div>
+      </section>
 
       {/* Filters */}
       <RaffleFilters
@@ -183,7 +175,69 @@ export default function SorteosPage() {
       )}
 
       {/* How It Works Section */}
-      <HowItWorks />
+      <section className={styles.howItWorks}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTag}>Proceso</span>
+          <h2 className={styles.sectionTitle}>Cómo funciona</h2>
+          <p className={styles.sectionSubtitle}>
+            Un proceso simple y transparente en 4 pasos
+          </p>
+        </div>
+
+        <div className={styles.stepsContainer}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>01</div>
+            <h3 className={styles.stepTitle}>Explora</h3>
+            <p className={styles.stepText}>
+              Descubre oportunidades únicas en nuestro catálogo curado
+            </p>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>02</div>
+            <h3 className={styles.stepTitle}>Participa</h3>
+            <p className={styles.stepText}>
+              Adquiere tickets y aumenta tus probabilidades de ganar
+            </p>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>03</div>
+            <h3 className={styles.stepTitle}>Sorteo</h3>
+            <p className={styles.stepText}>
+              El sistema ejecuta el sorteo automáticamente al completarse
+            </p>
+          </div>
+
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>04</div>
+            <h3 className={styles.stepTitle}>Gana</h3>
+            <p className={styles.stepText}>
+              El ganador se elige aleatoriamente y recibe notificación
+            </p>
+          </div>
+        </div>
+
+        {/* Benefits List */}
+        <div className={styles.benefitsList}>
+          <div className={styles.benefitItem}>
+            <FiCheckCircle className={styles.benefitIcon} />
+            <span>Sistema de selección completamente aleatorio</span>
+          </div>
+          <div className={styles.benefitItem}>
+            <FiCheckCircle className={styles.benefitIcon} />
+            <span>Resultados transparentes y verificables</span>
+          </div>
+          <div className={styles.benefitItem}>
+            <FiCheckCircle className={styles.benefitIcon} />
+            <span>Notificación inmediata por email</span>
+          </div>
+          <div className={styles.benefitItem}>
+            <FiCheckCircle className={styles.benefitIcon} />
+            <span>Cumplimiento normativo garantizado</span>
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className={styles.ctaSection}>
