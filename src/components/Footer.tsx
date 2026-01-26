@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
-import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import { FiMail, FiPhone, FiMapPin, FiLock, FiCheckCircle, FiAward, FiShield } from 'react-icons/fi';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -139,28 +139,36 @@ export default function Footer() {
       <div className={styles.trustSection}>
         <div className={styles.trustContainer}>
           <div className={styles.trustItem}>
-            <div className={styles.trustIcon}>🔒</div>
+            <div className={styles.trustIcon}>
+              <FiLock />
+            </div>
             <div className={styles.trustText}>
               <h4>100% Seguro</h4>
               <p>Encriptación SSL y procesamiento seguro de pagos</p>
             </div>
           </div>
           <div className={styles.trustItem}>
-            <div className={styles.trustIcon}>✓</div>
+            <div className={styles.trustIcon}>
+              <FiCheckCircle />
+            </div>
             <div className={styles.trustText}>
               <h4>Verificado</h4>
               <p>Organizadores y usuarios verificados</p>
             </div>
           </div>
           <div className={styles.trustItem}>
-            <div className={styles.trustIcon}>⚖️</div>
+            <div className={styles.trustIcon}>
+              <FiAward />
+            </div>
             <div className={styles.trustText}>
               <h4>Transparente</h4>
               <p>Sorteos criptográficamente verificables</p>
             </div>
           </div>
           <div className={styles.trustItem}>
-            <div className={styles.trustIcon}>🛡️</div>
+            <div className={styles.trustIcon}>
+              <FiShield />
+            </div>
             <div className={styles.trustText}>
               <h4>Protegido</h4>
               <p>Garantía de entrega de premios</p>
