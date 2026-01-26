@@ -3,9 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
-import { FiLogOut, FiPlay, FiTag, FiAward } from 'react-icons/fi';
-import Logo from '@/components/Logo';
-import styles from '@/app/dashboard/dashboard.module.css';
+import { FiLogOut, FiPlay, FiTag, FiAward, FiShoppingBag } from 'react-icons/fi';
+import styles from './UserDashboard.module.css';
 
 interface Raffle {
   id: string;
@@ -37,12 +36,10 @@ interface Product {
   value: number;
 }
 
-type TabType = 'overview' | 'raffles' | 'tickets';
 
 export default function UserDashboard() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [activeRaffles, setActiveRaffles] = useState<Raffle[]>([]);
   const [myTickets, setMyTickets] = useState<RaffleTicket[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -155,377 +152,264 @@ export default function UserDashboard() {
   return (
     <div className={styles.dashboard}>
       {/* Header */}
-      <div className={styles.header}>
+      <header className={styles.header}>
         <div className={styles.headerContent}>
-          <div className={styles.headerTitle}>
-            <Logo size="small" showText={false} />
-            <h1>Mi Dashboard</h1>
+          <div className={styles.headerLeft}>
+            <span className={styles.headerTag}>Panel de Usuario</span>
+            <h1 className={styles.title}>Mi Dashboard</h1>
+            <p className={styles.subtitle}>Participa en sorteos y gestiona tus tickets</p>
           </div>
-          <div className={styles.userSection}>
-            <div className={styles.userInfo}>
+          
+          <div className={styles.headerRight}>
+            <div className={styles.userCard}>
               <div className={styles.userAvatar}>
-                <span>{user?.name?.charAt(0).toUpperCase()}</span>
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div className={styles.userDetails}>
-                <p className={styles.userName}>{user?.name}</p>
-                <p className={styles.email}>{user?.email}</p>
-                <span className={styles.role}>Usuario</span>
+                <span className={styles.userName}>{user?.name || 'Usuario'}</span>
+                <span className={styles.userRole}>Usuario</span>
               </div>
             </div>
+            
             <button onClick={handleLogout} className={styles.logoutBtn}>
-              <FiLogOut className={styles.logoutIcon} />
-              Cerrar Sesión
+              <FiLogOut />
+              <span>Salir</span>
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      {error && <div className={styles.errorBanner}>{error}</div>}
+      {/* Main Content */}
+      <main className={styles.mainContent}>
+        {error && <div className={styles.errorBanner}>{error}</div>}
 
-      {/* Tabs */}
-      <div className={styles.tabsContainer}>
-        <button
-          className={`${styles.tab} ${activeTab === 'overview' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('overview')}
-        >
-          Resumen
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'raffles' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('raffles')}
-        >
-          Sorteos Disponibles ({activeRaffles.length})
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'tickets' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('tickets')}
-        >
-          Mis Tickets ({myTickets.length})
-        </button>
-      </div>
-
-      {/* Content */}
-      <div className={styles.content}>
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className={styles.overviewGrid}>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>
+        {/* Stats Grid */}
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <div>
+                <div className={styles.statLabel}>Sorteos Disponibles</div>
+                <div className={styles.statValue}>{activeRaffles.length}</div>
+              </div>
+              <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
                 <FiPlay />
               </div>
-              <h3>Sorteos Disponibles</h3>
-              <p className={styles.bigNumber}>{activeRaffles.length}</p>
-              <p className={styles.subtitle}>Sorteos activos para participar</p>
             </div>
+            <div className={styles.statChange}>
+              <span>Sorteos activos para participar</span>
+            </div>
+          </div>
 
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <div>
+                <div className={styles.statLabel}>Mis Tickets</div>
+                <div className={styles.statValue}>{myTickets.length}</div>
+              </div>
+              <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
                 <FiTag />
               </div>
-              <h3>Mis Tickets</h3>
-              <p className={styles.bigNumber}>{myTickets.length}</p>
-              <p className={styles.subtitle}>Tickets comprados</p>
             </div>
+            <div className={styles.statChange}>
+              <span>Tickets comprados</span>
+            </div>
+          </div>
 
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <div>
+                <div className={styles.statLabel}>Sorteos Participados</div>
+                <div className={styles.statValue}>
+                  {new Set(myTickets.map(t => t.raffleId)).size}
+                </div>
+              </div>
+              <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
                 <FiAward />
               </div>
-              <h3>Sorteos Participados</h3>
-              <p className={styles.bigNumber}>
-                {new Set(myTickets.map(t => t.raffleId)).size}
-              </p>
-              <p className={styles.subtitle}>Diferentes sorteos</p>
+            </div>
+            <div className={styles.statChange}>
+              <span>Diferentes sorteos</span>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Raffles Tab */}
-        {activeTab === 'raffles' && (
-          <div>
-            <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: '600', color: '#333' }}>
-              Sorteos Disponibles
-            </h2>
-            
-            {activeRaffles.length === 0 ? (
-              <div style={{
-                padding: '40px',
-                textAlign: 'center',
-                backgroundColor: '#f5f5f5',
-                borderRadius: '8px',
-                color: '#666'
-              }}>
-                <p>No hay sorteos disponibles en este momento</p>
-              </div>
-            ) : (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                gap: '20px'
-              }}>
-                {activeRaffles.map((raffle) => {
-                  const availableTickets = raffle.totalTickets - raffle.soldTickets;
-                  const progress = raffle.totalTickets > 0 ? (raffle.soldTickets / raffle.totalTickets) * 100 : 0;
-                  const productName = raffle.product?.name || products.find(p => p.id === raffle.productId)?.name || 'Producto desconocido';
-                  const productValue = raffle.productValue || raffle.product?.value || products.find(p => p.id === raffle.productId)?.value || 0;
-                  const quantity = ticketQuantity[raffle.id] || 1;
-                  const totalPrice = quantity * productValue;
-                  const canBuy = raffle.status === 'active' && availableTickets > 0;
-                  const statusLabels: { [key: string]: string } = {
-                    'active': 'Activo',
-                    'paused': 'Pausado',
-                    'sold_out': 'Agotado',
-                    'finished': 'Finalizado',
-                    'cancelled': 'Cancelado',
-                  };
+        {/* Raffles Section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <h2 className={styles.sectionTitle}>Sorteos Disponibles</h2>
+              <p className={styles.sectionSubtitle}>Explora y participa en los sorteos activos</p>
+            </div>
+          </div>
 
-                  return (
-                    <div key={raffle.id} style={{
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '12px',
-                      padding: '20px',
-                      backgroundColor: '#fff',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                      opacity: raffle.status === 'cancelled' || raffle.status === 'finished' ? 0.7 : 1,
-                      transition: 'transform 0.2s, box-shadow 0.2s',
-                      cursor: 'pointer',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-4px)';
-                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-                    }}>
-                      {/* Encabezado */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '15px' }}>
-                        <h3 style={{ margin: 0, color: '#333', fontSize: '18px', fontWeight: '600', flex: 1 }}>
-                          {productName}
-                        </h3>
-                        <span style={{
-                          backgroundColor: getStatusColor(raffle.status),
-                          color: '#fff',
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          whiteSpace: 'nowrap',
-                          marginLeft: '10px'
-                        }}>
-                          {statusLabels[raffle.status] || raffle.status}
-                        </span>
+          {activeRaffles.length === 0 ? (
+            <div className={styles.emptyState}>
+              <FiShoppingBag className={styles.emptyIcon} />
+              <h3>No hay sorteos disponibles</h3>
+              <p>En este momento no hay sorteos activos. Vuelve pronto para participar en nuevos sorteos.</p>
+            </div>
+          ) : (
+            <div className={styles.rafflesGrid}>
+              {activeRaffles.map((raffle) => {
+                const availableTickets = raffle.totalTickets - raffle.soldTickets;
+                const progress = raffle.totalTickets > 0 ? (raffle.soldTickets / raffle.totalTickets) * 100 : 0;
+                const productName = raffle.product?.name || products.find(p => p.id === raffle.productId)?.name || 'Producto desconocido';
+                const productValue = raffle.productValue || raffle.product?.value || products.find(p => p.id === raffle.productId)?.value || 0;
+                const quantity = ticketQuantity[raffle.id] || 1;
+                const totalPrice = quantity * productValue;
+                const canBuy = raffle.status === 'active' && availableTickets > 0;
+                const statusLabels: { [key: string]: string } = {
+                  'active': 'Activo',
+                  'paused': 'Pausado',
+                  'sold_out': 'Agotado',
+                  'finished': 'Finalizado',
+                  'cancelled': 'Cancelado',
+                };
+
+                return (
+                  <div key={raffle.id} className={styles.raffleCard}>
+                    <div className={styles.raffleHeader}>
+                      <h3 className={styles.raffleName}>{productName}</h3>
+                      <span 
+                        className={styles.statusBadge}
+                        style={{ backgroundColor: getStatusColor(raffle.status) }}
+                      >
+                        {statusLabels[raffle.status] || raffle.status}
+                      </span>
+                    </div>
+
+                    <p className={styles.rafflePrice}>
+                      S/. {productValue.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+
+                    <div className={styles.progressSection}>
+                      <div className={styles.progressInfo}>
+                        <span className={styles.progressLabel}>Tickets disponibles:</span>
+                        <strong className={styles.progressValue} style={{ color: availableTickets > 0 ? '#10b981' : '#ef4444' }}>
+                          {availableTickets.toLocaleString()} / {raffle.totalTickets.toLocaleString()}
+                        </strong>
                       </div>
-
-                      {/* Precio */}
-                      <p style={{
-                        fontSize: '20px',
-                        fontWeight: 'bold',
-                        color: '#1976d2',
-                        margin: '10px 0 15px 0'
-                      }}>
-                        S/. {productValue.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      <div className={styles.progressBar}>
+                        <div 
+                          className={styles.progressFill}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      <p className={styles.progressPercent}>
+                        {Math.round(progress)}% vendido
                       </p>
+                    </div>
 
-                      {/* Progreso de Tickets */}
-                      <div style={{ marginBottom: '15px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                          <span style={{ color: '#666' }}>Tickets disponibles:</span>
-                          <strong style={{ color: availableTickets > 0 ? '#4CAF50' : '#F44336' }}>
-                            {availableTickets.toLocaleString()} / {raffle.totalTickets.toLocaleString()}
-                          </strong>
-                        </div>
-                        <div style={{
-                          width: '100%',
-                          height: '8px',
-                          backgroundColor: '#e0e0e0',
-                          borderRadius: '4px',
-                          overflow: 'hidden'
-                        }}>
-                          <div style={{
-                            width: `${progress}%`,
-                            height: '100%',
-                            backgroundColor: progress >= 100 ? '#4CAF50' : '#2196F3',
-                            transition: 'width 0.3s ease'
-                          }} />
-                        </div>
-                        <p style={{ fontSize: '12px', color: '#999', margin: '5px 0 0 0' }}>
-                          {Math.round(progress)}% vendido
-                        </p>
-                      </div>
-
-                      {/* Selector de Cantidad y Botón */}
-                      {canBuy ? (
-                        <div>
-                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
-                            <button
-                              onClick={() => setTicketQuantity({
-                                ...ticketQuantity,
-                                [raffle.id]: Math.max(1, quantity - 1)
-                              })}
-                              disabled={quantity <= 1}
-                              style={{
-                                padding: '6px 10px',
-                                border: '1px solid #ddd',
-                                borderRadius: '4px',
-                                backgroundColor: '#f5f5f5',
-                                cursor: quantity <= 1 ? 'not-allowed' : 'pointer',
-                                opacity: quantity <= 1 ? 0.5 : 1
-                              }}
-                            >
-                              −
-                            </button>
-                            <input
-                              type="number"
-                              min="1"
-                              max={availableTickets}
-                              value={quantity}
-                              onChange={(e) => {
-                                const val = parseInt(e.target.value) || 1;
-                                setTicketQuantity({
-                                  ...ticketQuantity,
-                                  [raffle.id]: Math.max(1, Math.min(val, availableTickets))
-                                });
-                              }}
-                              style={{
-                                width: '50px',
-                                padding: '6px',
-                                border: '1px solid #ddd',
-                                borderRadius: '4px',
-                                textAlign: 'center',
-                                fontSize: '14px',
-                                fontWeight: '600'
-                              }}
-                            />
-                            <button
-                              onClick={() => setTicketQuantity({
-                                ...ticketQuantity,
-                                [raffle.id]: Math.min(availableTickets, quantity + 1)
-                              })}
-                              disabled={quantity >= availableTickets}
-                              style={{
-                                padding: '6px 10px',
-                                border: '1px solid #ddd',
-                                borderRadius: '4px',
-                                backgroundColor: '#f5f5f5',
-                                cursor: quantity >= availableTickets ? 'not-allowed' : 'pointer',
-                                opacity: quantity >= availableTickets ? 0.5 : 1
-                              }}
-                            >
-                              +
-                            </button>
-                          </div>
-                          <p style={{ fontSize: '14px', fontWeight: '600', margin: '8px 0', color: '#333' }}>
-                            Total: S/. {totalPrice.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </p>
+                    {canBuy ? (
+                      <div>
+                        <div className={styles.quantitySelector}>
                           <button
-                            onClick={() => handleBuyTickets(raffle.id)}
-                            style={{
-                              width: '100%',
-                              padding: '12px',
-                              backgroundColor: '#2196F3',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '6px',
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              cursor: 'pointer',
-                              transition: 'background-color 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1976d2'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2196F3'}
+                            className={styles.quantityBtn}
+                            onClick={() => setTicketQuantity({
+                              ...ticketQuantity,
+                              [raffle.id]: Math.max(1, quantity - 1)
+                            })}
+                            disabled={quantity <= 1}
                           >
-                            Comprar Tickets
+                            −
+                          </button>
+                          <input
+                            type="number"
+                            min="1"
+                            max={availableTickets}
+                            value={quantity}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 1;
+                              setTicketQuantity({
+                                ...ticketQuantity,
+                                [raffle.id]: Math.max(1, Math.min(val, availableTickets))
+                              });
+                            }}
+                            className={styles.quantityInput}
+                          />
+                          <button
+                            className={styles.quantityBtn}
+                            onClick={() => setTicketQuantity({
+                              ...ticketQuantity,
+                              [raffle.id]: Math.min(availableTickets, quantity + 1)
+                            })}
+                            disabled={quantity >= availableTickets}
+                          >
+                            +
                           </button>
                         </div>
-                      ) : (
-                        <div style={{
-                          padding: '12px',
-                          backgroundColor: '#f5f5f5',
-                          borderRadius: '6px',
-                          textAlign: 'center',
-                          color: '#999',
-                          fontSize: '13px'
-                        }}>
-                          {raffle.status === 'sold_out' && 'Agotado'}
-                          {raffle.status === 'finished' && 'Finalizado'}
-                          {raffle.status === 'cancelled' && 'Cancelado'}
-                          {raffle.status === 'paused' && 'Pausado'}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
+                        <p className={styles.totalPrice}>
+                          Total: S/. {totalPrice.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                        <button
+                          onClick={() => handleBuyTickets(raffle.id)}
+                          className={styles.buyBtn}
+                        >
+                          Comprar Tickets
+                        </button>
+                      </div>
+                    ) : (
+                      <div className={styles.unavailableBox}>
+                        {raffle.status === 'sold_out' && 'Agotado'}
+                        {raffle.status === 'finished' && 'Finalizado'}
+                        {raffle.status === 'cancelled' && 'Cancelado'}
+                        {raffle.status === 'paused' && 'Pausado'}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
-        {/* Tickets Tab */}
-        {activeTab === 'tickets' && (
-          <div>
-            <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: '600', color: '#333' }}>
-              Mis Tickets
-            </h2>
-            
-            {myTickets.length === 0 ? (
-              <div style={{
-                padding: '40px',
-                textAlign: 'center',
-                backgroundColor: '#f5f5f5',
-                borderRadius: '8px',
-                color: '#666'
-              }}>
-                <p>No has comprado tickets aún. Participa en los sorteos disponibles.</p>
-              </div>
-            ) : (
-              <div style={{
-                overflowX: 'auto',
-                borderRadius: '8px',
-                border: '1px solid #e0e0e0'
-              }}>
-                <table style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  backgroundColor: '#fff'
-                }}>
-                  <thead>
-                    <tr style={{ backgroundColor: '#f5f5f5', borderBottom: '2px solid #e0e0e0' }}>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Ticket</th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Sorteo</th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Estado</th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Fecha</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {myTickets.map((ticket) => (
-                      <tr key={ticket.id} style={{ borderBottom: '1px solid #e0e0e0' }}>
-                        <td style={{ padding: '12px', color: '#333' }}>#{ticket.number}</td>
-                        <td style={{ padding: '12px', color: '#666' }}>Sorteo</td>
-                        <td style={{ padding: '12px' }}>
-                          <span style={{
-                            backgroundColor: '#2196F3',
-                            color: '#fff',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            fontWeight: '600'
-                          }}>
-                            {ticket.status}
-                          </span>
-                        </td>
-                        <td style={{ padding: '12px', color: '#999', fontSize: '13px' }}>
-                          {ticket.purchasedAt ? new Date(ticket.purchasedAt).toLocaleDateString('es-PE') : '-'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+        {/* Tickets Section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <h2 className={styles.sectionTitle}>Mis Tickets</h2>
+              <p className={styles.sectionSubtitle}>Revisa todos tus tickets comprados</p>
+            </div>
           </div>
-        )}
-      </div>
+
+          {myTickets.length === 0 ? (
+            <div className={styles.emptyState}>
+              <FiTag className={styles.emptyIcon} />
+              <h3>No tienes tickets</h3>
+              <p>No has comprado tickets aún. Participa en los sorteos disponibles para obtener tus primeros tickets.</p>
+            </div>
+          ) : (
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Sorteo</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myTickets.map((ticket) => (
+                    <tr key={ticket.id}>
+                      <td>#{ticket.number}</td>
+                      <td>Sorteo</td>
+                      <td>
+                        <span className={styles.ticketBadge}>
+                          {ticket.status}
+                        </span>
+                      </td>
+                      <td style={{ color: '#94a3b8', fontSize: '13px' }}>
+                        {ticket.purchasedAt ? new Date(ticket.purchasedAt).toLocaleDateString('es-PE') : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
