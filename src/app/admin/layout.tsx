@@ -19,7 +19,6 @@ const TABS: TabItem[] = [
   { id: 'raffles-finished', label: 'Sorteos Finalizados', icon: <FiTag />, href: '/admin/raffles/finished' },
   { id: 'shops', label: 'Organizadores', icon: <FiShoppingBag />, href: '/admin/shops' },
   { id: 'users', label: 'Usuarios', icon: <FiUsers />, href: '/admin/users' },
-  { id: 'payments', label: 'Pagos', icon: <FiCreditCard />, href: '/admin/payments' },
 ];
 
 export default function AdminLayout({
@@ -55,46 +54,53 @@ export default function AdminLayout({
   const activeTab = getActiveTab();
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f5f7fa' }}>
       {/* Header */}
       <div
         style={{
           backgroundColor: 'white',
-          borderBottom: '1px solid #e2e8f0',
-          padding: '16px 24px',
+          borderBottom: '1px solid #e8ecf1',
+          padding: '20px 32px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           position: 'sticky',
           top: 0,
           zIndex: 100,
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
-          Panel de Administración
-        </h1>
+        <div>
+          <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700', color: '#0f172a', letterSpacing: '-0.5px' }}>
+            Panel de Administración
+          </h1>
+          <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>
+            Gestión integral de la plataforma
+          </p>
+        </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div style={{ textAlign: 'right' }}>
             <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>
-              {user?.name}
+              {user?.name || 'Administrador'}
             </p>
-            <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#64748b' }}>
-              Administrador
+            <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
+              Acceso total
             </p>
           </div>
           <div
             style={{
-              width: '40px',
-              height: '40px',
+              width: '44px',
+              height: '44px',
               borderRadius: '50%',
-              backgroundColor: '#667eea',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
               fontWeight: '700',
               fontSize: '16px',
+              boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
             }}
           >
             {user?.name?.charAt(0).toUpperCase() || 'A'}
@@ -102,24 +108,26 @@ export default function AdminLayout({
           <button
             onClick={handleLogout}
             style={{
-              padding: '8px 16px',
+              padding: '10px 18px',
               border: 'none',
-              backgroundColor: '#fee2e2',
-              color: '#991b1b',
-              borderRadius: '6px',
+              backgroundColor: '#f1f5f9',
+              color: '#475569',
+              borderRadius: '8px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'background-color 0.2s ease',
+              fontSize: '13px',
+              fontWeight: '600',
+              transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.backgroundColor = '#fecaca';
+              (e.currentTarget as HTMLElement).style.backgroundColor = '#e2e8f0';
+              (e.currentTarget as HTMLElement).style.color = '#1e293b';
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.backgroundColor = '#fee2e2';
+              (e.currentTarget as HTMLElement).style.backgroundColor = '#f1f5f9';
+              (e.currentTarget as HTMLElement).style.color = '#475569';
             }}
           >
             <FiLogOut style={{ fontSize: '16px' }} />
@@ -132,13 +140,13 @@ export default function AdminLayout({
       <div
         style={{
           backgroundColor: 'white',
-          borderBottom: '1px solid #e2e8f0',
-          padding: '0 24px',
+          borderBottom: '2px solid #e8ecf1',
+          padding: '0 32px',
           display: 'flex',
-          gap: '8px',
+          gap: '0',
           overflowX: 'auto',
           position: 'sticky',
-          top: '72px',
+          top: '88px',
           zIndex: 99,
         }}
       >
@@ -147,7 +155,7 @@ export default function AdminLayout({
             key={tab.id}
             onClick={() => router.push(tab.href)}
             style={{
-              padding: '12px 16px',
+              padding: '16px 20px',
               border: 'none',
               backgroundColor: 'transparent',
               color: activeTab === tab.id ? '#667eea' : '#64748b',
@@ -155,31 +163,37 @@ export default function AdminLayout({
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '10px',
               fontSize: '14px',
               fontWeight: activeTab === tab.id ? '600' : '500',
-              transition: 'all 0.2s ease',
+              transition: 'all 0.25s ease',
               whiteSpace: 'nowrap',
+              position: 'relative',
+              marginBottom: '-2px',
             }}
             onMouseEnter={(e) => {
               if (activeTab !== tab.id) {
                 (e.currentTarget as HTMLElement).style.color = '#1e293b';
+                (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
               }
             }}
             onMouseLeave={(e) => {
               if (activeTab !== tab.id) {
                 (e.currentTarget as HTMLElement).style.color = '#64748b';
+                (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
               }
             }}
           >
-            <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center' }}>{tab.icon}</span>
+            <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center', opacity: activeTab === tab.id ? 1 : 0.7 }}>
+              {tab.icon}
+            </span>
             {tab.label}
           </button>
         ))}
       </div>
 
       {/* Page Content */}
-      <div style={{ padding: '24px' }}>
+      <div style={{ padding: '32px' }}>
         {children}
       </div>
     </div>
