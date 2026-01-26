@@ -20,8 +20,8 @@ export default function PanelPage() {
       return;
     }
 
-    // Redirect to shop profile
-    router.push('/panel/tienda');
+    // Redirect to organizer profile
+    router.push('/panel/organizador');
   }, [isAuthenticated, user, router]);
 
   return <div>Redirigiendo...</div>;

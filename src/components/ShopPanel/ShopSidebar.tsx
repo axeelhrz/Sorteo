@@ -17,8 +17,8 @@ export function ShopSidebar({ isBlocked = false }: ShopSidebarProps) {
     <aside className={styles.sidebar}>
       <nav className={styles.sidebarNav}>
         <Link
-          href="/panel/tienda"
-          className={`${styles.navLink} ${isActive('/panel/tienda') ? styles.active : ''}`}
+          href="/panel/organizador"
+          className={`${styles.navLink} ${isActive('/panel/organizador') ? styles.active : ''}`}
         >
           📋 Mi organizador
         </Link>

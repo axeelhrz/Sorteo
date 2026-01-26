@@ -373,7 +373,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
             required
           />
           <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
-            Para que el admin de TIKETEA pueda comunicarse en caso de ser necesario
+            Para que el equipo de TIKETEA pueda comunicarse en caso de ser necesario
           </small>
         </div>
       </div>
@@ -445,7 +445,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
                 marginBottom: '15px',
               }}
             >
-              <strong>📍 Recojo en tienda</strong>
+              <strong>📍 Recojo con organizador</strong>
             </div>
 
             <div className={styles.formGroup}>

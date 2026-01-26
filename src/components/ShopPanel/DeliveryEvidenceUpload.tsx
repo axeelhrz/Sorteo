@@ -243,7 +243,7 @@ export function DeliveryEvidenceUpload({
             id="notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Ej: Premio entregado el 15 de diciembre en la tienda. El ganador estaba muy contento..."
+            placeholder="Ej: Premio entregado el 15 de diciembre con el organizador. El ganador estaba muy contento..."
             className={styles.textarea}
             rows={4}
             maxLength={500}

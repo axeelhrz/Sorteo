@@ -130,13 +130,13 @@ const faqItems: FAQItem[] = [
     id: '19',
     category: 'Premios y Entregas',
     question: '¿Puedo cambiar el premio por dinero?',
-    answer: 'No, los premios no se pueden cambiar por dinero. Sin embargo, puedes coordinar directamente con la tienda para negociar alternativas.'
+    answer: 'No, los premios no se pueden cambiar por dinero. Sin embargo, puedes coordinar directamente con el organizador para negociar alternativas.'
   },
   {
     id: '20',
     category: 'Premios y Entregas',
     question: '¿Qué pasa si el premio llega dañado?',
-    answer: 'Si el premio llega dañado, debes reportarlo a la tienda dentro de 48 horas con fotos. La tienda es responsable de reemplazarlo o reembolsarte.'
+    answer: 'Si el premio llega dañado, debes reportarlo al organizador dentro de 48 horas con fotos. El organizador es responsable de reemplazarlo o reembolsarte.'
   },
 
   // Cuenta y Seguridad
@@ -171,34 +171,34 @@ const faqItems: FAQItem[] = [
     answer: 'Usa una contraseña fuerte, no la compartas con nadie, habilita autenticación de dos factores si está disponible, y no hagas clic en enlaces sospechosos.'
   },
 
-  // Para Tiendas
+  // Para Organizadores
   {
     id: '26',
-    category: 'Para Tiendas',
-    question: '¿Cómo registro mi tienda?',
-    answer: 'Haz clic en "Registra tu tienda" en la página principal, completa el formulario con información de tu tienda, sube documentos de verificación y espera la aprobación manual.'
+    category: 'Para Organizadores',
+    question: '¿Cómo registro mi organizador?',
+    answer: 'Haz clic en "Registra tu organizador" en la página principal, completa el formulario con información de tu organizador, sube documentos de verificación y espera la aprobación manual.'
   },
   {
     id: '27',
-      category: 'Para Tiendas',
+      category: 'Para Organizadores',
       question: '¿Cuánto cuesta crear una oportunidad?',
       answer: 'Crear una oportunidad es gratis. Solo pagas una comisión del 10% sobre el monto total de tickets vendidos. Además, debes depositar un 10% del valor de ticket como garantía (reembolsable).'
     },
   {
     id: '28',
-    category: 'Para Tiendas',
+    category: 'Para Organizadores',
     question: '¿Cuáles son los requisitos para crear una oportunidad?',
-    answer: 'Requisitos:\n- Valor mínimo del producto: S/. 50\n- Dimensiones mínimas: 15cm x 15cm x 15cm\n- Fotos claras y descripción detallada\n- Tienda verificada y activa\n- Depósito de garantía del 10%'
+    answer: 'Requisitos:\n- Valor mínimo del producto: S/. 50\n- Dimensiones mínimas: 15cm x 15cm x 15cm\n- Fotos claras y descripción detallada\n- Organizador verificado y activo\n- Depósito de garantía del 10%'
   },
   {
     id: '29',
-    category: 'Para Tiendas',
+    category: 'Para Organizadores',
     question: '¿Cuánto tiempo tarda la aprobación de una oportunidad?',
     answer: 'Las oportunidades se revisan manualmente y generalmente se aprueban dentro de 24-48 horas. Recibirás una notificación cuando sea aprobada.'
   },
   {
     id: '30',
-    category: 'Para Tiendas',
+    category: 'Para Organizadores',
     question: '¿Puedo cancelar una oportunidad?',
     answer: 'Sí, puedes cancelar una oportunidad antes de que se ejecute. Se reembolsará el 100% a todos los participantes y recuperarás tu depósito de garantía.'
   },
