@@ -13,6 +13,12 @@ export default function GlobalHeader() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const [isHydrated, setIsHydrated] = React.useState(false);
+
+  // Handle hydration
+  React.useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -67,7 +73,7 @@ export default function GlobalHeader() {
             </span>
           </Link>
 
-          {isAuthenticated && user && (
+          {isHydrated && isAuthenticated && user && (
             <Link href="/dashboard" className={styles.navLink} onClick={closeMenu}>
               <span className={styles.navLinkContent}>
                 <FiUser className={styles.icon} />
@@ -77,7 +83,7 @@ export default function GlobalHeader() {
           )}
 
           {/* Versión móvil - dentro del menú */}
-          {isAuthenticated && user && (
+          {isHydrated && isAuthenticated && user && (
             <button onClick={handleLogout} className={`${styles.logoutBtn} ${styles.logoutBtnMobile}`}>
               <span className={styles.navLinkContent}>
                 <FiLogOut className={styles.icon} />
@@ -86,7 +92,7 @@ export default function GlobalHeader() {
             </button>
           )}
 
-          {!isAuthenticated && (
+          {isHydrated && !isAuthenticated && (
             <div className={`${styles.authButtons} ${styles.authButtonsMobile}`}>
               <Link href="/login" className={styles.loginButton} onClick={closeMenu}>
                 Iniciar Sesión
@@ -100,14 +106,14 @@ export default function GlobalHeader() {
 
         {/* Versión desktop - a la derecha */}
         <div className={styles.rightSection}>
-          {isAuthenticated && user ? (
+          {isHydrated && isAuthenticated && user ? (
             <button onClick={handleLogout} className={`${styles.logoutBtn} ${styles.logoutBtnDesktop}`}>
               <span className={styles.navLinkContent}>
                 <FiLogOut className={styles.icon} />
                 <span>Salir</span>
               </span>
             </button>
-          ) : (
+          ) : isHydrated ? (
             <div className={`${styles.authButtons} ${styles.authButtonsDesktop}`}>
               <Link href="/login" className={styles.loginButton} onClick={closeMenu}>
                 Iniciar Sesión
@@ -116,7 +122,7 @@ export default function GlobalHeader() {
                 Registrarse
               </Link>
             </div>
-          )}
+          ) : null}
 
           <button
             className={styles.menuToggle}

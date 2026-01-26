@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth-store';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   FiLogOut, 
   FiPackage, 
@@ -22,11 +22,10 @@ import styles from './StoreDashboard.module.css';
 
 export default function StoreDashboard() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user, logout, isHydrated } = useAuth();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [shop, setShop] = useState<Shop | null>(null);
   const [, setLoadingShop] = useState(true);
-  const [isHydrated, setIsHydrated] = useState(false);
 
   // Mock data - Replace with Firebase calls
   const [stats, setStats] = useState({
@@ -38,13 +37,8 @@ export default function StoreDashboard() {
 
   const [raffles] = useState<any[]>([]);
 
-  // Fix hydration mismatch by ensuring client-side rendering
   useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isHydrated) return;
+    if (!isHydrated || !user) return;
     loadData();
     loadShop();
   }, [user, isHydrated]);
