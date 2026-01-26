@@ -102,6 +102,18 @@ export default function StoreDashboard() {
     loadData(); // Reload data after creating raffle
   };
 
+  const handleViewRaffles = () => {
+    router.push('/panel/sorteos');
+  };
+
+  const handleViewEarnings = () => {
+    router.push('/shop/deposits');
+  };
+
+  const handleViewStats = () => {
+    router.push('/panel/estadisticas');
+  };
+
   // Prevent hydration mismatch by not rendering user-dependent content until hydrated
   if (!isHydrated) {
     return (
@@ -245,7 +257,7 @@ export default function StoreDashboard() {
               <div className={styles.actionDesc}>Nuevo sorteo</div>
             </button>
 
-            <button className={styles.actionCard} title="Ver todos tus sorteos activos">
+            <button className={styles.actionCard} onClick={handleViewRaffles} title="Ver todos tus sorteos activos">
               <div className={styles.actionIcon}>
                 <FiShoppingBag />
               </div>
@@ -253,7 +265,7 @@ export default function StoreDashboard() {
               <div className={styles.actionDesc}>Ver todos</div>
             </button>
 
-            <button className={styles.actionCard} title="Revisa tus ganancias totales">
+            <button className={styles.actionCard} onClick={handleViewEarnings} title="Revisa tus ganancias totales">
               <div className={styles.actionIcon}>
                 <FiDollarSign />
               </div>
@@ -261,7 +273,7 @@ export default function StoreDashboard() {
               <div className={styles.actionDesc}>Ingresos</div>
             </button>
 
-            <button className={styles.actionCard} title="Ver estadísticas y análisis">
+            <button className={styles.actionCard} onClick={handleViewStats} title="Ver estadísticas y análisis">
               <div className={styles.actionIcon}>
                 <FiTrendingUp />
               </div>
