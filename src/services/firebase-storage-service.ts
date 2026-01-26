@@ -3,18 +3,19 @@ import { ref, getDownloadURL, uploadBytes, deleteObject } from 'firebase/storage
 
 /**
  * Servicio para manejar operaciones de Firebase Storage
+ * Usa un proxy backend para evitar problemas de CORS
  */
 export const firebaseStorageService = {
   /**
-   * Obtiene la URL de descarga de un archivo en Firebase Storage
+   * Obtiene la URL de descarga de un archivo a través del proxy backend
    * @param filePath - Ruta del archivo en Firebase Storage
-   * @returns URL de descarga del archivo
+   * @returns URL de descarga del archivo a través del proxy
    */
   async getDownloadUrl(filePath: string): Promise<string> {
     try {
-      const fileRef = ref(storage, filePath);
-      const url = await getDownloadURL(fileRef);
-      return url;
+      // Usar el proxy backend en lugar de acceder directamente a Firebase Storage
+      const proxyUrl = `/api/storage/download?path=${encodeURIComponent(filePath)}`;
+      return proxyUrl;
     } catch (error) {
       console.error('Error getting download URL:', error);
       throw error;
@@ -22,11 +23,21 @@ export const firebaseStorageService = {
   },
 
   /**
-   * Obtiene una URL pública para un archivo (sin autenticación)
+   * Obtiene una URL pública para un archivo a través del proxy
    * @param filePath - Ruta del archivo en Firebase Storage
-   * @returns URL pública del archivo
+   * @returns URL pública del archivo a través del proxy
    */
   getPublicUrl(filePath: string): string {
+    // Usar el proxy backend para evitar CORS
+    return `/api/storage/download?path=${encodeURIComponent(filePath)}`;
+  },
+
+  /**
+   * Obtiene la URL directa de Firebase Storage (para casos especiales)
+   * @param filePath - Ruta del archivo en Firebase Storage
+   * @returns URL directa de Firebase Storage
+   */
+  getDirectUrl(filePath: string): string {
     const bucket = storage.app.options.storageBucket;
     return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filePath)}?alt=media`;
   },
@@ -35,14 +46,14 @@ export const firebaseStorageService = {
    * Sube un archivo a Firebase Storage
    * @param filePath - Ruta donde guardar el archivo
    * @param file - Archivo a subir
-   * @returns URL de descarga del archivo subido
+   * @returns URL de descarga del archivo subido (a través del proxy)
    */
   async uploadFile(filePath: string, file: File): Promise<string> {
     try {
       const fileRef = ref(storage, filePath);
       await uploadBytes(fileRef, file);
-      const url = await getDownloadURL(fileRef);
-      return url;
+      // Retornar URL a través del proxy
+      return `/api/storage/download?path=${encodeURIComponent(filePath)}`;
     } catch (error) {
       console.error('Error uploading file:', error);
       throw error;
@@ -54,7 +65,7 @@ export const firebaseStorageService = {
    * @param filePath - Ruta donde guardar el archivo
    * @param file - Archivo a subir
    * @param metadata - Metadatos personalizados
-   * @returns URL de descarga del archivo subido
+   * @returns URL de descarga del archivo subido (a través del proxy)
    */
   async uploadFileWithMetadata(
     filePath: string,
@@ -65,8 +76,8 @@ export const firebaseStorageService = {
       const fileRef = ref(storage, filePath);
       const uploadMetadata = metadata ? { customMetadata: metadata } : undefined;
       await uploadBytes(fileRef, file, uploadMetadata);
-      const url = await getDownloadURL(fileRef);
-      return url;
+      // Retornar URL a través del proxy
+      return `/api/storage/download?path=${encodeURIComponent(filePath)}`;
     } catch (error) {
       console.error('Error uploading file with metadata:', error);
       throw error;
@@ -88,14 +99,13 @@ export const firebaseStorageService = {
   },
 
   /**
-   * Obtiene una URL con parámetros de caché
+   * Obtiene una URL con parámetros de caché a través del proxy
    * @param filePath - Ruta del archivo
    * @param cacheControl - Parámetro de control de caché (ej: 'max-age=3600')
-   * @returns URL con parámetros de caché
+   * @returns URL con parámetros de caché a través del proxy
    */
   getUrlWithCache(filePath: string, cacheControl: string = 'max-age=3600'): string {
-    const bucket = storage.app.options.storageBucket;
-    return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(filePath)}?alt=media&${cacheControl}`;
+    return `/api/storage/download?path=${encodeURIComponent(filePath)}&cache=${encodeURIComponent(cacheControl)}`;
   },
 
   /**
@@ -105,7 +115,8 @@ export const firebaseStorageService = {
    */
   async fileExists(filePath: string): Promise<boolean> {
     try {
-      await this.getDownloadUrl(filePath);
+      const fileRef = ref(storage, filePath);
+      await getDownloadURL(fileRef);
       return true;
     } catch (error) {
       return false;
