@@ -52,12 +52,35 @@ export default function StoreDashboard() {
   }, [user, isHydrated]);
 
   const loadShop = async () => {
-    if (!user?.shopId) return;
+    if (!user?.id) {
+      console.error('No user ID available');
+      return;
+    }
     
     try {
       setLoadingShop(true);
-      const shopData = await firebaseShopService.getShopById(user.shopId);
-      setShop(shopData);
+      
+      // Si el usuario tiene shopId, intenta obtener la tienda por ID
+      if (user.shopId) {
+        try {
+          const shopData = await firebaseShopService.getShopById(user.shopId);
+          setShop(shopData);
+          return;
+        } catch (error) {
+          console.warn('Could not load shop by shopId, trying by userId:', error);
+        }
+      }
+      
+      // Si no tiene shopId o falló, intenta obtener la tienda por userId
+      const allShops = await firebaseShopService.getAllShops();
+      const userShop = allShops.find(shop => shop.userId === user.id);
+      
+      if (userShop) {
+        setShop(userShop);
+        console.log('Shop loaded by userId:', userShop);
+      } else {
+        console.error('No shop found for user:', user.id);
+      }
     } catch (error) {
       console.error('Error loading shop:', error);
     } finally {
@@ -103,8 +126,9 @@ export default function StoreDashboard() {
     console.log('user:', user);
     
     if (!shop) {
-      console.error('No shop found. User shopId:', user?.shopId);
-      alert('Error: No se encontró información de la tienda. Por favor, recarga la página.');
+      console.error('No shop found. User ID:', user?.id, 'User shopId:', user?.shopId);
+      // Intenta cargar la tienda nuevamente
+      loadShop();
       return;
     }
     
