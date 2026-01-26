@@ -257,7 +257,7 @@ export const adminService = {
 
       // Filter by shop if provided
       if (shopId) {
-        raffles = raffles.filter(r => r.shopId === shopId);
+        raffles = raffles.filter((r: any) => r.shopId === shopId);
       }
 
       // Apply pagination
@@ -267,13 +267,16 @@ export const adminService = {
       // Enrich with shop and product data
       const enrichedRaffles = await Promise.all(
         paginatedRaffles.map(async (raffle: any) => {
-          const shopDoc = await getDoc(doc(db, 'shops', raffle.shopId));
-          const productDoc = await getDoc(doc(db, 'products', raffle.productId));
+          const shopId = raffle.shopId as string;
+          const productId = raffle.productId as string;
+          
+          const shopDoc = await getDoc(doc(db, 'shops', shopId));
+          const productDoc = await getDoc(doc(db, 'products', productId));
           
           return {
             ...raffle,
-            shop: shopDoc.exists() ? { id: shopDoc.id, ...shopDoc.data() } : { id: raffle.shopId, name: 'Unknown' },
-            product: productDoc.exists() ? { id: productDoc.id, ...productDoc.data() } : { id: raffle.productId, name: 'Unknown' }
+            shop: shopDoc.exists() ? { id: shopDoc.id, ...shopDoc.data() } : { id: shopId, name: 'Unknown' },
+            product: productDoc.exists() ? { id: productDoc.id, ...productDoc.data() } : { id: productId, name: 'Unknown' }
           };
         })
       );
