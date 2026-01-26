@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
-import { FiLogOut, FiUser, FiMenu, FiX, FiShoppingBag } from 'react-icons/fi';
+import { FiLogOut, FiUser, FiMenu, FiX, FiShoppingBag, FiHelpCircle, FiFileText } from 'react-icons/fi';
 import Logo from '@/components/Logo';
 import styles from './GlobalHeader.module.css';
 
@@ -50,6 +50,20 @@ export default function GlobalHeader() {
             <span className={styles.navLinkContent}>
               <FiShoppingBag className={styles.icon} />
               <span>Oportunidades</span>
+            </span>
+          </Link>
+
+          <Link href="/faq" className={styles.navLink} onClick={closeMenu}>
+            <span className={styles.navLinkContent}>
+              <FiHelpCircle className={styles.icon} />
+              <span>Preguntas</span>
+            </span>
+          </Link>
+
+          <Link href="/legal/terms" className={styles.navLink} onClick={closeMenu}>
+            <span className={styles.navLinkContent}>
+              <FiFileText className={styles.icon} />
+              <span>Legal</span>
             </span>
           </Link>
 
