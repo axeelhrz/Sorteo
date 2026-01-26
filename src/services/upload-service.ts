@@ -1,43 +1,88 @@
-import { apiClient } from '@/lib/api-client';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export const uploadService = {
   /**
-   * Subir imagen de producto
+   * Subir imagen de producto directamente a Firebase Storage
    */
   async uploadProductImage(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append('image', file);
+    try {
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        throw new Error('El archivo debe ser una imagen válida');
+      }
 
-    const response = await apiClient.post('/uploads/products/image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+      // Validar tamaño (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('La imagen no debe superar los 5MB');
+      }
 
-    return response.data.fileUrl;
+      // Generar nombre único para el archivo
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(2, 15);
+      const fileName = `products/${timestamp}-${random}-${file.name}`;
+
+      // Subir a Firebase Storage
+      const storageRef = ref(storage, fileName);
+      await uploadBytes(storageRef, file, {
+        contentType: file.type,
+      });
+
+      // Obtener URL de descarga
+      const fileUrl = await getDownloadURL(storageRef);
+      return fileUrl;
+    } catch (error: any) {
+      console.error('Error uploading product image:', error);
+      throw new Error(error.message || 'Error al subir la imagen');
+    }
   },
 
   /**
    * Subir imagen genérica (para evidencias, avatares, etc.)
    */
   async uploadImage(file: File, folder: string = 'general'): Promise<string> {
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('folder', folder);
+    try {
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        throw new Error('El archivo debe ser una imagen válida');
+      }
 
-    const response = await apiClient.post('/uploads/image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+      // Validar tamaño (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('La imagen no debe superar los 5MB');
+      }
 
-    return response.data.fileUrl;
+      // Generar nombre único para el archivo
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(2, 15);
+      const fileName = `${folder}/${timestamp}-${random}-${file.name}`;
+
+      // Subir a Firebase Storage
+      const storageRef = ref(storage, fileName);
+      await uploadBytes(storageRef, file, {
+        contentType: file.type,
+      });
+
+      // Obtener URL de descarga
+      const fileUrl = await getDownloadURL(storageRef);
+      return fileUrl;
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      throw new Error(error.message || 'Error al subir la imagen');
+    }
   },
 
   /**
-   * Eliminar imagen
+   * Eliminar imagen de Firebase Storage
    */
   async deleteImage(fileName: string): Promise<void> {
-    await apiClient.delete(`/uploads/products/image/${fileName}`);
+    try {
+      const { deleteObject } = await import('firebase/storage');
+      const storageRef = ref(storage, fileName);
+      await deleteObject(storageRef);
+    } catch (error: any) {
+      console.error('Error deleting image:', error);
+      throw new Error(error.message || 'Error al eliminar la imagen');
+    }
   },
 };

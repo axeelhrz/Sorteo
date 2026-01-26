@@ -94,6 +94,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(false);
 
     // Validaciones
     if (!productData.name.trim()) {
@@ -111,11 +112,11 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
       return;
     }
 
-      const value = parseFloat(productData.value);
-      if (isNaN(value) || value <= 0) {
-        setError('El valor de ticket debe ser mayor a 0');
-        return;
-      }
+    const value = parseFloat(productData.value);
+    if (isNaN(value) || value <= 0) {
+      setError('El valor de ticket debe ser mayor a 0');
+      return;
+    }
 
     if (!productData.organizerWhatsapp.trim()) {
       setError('El WhatsApp del organizador es obligatorio');
@@ -153,37 +154,37 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     try {
       // 1. Subir la imagen del producto
       setUploadingImage(true);
-      const imageUrl = await uploadService.uploadProductImage(productData.mainImage);
+      let imageUrl = '';
+      try {
+        imageUrl = await uploadService.uploadProductImage(productData.mainImage);
+      } catch (uploadError: any) {
+        setUploadingImage(false);
+        throw new Error(`Error al subir la imagen: ${uploadError.message}`);
+      }
       setUploadingImage(false);
 
       // 2. Preparar zonas de entrega
-      let deliveryZones = '';
-      if (productData.hasDelivery) {
-        if (productData.deliveryType === 'local') {
-          deliveryZones = `Local: ${productData.deliveryScope}`;
-        } else if (productData.deliveryType === 'national') {
-          deliveryZones = 'Nacional';
-        } else if (productData.deliveryType === 'international') {
-          deliveryZones = 'Internacional';
-        }
-      } else {
-        deliveryZones = `Recojo: ${productData.pickupAddress}, ${productData.pickupDistrict}`;
+  
+      // 3. Crear el producto
+      let product;
+      try {
+        product = await productService.createProduct({
+          shopId: shop.id,
+          name: productData.name.trim(),
+          description: productData.description.trim(),
+          value,
+          mainImage: imageUrl,
+          height: 10, // Valores por defecto
+          width: 10,
+          depth: 10,
+        });
+      } catch (productError: any) {
+        throw new Error(`Error al crear el producto: ${productError.message}`);
       }
 
-      // 3. Crear el producto
-      const product = await productService.createProduct({
-        shopId: shop.id,
-        name: productData.name.trim(),
-        description: productData.description.trim(),
-        value,
-        mainImage: imageUrl,
-        height: 10, // Valores por defecto
-        width: 10,
-        depth: 10,
-        hasDelivery: productData.hasDelivery,
-        deliveryZones,
-        pickupInStore: !productData.hasDelivery,
-      });
+      if (!product || !product.id) {
+        throw new Error('El producto no se creó correctamente');
+      }
 
       // 4. Crear el sorteo con el producto recién creado
       const specialConditionsText = [
@@ -193,11 +194,20 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
         .filter(Boolean)
         .join('\n');
 
-      const raffle = await raffleService.createRaffle({
-        shopId: shop.id,
-        productId: product.id,
-        specialConditions: specialConditionsText || undefined,
-      });
+      let raffle;
+      try {
+        raffle = await raffleService.createRaffle({
+          shopId: shop.id,
+          productId: product.id,
+          specialConditions: specialConditionsText || undefined,
+        });
+      } catch (raffleError: any) {
+        throw new Error(`Error al crear el sorteo: ${raffleError.message}`);
+      }
+
+      if (!raffle || !raffle.id) {
+        throw new Error('El sorteo no se creó correctamente');
+      }
 
       setSuccess(true);
       
@@ -213,8 +223,8 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
         }, 1500);
       }
     } catch (err: any) {
+      console.error('Error creating raffle:', err);
       setError(err.message || 'Error al crear el sorteo y producto');
-    } finally {
       setLoading(false);
     }
   };
