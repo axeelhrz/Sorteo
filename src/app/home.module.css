@@ -623,6 +623,37 @@
   transform: translateY(-2px);
 }
 
+/* ============================================
+   WHATSAPP BUTTON
+   ============================================ */
+
+.whatsappButton {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%);
+  color: white;
+  border-radius: 50%;
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+  transition: all var(--transition-base);
+  z-index: 50;
+  border: none;
+  cursor: pointer;
+}
+
+.whatsappButton:hover {
+  transform: scale(1.1) translateY(-4px);
+  box-shadow: 0 15px 40px rgba(37, 211, 102, 0.4);
+}
+
+.whatsappIcon {
+  font-size: 28px;
+}
 
 /* ============================================
    RESPONSIVE DESIGN

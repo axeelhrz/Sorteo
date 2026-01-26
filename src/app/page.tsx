@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FiArrowRight, FiZap, FiDollarSign, FiShare2, FiTrendingUp, FiShield } from 'react-icons/fi';
+import { FiArrowRight, FiZap, FiDollarSign, FiShare2, FiTrendingUp, FiShield, FiMessageCircle } from 'react-icons/fi';
 import Logo from '@/components/Logo';
 import Testimonials from '@/components/Testimonials';
 import { useAuthStore } from '@/store/auth-store';
@@ -207,6 +207,16 @@ export default function Home() {
         </div>
       </section>
 
+      {/* WhatsApp Contact Button */}
+      <a
+        href="https://wa.me/51XXXXXXXXX?text=Hola%0A%0AEstoy%20visitando%20TIKETEA%20y%20quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20c%C3%B3mo%20funcionan%20las%20oportunidades%20y%20la%20compra%20de%20tickets.%0A%0A%C2%BFPodr%C3%ADan%20ayudarme,%20por%20favor?"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.whatsappButton}
+        aria-label="Contactar por WhatsApp"
+      >
+        <FiMessageCircle className={styles.whatsappIcon} />
+      </a>
     </main>
   );
 }
