@@ -5,15 +5,23 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { UserRole } from '@/types/auth';
 import StoreDashboard from '@/components/Dashboard/StoreDashboard';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
 import styles from '../dashboard.module.css';
 
 export default function StoreDashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
+  // First effect: Handle hydration
   useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  // Second effect: Check authentication and authorization after hydration
+  useEffect(() => {
+    if (!isHydrated) return;
+
     if (!isAuthenticated || !user) {
       router.push('/login');
       return;
@@ -25,10 +33,11 @@ export default function StoreDashboardPage() {
       return;
     }
 
-    setIsLoading(false);
-  }, [isAuthenticated, user, router]);
+    setIsAuthorized(true);
+  }, [isHydrated, isAuthenticated, user, router]);
 
-  if (isLoading) {
+  // Show loading state until hydrated
+  if (!isHydrated) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner} />
@@ -37,9 +46,15 @@ export default function StoreDashboardPage() {
     );
   }
 
-  return (
-    <ProtectedRoute>
-      <StoreDashboard />
-    </ProtectedRoute>
-  );
+  // Show loading state while checking authorization
+  if (!isAuthorized) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner} />
+        <p>Verificando permisos...</p>
+      </div>
+    );
+  }
+
+  return <StoreDashboard />;
 }
