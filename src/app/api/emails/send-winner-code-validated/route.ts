@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
     const {
       email,
       name,
-      raffleId,
       raffleTitle,
       productName,
       organizerName,
