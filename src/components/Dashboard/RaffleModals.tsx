@@ -1,5 +1,7 @@
 'use client';
 
+'use client';
+
 import React, { useState } from 'react';
 import { FiX, FiAlertTriangle } from 'react-icons/fi';
 import { Raffle } from '@/types/raffle';
@@ -73,8 +75,8 @@ export default function RaffleModals({
                 <h2 className={styles.modalTitleNew}>Detalles del Sorteo</h2>
                 <p className={styles.modalSubtitle}>Información completa del sorteo</p>
               </div>
-              <button className={styles.modalCloseBtnNew} onClick={onCloseViewModal}>
-                <FiX />
+              <button className={styles.modalCloseBtnNew} onClick={onCloseViewModal} type="button">
+                <FiX size={20} />
               </button>
             </div>
 
@@ -202,8 +204,8 @@ export default function RaffleModals({
                 <h2 className={styles.modalTitleNew}>Activar Sorteo</h2>
                 <p className={styles.modalSubtitle}>Confirma que deseas activar este sorteo</p>
               </div>
-              <button className={styles.modalCloseBtnNew} onClick={onCloseActivateModal}>
-                <FiX />
+              <button className={styles.modalCloseBtnNew} onClick={onCloseActivateModal} type="button">
+                <FiX size={20} />
               </button>
             </div>
 
@@ -283,8 +285,8 @@ export default function RaffleModals({
                 <h2 className={styles.modalTitleNew}>Eliminar Sorteo</h2>
                 <p className={styles.modalSubtitle}>Esta acción no se puede deshacer</p>
               </div>
-              <button className={styles.modalCloseBtnNew} onClick={onCloseDeleteModal}>
-                <FiX />
+              <button className={styles.modalCloseBtnNew} onClick={onCloseDeleteModal} type="button">
+                <FiX size={20} />
               </button>
             </div>
 
