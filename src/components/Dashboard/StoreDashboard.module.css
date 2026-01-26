@@ -300,14 +300,14 @@
 }
 
 .createBtn {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 12px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  color: white;
-  border: none;
+  padding: 10px 12px !important;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+  color: white !important;
+  border: none !important;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
@@ -318,6 +318,8 @@
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  width: auto !important;
+  margin-top: 0 !important;
 }
 
 .createBtn::before {
