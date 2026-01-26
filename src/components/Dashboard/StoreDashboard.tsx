@@ -206,36 +206,36 @@ export default function StoreDashboard() {
           </div>
 
           <div className={styles.actionsGrid}>
-            <button className={styles.actionCard} onClick={handleCreateRaffle}>
+            <button className={styles.actionCard} onClick={handleCreateRaffle} title="Crear un nuevo sorteo">
               <div className={styles.actionIcon}>
                 <FiPlus />
               </div>
               <div className={styles.actionTitle}>Crear Sorteo</div>
-              <div className={styles.actionDesc}>Crea un nuevo sorteo y producto</div>
+              <div className={styles.actionDesc}>Nuevo sorteo</div>
             </button>
 
-            <button className={styles.actionCard}>
-              <div className={styles.actionIcon}>
-                <FiPackage />
-              </div>
-              <div className={styles.actionTitle}>Mis Productos</div>
-              <div className={styles.actionDesc}>Gestiona tus productos</div>
-            </button>
-
-            <button className={styles.actionCard}>
+            <button className={styles.actionCard} title="Ver todos tus sorteos activos">
               <div className={styles.actionIcon}>
                 <FiShoppingBag />
               </div>
               <div className={styles.actionTitle}>Mis Sorteos</div>
-              <div className={styles.actionDesc}>Ver todos tus sorteos</div>
+              <div className={styles.actionDesc}>Ver todos</div>
             </button>
 
-            <button className={styles.actionCard}>
+            <button className={styles.actionCard} title="Revisa tus ganancias totales">
               <div className={styles.actionIcon}>
                 <FiDollarSign />
               </div>
               <div className={styles.actionTitle}>Ganancias</div>
-              <div className={styles.actionDesc}>Revisa tus ingresos</div>
+              <div className={styles.actionDesc}>Ingresos</div>
+            </button>
+
+            <button className={styles.actionCard} title="Ver estadísticas y análisis">
+              <div className={styles.actionIcon}>
+                <FiTrendingUp />
+              </div>
+              <div className={styles.actionTitle}>Estadísticas</div>
+              <div className={styles.actionDesc}>Análisis</div>
             </button>
           </div>
         </div>
@@ -245,11 +245,11 @@ export default function StoreDashboard() {
           <div className={styles.sectionHeader}>
             <div>
               <h2 className={styles.sectionTitle}>Mis Sorteos</h2>
-              <p className={styles.sectionSubtitle}>Gestiona todos tus sorteos activos</p>
+              <p className={styles.sectionSubtitle}>Gestiona todos tus sorteos activos y en progreso</p>
             </div>
-            <button className={styles.createBtn} onClick={handleCreateRaffle}>
+            <button className={styles.createBtn} onClick={handleCreateRaffle} title="Crear un nuevo sorteo">
               <FiPlus />
-              <span>Nuevo Sorteo</span>
+              <span>Nuevo</span>
             </button>
           </div>
 
