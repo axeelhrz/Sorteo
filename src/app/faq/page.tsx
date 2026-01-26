@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FiChevronDown } from 'react-icons/fi';
+import { FiChevronDown, FiMail, FiMessageCircle } from 'react-icons/fi';
 import styles from './faq.module.css';
 
 interface FAQItem {
@@ -307,7 +307,8 @@ export default function FAQPage() {
                 href="mailto:support@tiketea.com"
                 className={`${styles.contactButton} ${styles.primary}`}
               >
-                Enviar Email
+                <FiMail />
+                <span>Enviar Email</span>
               </a>
               <a
                 href="https://wa.me/51XXXXXXXXX?text=Hola%20👋%0A%0AEstoy%20visitando%20TIKETEA%20y%20quiero%20más%20información%20sobre%20cómo%20funcionan%20las%20oportunidades%20y%20la%20compra%20de%20tickets.%0A%0A¿Podrían%20ayudarme,%20por%20favor?"
@@ -315,7 +316,8 @@ export default function FAQPage() {
                 rel="noopener noreferrer"
                 className={`${styles.contactButton} ${styles.secondary}`}
               >
-                WhatsApp
+                <FiMessageCircle />
+                <span>Contactar por WhatsApp</span>
               </a>
             </div>
           </div>
