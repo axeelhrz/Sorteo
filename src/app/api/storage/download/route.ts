@@ -6,9 +6,9 @@ import { ref, getBytes } from 'firebase/storage';
  * API Route para descargar archivos de Firebase Storage
  * Esto evita problemas de CORS al actuar como proxy
  */
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const filePath = searchParams.get('path');
 
     if (!filePath) {
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
