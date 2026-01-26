@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiX, FiAlertTriangle, FiCheckCircle } from 'react-icons/fi';
+import { FiX, FiAlertTriangle } from 'react-icons/fi';
 import { Raffle } from '@/types/raffle';
 import styles from './StoreDashboard.module.css';
 
@@ -25,7 +25,6 @@ interface RaffleModalsProps {
   onCloseDeleteModal: () => void;
   onConfirmActivate: (raffleId: string) => Promise<void>;
   onConfirmDelete: (raffleId: string) => Promise<void>;
-  isLoading?: boolean;
 }
 
 export default function RaffleModals({
@@ -37,7 +36,6 @@ export default function RaffleModals({
   onCloseDeleteModal,
   onConfirmActivate,
   onConfirmDelete,
-  isLoading = false,
 }: RaffleModalsProps) {
   const [activatingId, setActivatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);

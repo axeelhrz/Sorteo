@@ -1,6 +1,6 @@
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
-import { Raffle, RaffleStatus } from '@/types/raffle';
+import { RaffleStatus } from '@/types/raffle';
 
 /**
  * Servicio para actualizar y eliminar sorteos
