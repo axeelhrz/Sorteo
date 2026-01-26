@@ -26,6 +26,7 @@ export default function StoreDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [shop, setShop] = useState<Shop | null>(null);
   const [, setLoadingShop] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Mock data - Replace with Firebase calls
   const [stats, setStats] = useState({
@@ -37,10 +38,16 @@ export default function StoreDashboard() {
 
   const [raffles] = useState<any[]>([]);
 
+  // Fix hydration mismatch by ensuring client-side rendering
   useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
     loadData();
     loadShop();
-  }, [user]);
+  }, [user, isHydrated]);
 
   const loadShop = async () => {
     if (!user?.shopId) return;
@@ -101,6 +108,36 @@ export default function StoreDashboard() {
     loadData(); // Reload data after creating raffle
   };
 
+  // Prevent hydration mismatch by not rendering user-dependent content until hydrated
+  if (!isHydrated) {
+    return (
+      <div className={styles.dashboard}>
+        <header className={styles.header}>
+          <div className={styles.headerContent}>
+            <div className={styles.headerLeft}>
+              <span className={styles.headerTag}>Panel de Control</span>
+              <h1 className={styles.title}>Panel de Organizador</h1>
+              <p className={styles.subtitle}>Gestiona tus sorteos y productos</p>
+            </div>
+            <div className={styles.headerRight}>
+              <div className={styles.userCard}>
+                <div className={styles.userAvatar}>-</div>
+                <div className={styles.userDetails}>
+                  <span className={styles.userName}>Cargando...</span>
+                  <span className={styles.userRole}>Organizador</span>
+                </div>
+              </div>
+              <button className={styles.logoutBtn} disabled>
+                <FiLogOut />
+                <span>Salir</span>
+              </button>
+            </div>
+          </div>
+        </header>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.dashboard}>
       {/* Header */}
@@ -115,10 +152,10 @@ export default function StoreDashboard() {
           <div className={styles.headerRight}>
             <div className={styles.userCard}>
               <div className={styles.userAvatar}>
-                {user?.name?.charAt(0).toUpperCase()}
+                {user?.name?.charAt(0).toUpperCase() || '-'}
               </div>
               <div className={styles.userDetails}>
-                <span className={styles.userName}>{user?.name}</span>
+                <span className={styles.userName}>{user?.name || 'Usuario'}</span>
                 <span className={styles.userRole}>Organizador</span>
               </div>
             </div>
