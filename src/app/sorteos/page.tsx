@@ -109,7 +109,6 @@ export default function SorteosPage() {
         </div>
       </div>
 
-
       {/* Filters */}
       <RaffleFilters
         onFiltersChange={handleFiltersChange}
