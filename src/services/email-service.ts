@@ -28,6 +28,43 @@ export interface WinnerNotificationEmailData {
   winDate: Date;
 }
 
+export interface WinnerCodeValidatedEmailData {
+  email: string;
+  name: string;
+  raffleId: string;
+  raffleTitle: string;
+  productName: string;
+  organizerName: string;
+}
+
+export interface DeliveryEvidenceUploadedEmailData {
+  email: string;
+  name: string;
+  raffleId: string;
+  raffleTitle: string;
+  productName: string;
+  organizerName: string;
+  daysToConfirm: number;
+}
+
+export interface DeliveryConfirmedEmailData {
+  email: string;
+  name: string;
+  raffleId: string;
+  raffleTitle: string;
+  productName: string;
+  winnerName: string;
+}
+
+export interface DeliveryReminderEmailData {
+  email: string;
+  name: string;
+  raffleId: string;
+  raffleTitle: string;
+  productName: string;
+  daysRemaining: number;
+}
+
 /**
  * Servicio de correos
  * Nota: Requiere configuración de Cloud Functions en Firebase
@@ -143,6 +180,94 @@ export const emailService = {
     } catch (error: any) {
       console.error('Error sending winner notification email:', error);
       throw new Error('Error al enviar correo de notificación al ganador');
+    }
+  },
+
+  /**
+   * Envía correo al ganador cuando su código es validado por el organizador
+   */
+  async sendWinnerCodeValidatedEmail(data: WinnerCodeValidatedEmailData): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-winner-code-validated', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending winner code validated email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending winner code validated email:', error);
+      // No lanzar error para no bloquear el flujo
+    }
+  },
+
+  /**
+   * Envía correo al ganador cuando el organizador sube evidencia de entrega
+   */
+  async sendDeliveryEvidenceUploadedEmail(data: DeliveryEvidenceUploadedEmailData): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-delivery-evidence-uploaded', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending delivery evidence uploaded email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending delivery evidence uploaded email:', error);
+      // No lanzar error para no bloquear el flujo
+    }
+  },
+
+  /**
+   * Envía correo al organizador cuando el ganador confirma la recepción
+   */
+  async sendDeliveryConfirmedEmail(data: DeliveryConfirmedEmailData): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-delivery-confirmed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending delivery confirmed email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending delivery confirmed email:', error);
+      // No lanzar error para no bloquear el flujo
+    }
+  },
+
+  /**
+   * Envía correo de recordatorio al ganador si faltan 2 días para expirar
+   */
+  async sendDeliveryReminderEmail(data: DeliveryReminderEmailData): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-delivery-reminder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending delivery reminder email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending delivery reminder email:', error);
+      // No lanzar error para no bloquear el flujo
     }
   },
 

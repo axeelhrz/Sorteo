@@ -1,205 +1,88 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { WinnerInfo } from '@/types/raffle';
 
 /**
- * Cron Job para verificar y auto-confirmar entregas después de 7 días
- * Se ejecuta diariamente a las 00:00 (configurado en vercel.json)
+ * GET /api/cron/check-deliveries
+ * Cron job que verifica diariamente si hay entregas que deben auto-confirmarse
+ * Se ejecuta automáticamente según la configuración de Vercel Cron
+ * 
+ * Configuración en vercel.json:
+ * {
+ *   "crons": [{
+ *     "path": "/api/cron/check-deliveries",
+ *     "schedule": "0 0 * * *"  // Diariamente a las 00:00 UTC
+ *   }]
+ * }
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verificar autorización (Vercel Cron Secret)
+    // Verificar que la solicitud viene de Vercel Cron
     const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-
-    if (!cronSecret) {
-      console.error('❌ CRON_SECRET no está configurado');
-      return NextResponse.json(
-        { error: 'Cron job no configurado correctamente' },
-        { status: 500 }
-      );
-    }
-
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      console.error('❌ Autorización inválida para cron job');
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    console.log('🔍 Iniciando verificación de entregas pendientes...');
+    console.log('Starting delivery auto-confirmation check...');
 
-    // Buscar sorteos con estado 'delivered'
+    // Obtener todos los sorteos con estado 'delivered'
     const rafflesRef = collection(db, 'raffles');
-    const q = query(
-      rafflesRef,
-      where('winnerInfo.deliveryStatus', '==', 'delivered')
-    );
+    const q = query(rafflesRef, where('winnerInfo.deliveryStatus', '==', 'delivered'));
+    const querySnapshot = await getDocs(q);
 
-    const snapshot = await getDocs(q);
-    let autoConfirmed = 0;
-    let checked = 0;
-    const results = [];
+    let autoConfirmedCount = 0;
+    const now = new Date();
 
-    for (const raffleDoc of snapshot.docs) {
-      checked++;
-      const raffle = raffleDoc.data();
-      const winnerInfo = raffle.winnerInfo;
+    for (const docSnap of querySnapshot.docs) {
+      const raffleData = docSnap.data();
+      const winnerInfo = raffleData.winnerInfo as WinnerInfo;
 
       if (!winnerInfo || !winnerInfo.deliveryDeadline) {
-        console.log(`⚠️ Sorteo ${raffleDoc.id}: Sin fecha límite de entrega`);
         continue;
       }
 
-      // Convertir Timestamp de Firestore a Date
-      const deadline = winnerInfo.deliveryDeadline.toDate
-        ? winnerInfo.deliveryDeadline.toDate()
+      // Convertir deadline a Date si es necesario
+      const deadline = winnerInfo.deliveryDeadline instanceof Date
+        ? winnerInfo.deliveryDeadline
         : new Date(winnerInfo.deliveryDeadline);
 
-      const now = new Date();
-
-      // Si la fecha límite ha pasado, auto-confirmar
+      // Verificar si la fecha límite ha pasado
       if (now > deadline) {
         try {
-          const raffleRef = doc(db, 'raffles', raffleDoc.id);
-          await updateDoc(raffleRef, {
+          // Auto-confirmar la entrega
+          await updateDoc(doc(db, 'raffles', docSnap.id), {
             'winnerInfo.deliveryStatus': 'confirmed',
             'winnerInfo.deliveryConfirmedAt': serverTimestamp(),
             'winnerInfo.deliveryConfirmedBy': 'system_auto_confirm',
             updatedAt: serverTimestamp(),
           });
 
-          autoConfirmed++;
-          results.push({
-            raffleId: raffleDoc.id,
-            status: 'auto-confirmed',
-            deadline: deadline.toISOString(),
-          });
+          autoConfirmedCount++;
+          console.log(`Auto-confirmed delivery for raffle: ${docSnap.id}`);
 
-          console.log(`✅ Auto-confirmado sorteo ${raffleDoc.id}`);
+          // Aquí se podría enviar un correo al ganador notificando la auto-confirmación
+          // await emailService.sendAutoConfirmationEmail({...});
         } catch (error) {
-          console.error(`❌ Error al auto-confirmar sorteo ${raffleDoc.id}:`, error);
-          results.push({
-            raffleId: raffleDoc.id,
-            status: 'error',
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
-        }
-      } else {
-        const daysRemaining = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        console.log(`⏰ Sorteo ${raffleDoc.id}: ${daysRemaining} días restantes`);
-        results.push({
-          raffleId: raffleDoc.id,
-          status: 'pending',
-          daysRemaining,
-          deadline: deadline.toISOString(),
-        });
-      }
-    }
-
-    const summary = {
-      success: true,
-      timestamp: new Date().toISOString(),
-      checked,
-      autoConfirmed,
-      message: `Verificados ${checked} sorteos, ${autoConfirmed} auto-confirmados`,
-      results,
-    };
-
-    console.log('✅ Proceso completado:', summary);
-
-    return NextResponse.json(summary);
-  } catch (error: any) {
-    console.error('❌ Error en cron job:', error);
-    return NextResponse.json(
-      {
-        error: error.message || 'Error desconocido',
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * Endpoint POST para ejecutar manualmente el cron job (solo en desarrollo)
- */
-export async function POST() {
-  // Solo permitir en desarrollo
-  if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { error: 'Endpoint no disponible en producción' },
-      { status: 403 }
-    );
-  }
-
-  console.log('🔧 Ejecutando cron job manualmente (desarrollo)...');
-
-  // Reutilizar la lógica del GET pero sin verificar autorización
-  try {
-    const rafflesRef = collection(db, 'raffles');
-    const q = query(
-      rafflesRef,
-      where('winnerInfo.deliveryStatus', '==', 'delivered')
-    );
-
-    const snapshot = await getDocs(q);
-    let autoConfirmed = 0;
-    let checked = 0;
-    const results = [];
-
-    for (const raffleDoc of snapshot.docs) {
-      checked++;
-      const raffle = raffleDoc.data();
-      const winnerInfo = raffle.winnerInfo;
-
-      if (!winnerInfo || !winnerInfo.deliveryDeadline) {
-        continue;
-      }
-
-      const deadline = winnerInfo.deliveryDeadline.toDate
-        ? winnerInfo.deliveryDeadline.toDate()
-        : new Date(winnerInfo.deliveryDeadline);
-
-      const now = new Date();
-
-      if (now > deadline) {
-        try {
-          const raffleRef = doc(db, 'raffles', raffleDoc.id);
-          await updateDoc(raffleRef, {
-            'winnerInfo.deliveryStatus': 'confirmed',
-            'winnerInfo.deliveryConfirmedAt': serverTimestamp(),
-            'winnerInfo.deliveryConfirmedBy': 'system_auto_confirm',
-            updatedAt: serverTimestamp(),
-          });
-
-          autoConfirmed++;
-          results.push({
-            raffleId: raffleDoc.id,
-            status: 'auto-confirmed',
-          });
-        } catch (error) {
-          results.push({
-            raffleId: raffleDoc.id,
-            status: 'error',
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
+          console.error(`Error auto-confirming delivery for raffle ${docSnap.id}:`, error);
         }
       }
     }
+
+    console.log(`Delivery auto-confirmation check completed. Auto-confirmed: ${autoConfirmedCount}`);
 
     return NextResponse.json({
       success: true,
-      mode: 'manual',
-      timestamp: new Date().toISOString(),
-      checked,
-      autoConfirmed,
-      results,
+      message: `Auto-confirmation check completed. ${autoConfirmedCount} deliveries auto-confirmed.`,
+      autoConfirmedCount,
     });
   } catch (error: any) {
+    console.error('Error in delivery auto-confirmation check:', error);
     return NextResponse.json(
-      { error: error.message },
+      { error: error.message || 'Error checking deliveries' },
       { status: 500 }
     );
   }

@@ -66,14 +66,12 @@ export default function ProductsPage() {
                     marginTop: '20px',
                   }}
                 >
-                  <h3 style={{ margin: '0 0 10px 0', color: '#1976d2' }}>ℹ️ Cambio en la gestión de productos</h3>
+                  <h3 style={{ margin: '0 0 10px 0', color: '#1976d2' }}>ℹ️ Gestión de productos</h3>
                   <p style={{ margin: '0 0 15px 0', lineHeight: '1.6' }}>
-                    Los productos ahora se crean automáticamente al crear un sorteo. Ya no es necesario crear productos
-                    por separado.
+                    Los productos se crean automáticamente cuando creas un sorteo. No es posible crear, modificar o eliminar productos de forma independiente.
                   </p>
                   <p style={{ margin: '0 0 15px 0', lineHeight: '1.6' }}>
-                    <strong>Importante:</strong> No se pueden modificar o eliminar productos que tengan un sorteo
-                    vigente asociado.
+                    <strong>Restricción importante:</strong> Los productos no pueden ser modificados ni eliminados si tienen un sorteo vigente asociado. Para cambiar un producto, primero debes finalizar o cancelar su sorteo.
                   </p>
                   <button
                     onClick={() => router.push('/panel/sorteos/crear')}
@@ -92,13 +90,29 @@ export default function ProductsPage() {
                     borderRadius: '8px',
                   }}
                 >
-                  <h3 style={{ margin: '0 0 15px 0' }}>¿Cómo funciona ahora?</h3>
+                  <h3 style={{ margin: '0 0 15px 0' }}>¿Cómo crear un producto?</h3>
                   <ol style={{ lineHeight: '1.8', paddingLeft: '20px' }}>
-                    <li>Ve a "Crear sorteo" desde el menú lateral</li>
+                    <li>Haz clic en <strong>"Crear nuevo sorteo"</strong> desde el menú lateral</li>
                     <li>Completa la información del producto (nombre, descripción, valor, dimensiones, etc.)</li>
-                    <li>Agrega las condiciones especiales del sorteo (opcional)</li>
+                    <li>Configura las opciones de entrega (envío o recojo)</li>
+                    <li>Agrega condiciones especiales del sorteo si lo deseas</li>
                     <li>El producto y el sorteo se crearán automáticamente juntos</li>
                   </ol>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: '20px',
+                    padding: '20px',
+                    backgroundColor: '#fff3cd',
+                    borderLeft: '4px solid #ffc107',
+                    borderRadius: '8px',
+                  }}
+                >
+                  <h3 style={{ margin: '0 0 10px 0', color: '#856404' }}>⚠️ Nota importante</h3>
+                  <p style={{ margin: '0', lineHeight: '1.6', color: '#856404' }}>
+                    Cada sorteo tiene su propio producto asociado. Si necesitas cambiar las características del producto, deberás crear un nuevo sorteo con los datos actualizados.
+                  </p>
                 </div>
               </div>
             </>

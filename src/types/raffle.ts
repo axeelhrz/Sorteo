@@ -53,6 +53,8 @@ export interface RaffleWithRelations extends Raffle {
 // Información del ganador
 export interface WinnerInfo {
   userId: string;
+  userName?: string;
+  userEmail?: string;
   ticketId: string;
   ticketNumber: number;
   verificationCode: string;
@@ -63,6 +65,8 @@ export interface WinnerInfo {
   deliveryConfirmedAt?: Date;
   deliveryConfirmedBy?: string;
   deliveryDeadline?: Date;
+  reminderSent?: boolean;
+  reminderSentAt?: Date;
 }
 
 // Evidencia de entrega del premio
