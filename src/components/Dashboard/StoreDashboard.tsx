@@ -13,15 +13,14 @@ import {
   FiEdit2,
   FiTrash2,
   FiEye,
-  FiX,
   FiBarChart2,
   FiCreditCard,
   FiCalendar,
   FiDownload
 } from 'react-icons/fi';
-import { CreateRaffleForm } from '@/components/ShopPanel/CreateRaffleForm';
 import { firebaseShopService } from '@/services/firebase-shop-service';
 import { Shop } from '@/types/shop';
+import CreateRaffleModal from './CreateRaffleModal';
 import styles from './StoreDashboard.module.css';
 
 type TabType = 'overview' | 'raffles' | 'earnings' | 'stats';
@@ -602,41 +601,12 @@ export default function StoreDashboard() {
       </main>
 
       {/* Create Raffle Modal */}
-      {showCreateModal && (
-        <div className={styles.modalOverlay} onClick={handleCloseModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeaderNew}>
-              <div className={styles.modalHeaderLeft}>
-                <h2 className={styles.modalTitleNew}>Crear Nuevo Sorteo</h2>
-                <p className={styles.modalSubtitle}>Completa los detalles de tu sorteo</p>
-              </div>
-              <button 
-                className={styles.modalCloseBtnNew} 
-                onClick={handleCloseModal}
-                type="button"
-                aria-label="Cerrar modal"
-              >
-                <FiX />
-              </button>
-            </div>
-            
-            <div className={styles.modalBodyNew}>
-              {shop ? (
-                <CreateRaffleForm 
-                  shop={shop} 
-                  onSuccess={handleRaffleCreated}
-                  onCancel={handleCloseModal}
-                />
-              ) : (
-                <div className={styles.loadingState}>
-                  <div className={styles.spinner}></div>
-                  <p>Cargando información de la tienda...</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <CreateRaffleModal
+        isOpen={showCreateModal}
+        shop={shop}
+        onClose={handleCloseModal}
+        onSuccess={handleRaffleCreated}
+      />
     </div>
   );
 }
