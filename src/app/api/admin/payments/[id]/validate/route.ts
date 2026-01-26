@@ -65,6 +65,13 @@ export async function POST(
     const userSnap = await getDoc(userRef);
     const userData = userSnap.data();
 
+    if (!userData) {
+      return NextResponse.json(
+        { error: 'Usuario no encontrado' },
+        { status: 404 }
+      );
+    }
+
     const raffleRef = doc(db, 'raffles', paymentData.raffleId);
     const raffleSnap = await getDoc(raffleRef);
     const raffleData = raffleSnap.data();

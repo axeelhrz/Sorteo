@@ -1,17 +1,25 @@
+/* ============================================
+   HOME PAGE - DESIGN SYSTEM IMPLEMENTATION
+   ============================================ */
+
+/* CONTAINER */
 .container {
   width: 100%;
   min-height: 100vh;
-  background: #fafafa;
+  background: var(--bg-primary);
 }
 
-/* Hero Section */
+/* ============================================
+   HERO SECTION
+   ============================================ */
+
 .hero {
   position: relative;
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0;
   overflow: hidden;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, var(--primary-600) 0%, #8b5cf6 100%);
   border-radius: 0;
   box-shadow: none;
 }
@@ -45,10 +53,10 @@
   position: relative;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 100px 60px;
+  padding: var(--space-20) var(--space-16);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 80px;
+  gap: var(--space-20);
   align-items: center;
   z-index: 1;
 }
@@ -57,7 +65,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 24px;
+  gap: var(--space-6);
 }
 
 .heroLogoContainer {
@@ -83,33 +91,33 @@
 
 .heroTag {
   display: inline-block;
-  padding: 8px 18px;
+  padding: var(--space-2) var(--space-4);
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 100px;
+  border-radius: var(--radius-full);
   color: white;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.2px;
   backdrop-filter: blur(10px);
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .heroTitle {
   margin: 0;
-  font-size: 64px;
-  font-weight: 800;
+  font-size: 48px;
+  font-weight: 700;
   color: white;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
   max-width: 700px;
 }
 
 .heroSubtitle {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   color: rgba(255, 255, 255, 0.95);
   line-height: 1.6;
   font-weight: 400;
@@ -129,37 +137,42 @@
 
 .heroCTA {
   display: flex;
-  gap: 16px;
-  margin-top: 16px;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
 }
 
 .primaryButton,
 .secondaryButton {
-  padding: 16px 32px;
+  padding: var(--space-3) var(--space-8);
   border: none;
-  border-radius: 12px;
-  font-size: 15px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-2);
   white-space: nowrap;
   letter-spacing: -0.01em;
+  height: 44px;
 }
 
 .primaryButton {
   background: white;
-  color: #6366f1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.15);
+  color: var(--primary-600);
+  box-shadow: var(--shadow-sm);
 }
 
 .primaryButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 15px 30px -10px rgba(0, 0, 0, 0.2);
-  background: #fafafa;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: var(--bg-secondary);
+}
+
+.primaryButton:active {
+  transform: translateY(0);
 }
 
 .secondaryButton {
@@ -172,15 +185,16 @@
 .secondaryButton:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .buttonIconRight {
   font-size: 18px;
-  transition: transform 0.3s ease;
+  transition: transform var(--transition-fast);
 }
 
-.primaryButton:hover .buttonIconRight {
+.primaryButton:hover .buttonIconRight,
+.secondaryButton:hover .buttonIconRight {
   transform: translateX(4px);
 }
 
@@ -188,11 +202,11 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 48px;
-  margin-top: 48px;
-  padding: 28px 36px;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+  padding: var(--space-7) var(--space-9);
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   max-width: fit-content;
@@ -203,11 +217,11 @@
 }
 
 .statNumber {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 700;
   color: white;
   line-height: 1;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   letter-spacing: -0.02em;
 }
@@ -225,46 +239,47 @@
   height: 48px;
   background: rgba(255, 255, 255, 0.2);
 }
+/* ============================================
+   FEATURES SECTION
+   ============================================ */
 
-/* Features Section */
 .features {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 120px 60px;
+  padding: var(--space-20) var(--space-16);
 }
 
 .features .sectionHeader {
   text-align: center;
-  margin-bottom: 64px;
+  margin-bottom: var(--space-16);
 }
 
 .features .sectionTag {
   display: inline-block;
-  padding: 8px 18px;
-  background: rgba(99, 102, 241, 0.08);
-  border-radius: 100px;
-  color: #6366f1;
+  padding: var(--space-2) var(--space-4);
+  background: var(--primary-50);
+  border-radius: var(--radius-full);
+  color: var(--primary-600);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.2px;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
 }
 
 .features .sectionTitle {
-  margin: 0 0 20px 0;
-  font-size: 48px;
+  margin: 0 0 var(--space-5) 0;
+  font-size: 40px;
   font-weight: 700;
-  color: #1a1a1a;
-  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .features .sectionSubtitle {
-  margin: 0;
-  font-size: 18px;
-  color: #6b7280;
-  max-width: 680px;
   margin: 0 auto;
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 680px;
   line-height: 1.7;
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -273,66 +288,68 @@
 .featureGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  gap: var(--space-6);
 }
 
 .featureCard {
-  background: white;
-  border-radius: 20px;
-  padding: 40px 32px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-10) var(--space-8);
   text-align: left;
-  border: 1px solid #f3f4f6;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-base);
 }
 
 .featureCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.15), 0 20px 40px -10px rgba(99, 102, 241, 0.1);
-  border-color: #e5e7eb;
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-medium);
 }
 
 .featureIcon {
   font-size: 28px;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  background: linear-gradient(135deg, var(--primary-600) 0%, #8b5cf6 100%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
 .featureTitle {
-  margin: 0 0 12px 0;
-  font-size: 20px;
+  margin: 0 0 var(--space-3) 0;
+  font-size: 18px;
   font-weight: 600;
-  color: #1a1a1a;
-  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .featureText {
   margin: 0;
-  font-size: 15px;
-  color: #6b7280;
+  font-size: 14px;
+  color: var(--text-secondary);
   line-height: 1.7;
   font-weight: 400;
   letter-spacing: -0.01em;
 }
+/* ============================================
+   SHARE SECTION
+   ============================================ */
 
-/* Share Section */
 .shareSection {
   max-width: 1280px;
-  margin: 0 auto 100px;
-  padding: 0 60px;
+  margin: 0 auto var(--space-20);
+  padding: 0 var(--space-16);
 }
 
 .shareSectionContent {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  border-radius: 24px;
-  padding: 64px;
+  background: linear-gradient(135deg, var(--primary-600) 0%, #8b5cf6 100%);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-16);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -361,7 +378,7 @@
   border-radius: 50%;
   color: white;
   font-size: 28px;
-  margin-bottom: 28px;
+  margin-bottom: var(--space-7);
   backdrop-filter: blur(10px);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   position: relative;
@@ -369,8 +386,8 @@
 }
 
 .shareTitle {
-  margin: 0 0 20px 0;
-  font-size: 36px;
+  margin: 0 0 var(--space-5) 0;
+  font-size: 32px;
   font-weight: 700;
   color: white;
   position: relative;
@@ -379,13 +396,11 @@
 }
 
 .shareText {
-  margin: 0 0 32px 0;
-  font-size: 17px;
+  margin: 0 auto var(--space-8);
+  font-size: 16px;
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.7;
   max-width: 720px;
-  margin-left: auto;
-  margin-right: auto;
   position: relative;
   z-index: 1;
   font-weight: 400;
@@ -395,10 +410,10 @@
 .shareHighlight {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 32px;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-8);
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 100px;
+  border-radius: var(--radius-full);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.25);
   position: relative;
@@ -416,46 +431,47 @@
   color: white;
   letter-spacing: -0.01em;
 }
+/* ============================================
+   HOW IT WORKS SECTION
+   ============================================ */
 
-/* How It Works Section */
 .howItWorks {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 120px 60px;
+  padding: var(--space-20) var(--space-16);
 }
 
 .howItWorks .sectionHeader {
   text-align: center;
-  margin-bottom: 64px;
+  margin-bottom: var(--space-16);
 }
 
 .howItWorks .sectionTag {
   display: inline-block;
-  padding: 8px 18px;
-  background: rgba(99, 102, 241, 0.08);
-  border-radius: 100px;
-  color: #6366f1;
+  padding: var(--space-2) var(--space-4);
+  background: var(--primary-50);
+  border-radius: var(--radius-full);
+  color: var(--primary-600);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.2px;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
 }
 
 .howItWorks .sectionTitle {
-  margin: 0 0 20px 0;
-  font-size: 48px;
+  margin: 0 0 var(--space-5) 0;
+  font-size: 40px;
   font-weight: 700;
-  color: #1a1a1a;
-  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .howItWorks .sectionSubtitle {
-  margin: 0;
-  font-size: 18px;
-  color: #6b7280;
-  max-width: 680px;
   margin: 0 auto;
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 680px;
   line-height: 1.7;
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -464,7 +480,7 @@
 .stepsContainer {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  gap: var(--space-6);
   max-width: 1000px;
   margin: 0 auto;
 }
@@ -472,59 +488,61 @@
 .step {
   text-align: left;
   position: relative;
-  padding: 40px 36px;
-  background: white;
-  border-radius: 20px;
-  border: 1px solid #f3f4f6;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: var(--space-10) var(--space-9);
+  background: var(--bg-primary);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-base);
 }
 
 .step:hover {
-  border-color: #e5e7eb;
-  box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.15), 0 20px 40px -10px rgba(99, 102, 241, 0.1);
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-4px);
 }
 
 .stepNumber {
   display: inline-block;
-  font-size: 48px;
+  font-size: 44px;
   font-weight: 700;
-  color: #f3f4f6;
+  color: var(--bg-tertiary);
   line-height: 1;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
   letter-spacing: -0.03em;
 }
 
 .stepTitle {
-  margin: 0 0 12px 0;
-  font-size: 20px;
+  margin: 0 0 var(--space-3) 0;
+  font-size: 18px;
   font-weight: 600;
-  color: #1a1a1a;
-  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .stepText {
   margin: 0;
-  font-size: 15px;
-  color: #6b7280;
+  font-size: 14px;
+  color: var(--text-secondary);
   line-height: 1.7;
   font-weight: 400;
   letter-spacing: -0.01em;
 }
+/* ============================================
+   CTA SECTION
+   ============================================ */
 
-/* CTA Section */
 .cta {
   max-width: 1280px;
-  margin: 100px auto;
-  padding: 0 60px;
+  margin: var(--space-20) auto;
+  padding: 0 var(--space-16);
 }
 
 .ctaContent {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, var(--primary-600) 0%, #8b5cf6 100%);
   color: white;
   text-align: center;
-  padding: 80px 64px;
-  border-radius: 24px;
+  padding: var(--space-20) var(--space-16);
+  border-radius: var(--radius-2xl);
   position: relative;
   overflow: hidden;
 }
@@ -541,30 +559,28 @@
 }
 
 .ctaTitle {
-  margin: 0 0 20px 0;
-  font-size: 48px;
+  margin: 0 0 var(--space-5) 0;
+  font-size: 40px;
   font-weight: 700;
   position: relative;
   z-index: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .ctaText {
-  margin: 0 0 40px 0;
+  margin: 0 auto var(--space-10);
   font-size: 18px;
   opacity: 0.9;
   position: relative;
   z-index: 1;
   max-width: 640px;
-  margin-left: auto;
-  margin-right: auto;
   font-weight: 400;
   letter-spacing: -0.01em;
 }
 
 .ctaButtons {
   display: flex;
-  gap: 16px;
+  gap: var(--space-4);
   justify-content: center;
   position: relative;
   z-index: 1;
@@ -572,29 +588,31 @@
 
 .ctaPrimaryButton,
 .ctaSecondaryButton {
-  padding: 16px 32px;
+  padding: var(--space-3) var(--space-8);
   border: none;
-  border-radius: 12px;
-  font-size: 15px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-2);
   letter-spacing: -0.01em;
+  height: 44px;
 }
 
 .ctaPrimaryButton {
   background: white;
-  color: #6366f1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.15);
+  color: var(--primary-600);
+  box-shadow: var(--shadow-sm);
 }
 
 .ctaPrimaryButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 15px 30px -10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: var(--bg-secondary);
 }
 
 .ctaSecondaryButton {
@@ -606,15 +624,17 @@
 
 .ctaSecondaryButton:hover {
   background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
+/* ============================================
+   WHATSAPP BUTTON
+   ============================================ */
 
-/* WhatsApp Button */
 .whatsappButton {
   position: fixed;
-  bottom: 32px;
-  right: 32px;
+  bottom: var(--space-8);
+  right: var(--space-8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -624,8 +644,8 @@
   color: white;
   border-radius: 50%;
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3), 0 8px 20px -5px rgba(37, 211, 102, 0.2);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-fast);
   z-index: 1000;
 }
 
@@ -638,17 +658,16 @@
 .whatsappIcon {
   font-size: 26px;
 }
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
 
-/* Responsive */
+/* TABLET (1024px) */
 @media (max-width: 1024px) {
-  .hero {
-    border-radius: 0 0 16px 16px;
-  }
-
   .heroWrapper {
-    padding: 60px 40px;
+    padding: var(--space-16) var(--space-10);
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: var(--space-10);
   }
 
   .heroLogoContainer {
@@ -656,56 +675,61 @@
   }
 
   .heroTitle {
-    font-size: 44px;
+    font-size: 40px;
   }
 
   .heroStats {
-    gap: 24px;
-    padding: 24px;
+    gap: var(--space-6);
+    padding: var(--space-6);
   }
 
   .statNumber {
     font-size: 28px;
   }
 
+  .features,
+  .howItWorks {
+    padding: var(--space-16) var(--space-10);
+  }
+
+  .features .sectionTitle,
+  .howItWorks .sectionTitle {
+    font-size: 36px;
+  }
+
   .featureGrid {
     grid-template-columns: 1fr;
-    gap: 24px;
   }
 
   .shareSectionContent {
-    padding: 40px 32px;
+    padding: var(--space-10) var(--space-8);
   }
 
   .shareTitle {
-    font-size: 24px;
+    font-size: 28px;
   }
 
   .shareText {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .stepsContainer {
     grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .step {
-    padding: 28px;
   }
 
   .ctaContent {
-    padding: 60px 40px;
+    padding: var(--space-16) var(--space-10);
+  }
+
+  .ctaTitle {
+    font-size: 36px;
   }
 }
 
+/* MOBILE (768px) */
 @media (max-width: 768px) {
-  .hero {
-    border-radius: 0 0 12px 12px;
-  }
-
   .heroWrapper {
-    padding: 48px 24px;
+    padding: var(--space-12) var(--space-6);
   }
 
   .heroContent {
@@ -714,16 +738,16 @@
   }
 
   .heroTitle {
-    font-size: 36px;
-    letter-spacing: -1px;
+    font-size: 32px;
+    letter-spacing: -0.01em;
   }
 
   .heroSubtitle {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .heroDescription {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .heroCTA {
@@ -738,7 +762,7 @@
 
   .heroStats {
     flex-direction: column;
-    gap: 24px;
+    gap: var(--space-6);
   }
 
   .statDivider {
@@ -748,23 +772,25 @@
 
   .features,
   .howItWorks {
-    padding: 60px 24px;
+    padding: var(--space-16) var(--space-6);
   }
 
-  .sectionTitle {
-    font-size: 36px;
+  .features .sectionTitle,
+  .howItWorks .sectionTitle {
+    font-size: 32px;
   }
 
-  .sectionSubtitle {
+  .features .sectionSubtitle,
+  .howItWorks .sectionSubtitle {
     font-size: 16px;
   }
 
   .shareSection {
-    padding: 0 24px;
+    padding: 0 var(--space-6);
   }
 
   .shareSectionContent {
-    padding: 36px 28px;
+    padding: var(--space-9) var(--space-7);
   }
 
   .shareIcon {
@@ -774,7 +800,7 @@
   }
 
   .shareTitle {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .shareText {
@@ -782,34 +808,38 @@
   }
 
   .shareHighlight {
-    padding: 12px 24px;
+    padding: var(--space-3) var(--space-6);
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
   }
 
   .shareHighlight span {
-    font-size: 14px;
+    font-size: 13px;
     text-align: center;
   }
 
   .stepNumber {
-    font-size: 40px;
+    font-size: 36px;
   }
 
   .stepTitle {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .stepText {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .ctaContent {
-    padding: 48px 32px;
+    padding: var(--space-12) var(--space-8);
   }
 
   .ctaTitle {
-    font-size: 36px;
+    font-size: 32px;
+  }
+
+  .ctaText {
+    font-size: 16px;
   }
 
   .ctaButtons {
@@ -825,8 +855,8 @@
   .whatsappButton {
     width: 56px;
     height: 56px;
-    bottom: 24px;
-    right: 24px;
+    bottom: var(--space-6);
+    right: var(--space-6);
   }
 
   .whatsappIcon {
@@ -834,9 +864,10 @@
   }
 }
 
+/* SMALL MOBILE (480px) */
 @media (max-width: 480px) {
   .heroWrapper {
-    padding: 40px 20px;
+    padding: var(--space-10) var(--space-5);
   }
 
   .heroTitle {
@@ -844,22 +875,22 @@
   }
 
   .heroSubtitle {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .heroDescription {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .heroTag {
-    font-size: 12px;
-    padding: 6px 16px;
+    font-size: 11px;
+    padding: var(--space-1) var(--space-4);
   }
 
   .primaryButton,
   .secondaryButton {
-    padding: 14px 24px;
-    font-size: 15px;
+    padding: var(--space-3) var(--space-6);
+    font-size: 14px;
   }
 
   .statNumber {
@@ -872,78 +903,91 @@
 
   .features,
   .howItWorks {
-    padding: 48px 20px;
+    padding: var(--space-12) var(--space-5);
   }
 
-  .sectionTitle {
-    font-size: 28px;
+  .features .sectionTitle,
+  .howItWorks .sectionTitle {
+    font-size: 26px;
   }
 
-  .sectionSubtitle {
-    font-size: 15px;
+  .features .sectionSubtitle,
+  .howItWorks .sectionSubtitle {
+    font-size: 14px;
   }
 
   .shareSection {
-    padding: 0 20px;
+    padding: 0 var(--space-5);
   }
 
   .shareSectionContent {
-    padding: 32px 24px;
+    padding: var(--space-8) var(--space-6);
   }
 
   .shareIcon {
     width: 56px;
     height: 56px;
     font-size: 24px;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
   }
 
   .shareTitle {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .shareText {
-    font-size: 14px;
-    margin-bottom: 20px;
+    font-size: 13px;
+    margin-bottom: var(--space-5);
   }
 
   .shareHighlight {
-    padding: 12px 20px;
+    padding: var(--space-3) var(--space-5);
   }
 
   .shareHighlightIcon {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .shareHighlight span {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .step {
-    padding: 24px;
+    padding: var(--space-6);
   }
 
   .stepNumber {
-    font-size: 36px;
+    font-size: 32px;
   }
 
   .stepTitle {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .stepText {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .ctaContent {
-    padding: 40px 24px;
+    padding: var(--space-10) var(--space-6);
   }
 
   .ctaTitle {
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .ctaText {
-    font-size: 16px;
+    font-size: 14px;
+  }
+
+  .whatsappButton {
+    width: 56px;
+    height: 56px;
+    bottom: var(--space-5);
+    right: var(--space-5);
+  }
+
+  .whatsappIcon {
+    font-size: 22px;
   }
 }

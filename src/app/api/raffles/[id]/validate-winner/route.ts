@@ -56,7 +56,7 @@ export async function POST(
               raffleId,
               raffleTitle: raffle.product?.name || 'Sorteo',
               productName: raffle.product?.name || 'Premio',
-              organizerName: raffle.shopName || 'Organizador',
+              organizerName: raffle.shop?.name || 'Organizador',
             }),
           }
         );

@@ -54,8 +54,8 @@ export async function POST(
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: raffle.shopEmail || raffle.createdByEmail,
-            name: raffle.shopName || 'Organizador',
+            email: raffle.shop?.publicEmail || 'noreply@tiketea.com',
+            name: raffle.shop?.name || 'Organizador',
             raffleTitle: raffle.product?.name || 'Sorteo',
             productName: raffle.product?.name || 'Premio',
             winnerName: winnerInfo.userName || 'Ganador',
