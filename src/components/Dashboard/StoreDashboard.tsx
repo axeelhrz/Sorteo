@@ -13,12 +13,18 @@ import {
   FiEdit2,
   FiTrash2,
   FiEye,
-  FiX
+  FiX,
+  FiBarChart2,
+  FiCreditCard,
+  FiCalendar,
+  FiDownload
 } from 'react-icons/fi';
 import { CreateRaffleForm } from '@/components/ShopPanel/CreateRaffleForm';
 import { firebaseShopService } from '@/services/firebase-shop-service';
 import { Shop } from '@/types/shop';
 import styles from './StoreDashboard.module.css';
+
+type TabType = 'overview' | 'raffles' | 'earnings' | 'stats';
 
 export default function StoreDashboard() {
   const router = useRouter();
@@ -26,6 +32,7 @@ export default function StoreDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [shop, setShop] = useState<Shop | null>(null);
   const [, setLoadingShop] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
 
   // Mock data - Replace with Firebase calls
   const [stats, setStats] = useState({
@@ -36,6 +43,7 @@ export default function StoreDashboard() {
   });
 
   const [raffles] = useState<any[]>([]);
+  const [deposits] = useState<any[]>([]);
 
   useEffect(() => {
     if (!isHydrated || !user) return;
@@ -103,15 +111,15 @@ export default function StoreDashboard() {
   };
 
   const handleViewRaffles = () => {
-    router.push('/panel/sorteos');
+    setActiveTab('raffles');
   };
 
   const handleViewEarnings = () => {
-    router.push('/shop/deposits');
+    setActiveTab('earnings');
   };
 
   const handleViewStats = () => {
-    router.push('/panel/estadisticas');
+    setActiveTab('stats');
   };
 
   // Prevent hydration mismatch by not rendering user-dependent content until hydrated
@@ -176,8 +184,43 @@ export default function StoreDashboard() {
 
       {/* Main Content */}
       <main className={styles.mainContent}>
-        {/* Stats Grid */}
-        <div className={styles.statsGrid}>
+        {/* Tabs Navigation */}
+        <div className={styles.tabsContainer}>
+          <button 
+            className={`${styles.tab} ${activeTab === 'overview' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('overview')}
+          >
+            <FiPackage />
+            <span>Resumen</span>
+          </button>
+          <button 
+            className={`${styles.tab} ${activeTab === 'raffles' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('raffles')}
+          >
+            <FiShoppingBag />
+            <span>Mis Sorteos</span>
+          </button>
+          <button 
+            className={`${styles.tab} ${activeTab === 'earnings' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('earnings')}
+          >
+            <FiDollarSign />
+            <span>Ganancias</span>
+          </button>
+          <button 
+            className={`${styles.tab} ${activeTab === 'stats' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('stats')}
+          >
+            <FiBarChart2 />
+            <span>Estadísticas</span>
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <>
+            {/* Stats Grid */}
+            <div className={styles.statsGrid}>
           <div className={styles.statCard}>
             <div className={styles.statHeader}>
               <div>
@@ -239,8 +282,8 @@ export default function StoreDashboard() {
           </div>
         </div>
 
-        {/* Quick Actions Section */}
-        <div className={styles.section}>
+            {/* Quick Actions Section */}
+            <div className={styles.section}>
           <div className={styles.sectionHeader}>
             <div>
               <h2 className={styles.sectionTitle}>Acciones Rápidas</h2>
@@ -283,72 +326,245 @@ export default function StoreDashboard() {
           </div>
         </div>
 
-        {/* Raffles Section */}
-        <div className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <div>
-              <h2 className={styles.sectionTitle}>Mis Sorteos</h2>
-              <p className={styles.sectionSubtitle}>Gestiona todos tus sorteos activos y en progreso</p>
+            {/* Recent Activity */}
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <div>
+                  <h2 className={styles.sectionTitle}>Actividad Reciente</h2>
+                  <p className={styles.sectionSubtitle}>Últimas acciones en tu tienda</p>
+                </div>
+              </div>
+              <div className={styles.emptyState}>
+                <FiCalendar className={styles.emptyIcon} />
+                <h3>Sin actividad reciente</h3>
+                <p>Aquí verás las últimas acciones realizadas en tu tienda</p>
+              </div>
             </div>
-            <button className={styles.createBtn} onClick={handleCreateRaffle} title="Crear un nuevo sorteo" type="button">
-              <FiPlus />
-              <span>Nuevo Sorteo</span>
-            </button>
-          </div>
+          </>
+        )}
 
-          {raffles.length === 0 ? (
-            <div className={styles.emptyState}>
-              <FiShoppingBag className={styles.emptyIcon} />
-              <h3>No tienes sorteos</h3>
-              <p>Crea tu primer sorteo para comenzar a vender tickets y generar ingresos</p>
-              <button className={styles.createBtn} onClick={handleCreateRaffle} type="button">
+        {activeTab === 'raffles' && (
+          <div className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2 className={styles.sectionTitle}>Mis Sorteos</h2>
+                <p className={styles.sectionSubtitle}>Gestiona todos tus sorteos activos y en progreso</p>
+              </div>
+              <button className={styles.createBtn} onClick={handleCreateRaffle} title="Crear un nuevo sorteo" type="button">
                 <FiPlus />
-                <span>Crear Sorteo</span>
+                <span>Nuevo Sorteo</span>
               </button>
             </div>
-          ) : (
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Sorteo</th>
-                    <th>Producto</th>
-                    <th>Tickets</th>
-                    <th>Precio</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {raffles.map((raffle) => (
-                    <tr key={raffle.id}>
-                      <td>{raffle.title}</td>
-                      <td>{raffle.productName}</td>
-                      <td>{raffle.soldTickets}/{raffle.totalTickets}</td>
-                      <td>S/. {raffle.ticketPrice}</td>
-                      <td>
-                        <span className={styles.badge}>{raffle.status}</span>
-                      </td>
-                      <td>
-                        <div className={styles.actions}>
-                          <button className={styles.actionBtn} title="Ver">
-                            <FiEye />
-                          </button>
-                          <button className={styles.actionBtn} title="Editar">
-                            <FiEdit2 />
-                          </button>
-                          <button className={styles.actionBtn} title="Eliminar">
-                            <FiTrash2 />
-                          </button>
-                        </div>
-                      </td>
+
+            {raffles.length === 0 ? (
+              <div className={styles.emptyState}>
+                <FiShoppingBag className={styles.emptyIcon} />
+                <h3>No tienes sorteos</h3>
+                <p>Crea tu primer sorteo para comenzar a vender tickets y generar ingresos</p>
+                <button className={styles.createBtn} onClick={handleCreateRaffle} type="button">
+                  <FiPlus />
+                  <span>Crear Sorteo</span>
+                </button>
+              </div>
+            ) : (
+              <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Sorteo</th>
+                      <th>Producto</th>
+                      <th>Tickets</th>
+                      <th>Precio</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {raffles.map((raffle) => (
+                      <tr key={raffle.id}>
+                        <td>{raffle.title}</td>
+                        <td>{raffle.productName}</td>
+                        <td>{raffle.soldTickets}/{raffle.totalTickets}</td>
+                        <td>S/. {raffle.ticketPrice}</td>
+                        <td>
+                          <span className={styles.badge}>{raffle.status}</span>
+                        </td>
+                        <td>
+                          <div className={styles.actions}>
+                            <button className={styles.actionBtn} title="Ver">
+                              <FiEye />
+                            </button>
+                            <button className={styles.actionBtn} title="Editar">
+                              <FiEdit2 />
+                            </button>
+                            <button className={styles.actionBtn} title="Eliminar">
+                              <FiTrash2 />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'earnings' && (
+          <div className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2 className={styles.sectionTitle}>Ganancias</h2>
+                <p className={styles.sectionSubtitle}>Historial de ingresos y depósitos</p>
+              </div>
+              <button className={styles.createBtn} type="button">
+                <FiDownload />
+                <span>Exportar</span>
+              </button>
             </div>
-          )}
-        </div>
+
+            {/* Earnings Stats */}
+            <div className={styles.earningsGrid}>
+              <div className={styles.earningCard}>
+                <div className={styles.earningLabel}>Total Acumulado</div>
+                <div className={styles.earningValue}>S/. {stats.totalRevenue.toFixed(2)}</div>
+                <div className={styles.earningChange}>+0% este mes</div>
+              </div>
+              <div className={styles.earningCard}>
+                <div className={styles.earningLabel}>Pendiente de Cobro</div>
+                <div className={styles.earningValue}>S/. 0.00</div>
+                <div className={styles.earningChange}>0 transacciones</div>
+              </div>
+              <div className={styles.earningCard}>
+                <div className={styles.earningLabel}>Cobrado Este Mes</div>
+                <div className={styles.earningValue}>S/. 0.00</div>
+                <div className={styles.earningChange}>0 depósitos</div>
+              </div>
+            </div>
+
+            {deposits.length === 0 ? (
+              <div className={styles.emptyState}>
+                <FiCreditCard className={styles.emptyIcon} />
+                <h3>Sin depósitos registrados</h3>
+                <p>Aquí verás el historial de tus depósitos y ganancias</p>
+              </div>
+            ) : (
+              <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Concepto</th>
+                      <th>Monto</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {deposits.map((deposit) => (
+                      <tr key={deposit.id}>
+                        <td>{deposit.date}</td>
+                        <td>{deposit.concept}</td>
+                        <td>S/. {deposit.amount}</td>
+                        <td>
+                          <span className={styles.badge}>{deposit.status}</span>
+                        </td>
+                        <td>
+                          <div className={styles.actions}>
+                            <button className={styles.actionBtn} title="Ver">
+                              <FiEye />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'stats' && (
+          <div className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2 className={styles.sectionTitle}>Estadísticas</h2>
+                <p className={styles.sectionSubtitle}>Análisis detallado de tu tienda</p>
+              </div>
+            </div>
+
+            {/* Stats Overview */}
+            <div className={styles.statsGrid}>
+              <div className={styles.statCard}>
+                <div className={styles.statHeader}>
+                  <div>
+                    <div className={styles.statLabel}>Tasa de Conversión</div>
+                    <div className={styles.statValue}>0%</div>
+                  </div>
+                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                    <FiTrendingUp />
+                  </div>
+                </div>
+                <div className={styles.statChange}>
+                  <span>Visitantes a compradores</span>
+                </div>
+              </div>
+
+              <div className={styles.statCard}>
+                <div className={styles.statHeader}>
+                  <div>
+                    <div className={styles.statLabel}>Ticket Promedio</div>
+                    <div className={styles.statValue}>S/. 0.00</div>
+                  </div>
+                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
+                    <FiDollarSign />
+                  </div>
+                </div>
+                <div className={styles.statChange}>
+                  <span>Valor promedio por venta</span>
+                </div>
+              </div>
+
+              <div className={styles.statCard}>
+                <div className={styles.statHeader}>
+                  <div>
+                    <div className={styles.statLabel}>Sorteos Completados</div>
+                    <div className={styles.statValue}>0</div>
+                  </div>
+                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
+                    <FiShoppingBag />
+                  </div>
+                </div>
+                <div className={styles.statChange}>
+                  <span>Total finalizados</span>
+                </div>
+              </div>
+
+              <div className={styles.statCard}>
+                <div className={styles.statHeader}>
+                  <div>
+                    <div className={styles.statLabel}>Satisfacción</div>
+                    <div className={styles.statValue}>0%</div>
+                  </div>
+                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }}>
+                    <FiBarChart2 />
+                  </div>
+                </div>
+                <div className={styles.statChange}>
+                  <span>Calificación promedio</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.emptyState}>
+              <FiBarChart2 className={styles.emptyIcon} />
+              <h3>Estadísticas en desarrollo</h3>
+              <p>Pronto podrás ver gráficos detallados y análisis avanzados de tu tienda</p>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Create Raffle Modal */}
