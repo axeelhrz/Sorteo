@@ -355,7 +355,7 @@ export const adminService = {
 
   /**
    * Get dashboard statistics (admin only)
-   * TODO: Implement proper Firestore queries for dashboard stats
+   * Fetches real data from Firestore
    */
   async getDashboardStats(): Promise<{
     users: { total: number };
@@ -378,27 +378,100 @@ export const adminService = {
     };
   }> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would query Firestore for actual statistics
-      console.warn('getDashboardStats is not fully implemented yet');
+      const { collection, query, getDocs, where } = await import('firebase/firestore');
+
+      // Get users count
+      const usersRef = collection(db, 'users');
+      const usersSnapshot = await getDocs(usersRef);
+      const totalUsers = usersSnapshot.size;
+
+      // Get shops statistics
+      const shopsRef = collection(db, 'shops');
+      const shopsSnapshot = await getDocs(shopsRef);
+      const totalShops = shopsSnapshot.size;
+      let pendingShops = 0;
+      let verifiedShops = 0;
+      let blockedShops = 0;
+
+      shopsSnapshot.docs.forEach((doc) => {
+        const status = doc.data().status;
+        if (status === 'pending') pendingShops++;
+        else if (status === 'verified' || status === 'active') verifiedShops++;
+        else if (status === 'blocked') blockedShops++;
+      });
+
+      // Get raffles statistics
+      const rafflesRef = collection(db, 'raffles');
+      const rafflesSnapshot = await getDocs(rafflesRef);
+      let pendingRaffles = 0;
+      let activeRaffles = 0;
+      let finishedRaffles = 0;
+      let cancelledRaffles = 0;
+      let rejectedRaffles = 0;
+
+      rafflesSnapshot.docs.forEach((doc) => {
+        const status = doc.data().status;
+        if (status === 'pending_approval') pendingRaffles++;
+        else if (status === 'active' || status === 'sold_out') activeRaffles++;
+        else if (status === 'finished') finishedRaffles++;
+        else if (status === 'cancelled') cancelledRaffles++;
+        else if (status === 'rejected') rejectedRaffles++;
+      });
+
+      // Get tickets statistics
+      const ticketsRef = collection(db, 'raffle-tickets');
+      const ticketsSnapshot = await getDocs(ticketsRef);
+      const totalSoldTickets = ticketsSnapshot.size;
+
+      // Get payments statistics
+      const paymentsRef = collection(db, 'payments');
+      const paymentsSnapshot = await getDocs(paymentsRef);
+      let totalPayments = paymentsSnapshot.size;
+      let completedPayments = 0;
+      let pendingPayments = 0;
+      let failedPayments = 0;
+      let refundedPayments = 0;
+      let totalRevenue = 0;
+
+      paymentsSnapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        const status = data.status;
+        
+        if (status === 'completed' || status === 'approved') {
+          completedPayments++;
+          totalRevenue += data.amount || 0;
+        } else if (status === 'pending' || status === 'pending_validation') {
+          pendingPayments++;
+        } else if (status === 'failed') {
+          failedPayments++;
+        } else if (status === 'refunded') {
+          refundedPayments++;
+        }
+      });
+
       return {
-        users: { total: 0 },
-        shops: { total: 0, pending: 0, verified: 0, blocked: 0 },
-        raffles: {
-          pending: 0,
-          active: 0,
-          finished: 0,
-          cancelled: 0,
-          rejected: 0,
+        users: { total: totalUsers },
+        shops: { 
+          total: totalShops, 
+          pending: pendingShops, 
+          verified: verifiedShops, 
+          blocked: blockedShops 
         },
-        tickets: { totalSold: 0 },
+        raffles: {
+          pending: pendingRaffles,
+          active: activeRaffles,
+          finished: finishedRaffles,
+          cancelled: cancelledRaffles,
+          rejected: rejectedRaffles,
+        },
+        tickets: { totalSold: totalSoldTickets },
         payments: {
-          total: 0,
-          completed: 0,
-          pending: 0,
-          failed: 0,
-          refunded: 0,
-          totalRevenue: 0,
+          total: totalPayments,
+          completed: completedPayments,
+          pending: pendingPayments,
+          failed: failedPayments,
+          refunded: refundedPayments,
+          totalRevenue,
         },
       };
     } catch (error) {
