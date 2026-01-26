@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiChevronDown } from 'react-icons/fi';
+import styles from './faq.module.css';
 
 interface FAQItem {
   id: string;
@@ -239,135 +240,86 @@ export default function FAQPage() {
   };
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '60px 20px' }}>
-      <h1 style={{ fontSize: '36px', fontWeight: '700', marginBottom: '10px', color: '#333' }}>
-        Preguntas Frecuentes
-      </h1>
-      <p style={{ color: '#666', marginBottom: '40px', fontSize: '16px' }}>
-        Encuentra respuestas a las preguntas más comunes sobre TIKETEA ONLINE
-      </p>
-
-      {/* Category Filter */}
-      <div style={{ marginBottom: '40px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-        {categories.map(category => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            style={{
-              padding: '10px 20px',
-              border: 'none',
-              borderRadius: '20px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              backgroundColor: selectedCategory === category ? '#667eea' : '#f0f0f0',
-              color: selectedCategory === category ? 'white' : '#333',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      {/* FAQ Items */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        {filteredItems.map(item => (
-          <div
-            key={item.id}
-            style={{
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              backgroundColor: 'white'
-            }}
-          >
-            <button
-              onClick={() => toggleExpand(item.id)}
-              style={{
-                width: '100%',
-                padding: '20px',
-                border: 'none',
-                backgroundColor: expandedId === item.id ? '#f5f7fa' : 'white',
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                transition: 'background-color 0.3s ease'
-              }}
-            >
-              <h3 style={{ margin: '0', fontSize: '16px', fontWeight: '600', color: '#333', textAlign: 'left' }}>
-                {item.question}
-              </h3>
-              {expandedId === item.id ? (
-                <FiChevronUp style={{ fontSize: '20px', color: '#667eea', flexShrink: 0, marginLeft: '15px' }} />
-              ) : (
-                <FiChevronDown style={{ fontSize: '20px', color: '#999', flexShrink: 0, marginLeft: '15px' }} />
-              )}
-            </button>
-
-            {expandedId === item.id && (
-              <div style={{ padding: '0 20px 20px 20px', borderTop: '1px solid #e0e0e0' }}>
-                <p style={{ color: '#555', lineHeight: '1.6', margin: '15px 0 0 0', whiteSpace: 'pre-wrap' }}>
-                  {item.answer}
-                </p>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Contact Section */}
-      <div style={{
-        backgroundColor: '#f5f7fa',
-        padding: '40px',
-        borderRadius: '12px',
-        marginTop: '60px',
-        textAlign: 'center',
-        borderLeft: '4px solid #667eea'
-      }}>
-        <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '15px', color: '#333' }}>
-          ¿No encontraste tu respuesta?
-        </h2>
-        <p style={{ color: '#555', marginBottom: '25px', fontSize: '16px' }}>
-          Nuestro equipo de soporte está disponible para ayudarte
-        </p>
-        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a
-            href="mailto:support@tiketea.com"
-            style={{
-              padding: '12px 30px',
-              backgroundColor: '#667eea',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: '600',
-              transition: 'background-color 0.3s ease'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#764ba2')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#667eea')}
-          >
-            Enviar Email
-          </a>
-          <a
-            href="https://wa.me/51XXXXXXXXX?text=Hola%20👋%0A%0AEstoy%20visitando%20TIKETEA%20y%20quiero%20más%20información%20sobre%20cómo%20funcionan%20las%20oportunidades%20y%20la%20compra%20de%20tickets.%0A%0A¿Podrían%20ayudarme,%20por%20favor?"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              padding: '12px 30px',
-              backgroundColor: '#25D366',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: '600',
-              transition: 'background-color 0.3s ease'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#20BA5A')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#25D366')}
-          >
-            WhatsApp
-          </a>
+    <div className={styles.container}>
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <span className={styles.heroTag}>Soporte y ayuda</span>
+          <h1 className={styles.heroTitle}>Preguntas Frecuentes</h1>
+          <p className={styles.heroSubtitle}>
+            Encuentra respuestas a las preguntas más comunes sobre TIKETEA ONLINE
+          </p>
         </div>
+      </section>
+
+      {/* Main Content */}
+      <div className={styles.mainContent}>
+        {/* Category Filter */}
+        <div className={styles.categoryFilter}>
+          {categories.map(category => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`${styles.categoryButton} ${selectedCategory === category ? styles.active : ''}`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/* FAQ Items */}
+        <div className={styles.faqContainer}>
+          {filteredItems.map(item => (
+            <div
+              key={item.id}
+              className={`${styles.faqItem} ${expandedId === item.id ? styles.expanded : ''}`}
+            >
+              <button
+                onClick={() => toggleExpand(item.id)}
+                className={styles.faqQuestion}
+              >
+                <h3 className={styles.faqQuestionText}>
+                  {item.question}
+                </h3>
+                <FiChevronDown className={styles.faqIcon} />
+              </button>
+
+              {expandedId === item.id && (
+                <div className={styles.faqAnswer}>
+                  {item.answer}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Contact Section */}
+        <section className={styles.contactSection}>
+          <div className={styles.contactContent}>
+            <h2 className={styles.contactTitle}>
+              ¿No encontraste tu respuesta?
+            </h2>
+            <p className={styles.contactSubtitle}>
+              Nuestro equipo de soporte está disponible para ayudarte
+            </p>
+            <div className={styles.contactButtons}>
+              <a
+                href="mailto:support@tiketea.com"
+                className={`${styles.contactButton} ${styles.primary}`}
+              >
+                Enviar Email
+              </a>
+              <a
+                href="https://wa.me/51XXXXXXXXX?text=Hola%20👋%0A%0AEstoy%20visitando%20TIKETEA%20y%20quiero%20más%20información%20sobre%20cómo%20funcionan%20las%20oportunidades%20y%20la%20compra%20de%20tickets.%0A%0A¿Podrían%20ayudarme,%20por%20favor?"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.contactButton} ${styles.secondary}`}
+              >
+                WhatsApp
+              </a>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
