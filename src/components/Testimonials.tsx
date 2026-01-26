@@ -18,7 +18,7 @@ const testimonials: Testimonial[] = [
     id: 1,
     name: 'Carlos Mendoza',
     role: 'Usuario desde hace 6 meses',
-    avatar: '👨‍💼',
+    avatar: 'CM',
     content: 'TIKETEA cambió mi forma de ver las oportunidades. Gané un laptop de $1500 con solo $50 invertidos. ¡Increíble!',
     rating: 5,
   },
@@ -26,7 +26,7 @@ const testimonials: Testimonial[] = [
     id: 2,
     name: 'María García',
     role: 'Ganadora de 3 premios',
-    avatar: '👩‍🎓',
+    avatar: 'MG',
     content: 'La plataforma es muy transparente y segura. He ganado múltiples veces y siempre recibí mis premios sin problemas.',
     rating: 5,
   },
@@ -34,7 +34,7 @@ const testimonials: Testimonial[] = [
     id: 3,
     name: 'Juan Rodríguez',
     role: 'Organizador activo',
-    avatar: '👨‍💻',
+    avatar: 'JR',
     content: 'Como organizador, TIKETEA me ayudó a vender 500 productos en 2 meses. La plataforma es muy eficiente.',
     rating: 5,
   },
@@ -42,7 +42,7 @@ const testimonials: Testimonial[] = [
     id: 4,
     name: 'Ana López',
     role: 'Usuario frecuente',
-    avatar: '👩‍🔬',
+    avatar: 'AL',
     content: 'Me encanta que pueda controlar cuántos tickets comprar. Las probabilidades son reales y justas.',
     rating: 5,
   },
@@ -81,7 +81,7 @@ export const Testimonials: React.FC = () => {
     <section className={styles.testimonials}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <span className={styles.tag}>💬 Testimonios</span>
+          <span className={styles.tag}>Testimonios</span>
           <h2 className={styles.title}>Lo que dicen nuestros usuarios</h2>
           <p className={styles.subtitle}>
             Miles de usuarios confían en TIKETEA para sus oportunidades

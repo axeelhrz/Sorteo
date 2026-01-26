@@ -154,9 +154,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
   border-radius: var(--radius-xl);
-  font-size: 24px;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
 }
 
 .info {

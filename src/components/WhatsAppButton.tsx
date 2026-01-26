@@ -5,7 +5,7 @@ import styles from './WhatsAppButton.module.css';
 
 const WhatsAppButton: React.FC = () => {
   const phoneNumber = '5491234567890'; // Reemplaza con tu número de WhatsApp (código de país + número sin espacios ni guiones)
-  const defaultMessage = `Hola 👋
+  const defaultMessage = `Hola
 Estoy visitando TIKETEA y quiero más información sobre cómo funcionan las oportunidades y la compra de tickets.
 ¿Podrían ayudarme, por favor?`;
 
