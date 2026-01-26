@@ -419,32 +419,81 @@ export default function StoreDashboard() {
                   <thead>
                     <tr>
                       <th>Sorteo</th>
-                      <th>Producto</th>
                       <th>Tickets</th>
-                      <th>Precio</th>
+                      <th>Valor Ticket</th>
                       <th>Estado</th>
+                      <th>Creado</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
                     {raffles.map((raffle) => (
                       <tr key={raffle.id}>
-                        <td>{raffle.title}</td>
-                        <td>{raffle.productName}</td>
-                        <td>{raffle.soldTickets}/{raffle.totalTickets}</td>
-                        <td>S/. {raffle.ticketPrice}</td>
                         <td>
-                          <span className={styles.badge}>{raffle.status}</span>
+                          <div className={styles.raffleInfo}>
+                            <div className={styles.raffleName}>
+                              {raffle.product?.name || 'Producto sin nombre'}
+                            </div>
+                            <div className={styles.raffleId}>
+                              ID: {raffle.id.substring(0, 8)}...
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div className={styles.ticketsInfo}>
+                            <span className={styles.ticketsCount}>
+                              {raffle.soldTickets}/{raffle.totalTickets}
+                            </span>
+                            <div className={styles.progressBar}>
+                              <div 
+                                className={styles.progressFill}
+                                style={{ width: `${(raffle.soldTickets / raffle.totalTickets) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span className={styles.price}>
+                            S/. {raffle.productValue.toFixed(2)}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`${styles.badge} ${styles[`badge${raffle.status}`]}`}>
+                            {raffle.status === 'draft' && '📝 Borrador'}
+                            {raffle.status === 'pending_approval' && '⏳ Pendiente'}
+                            {raffle.status === 'active' && '🟢 Activo'}
+                            {raffle.status === 'paused' && '⏸️ Pausado'}
+                            {raffle.status === 'sold_out' && '✅ Agotado'}
+                            {raffle.status === 'finished' && '🏁 Finalizado'}
+                            {raffle.status === 'cancelled' && '❌ Cancelado'}
+                            {raffle.status === 'rejected' && '🚫 Rechazado'}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={styles.date}>
+                            {new Date(raffle.createdAt).toLocaleDateString('es-PE')}
+                          </span>
                         </td>
                         <td>
                           <div className={styles.actions}>
-                            <button className={styles.actionBtn} title="Ver">
+                            <button 
+                              className={styles.actionBtn} 
+                              title="Ver detalles"
+                              onClick={() => router.push(`/panel/sorteos/${raffle.id}`)}
+                            >
                               <FiEye />
                             </button>
-                            <button className={styles.actionBtn} title="Editar">
+                            <button 
+                              className={styles.actionBtn} 
+                              title="Editar"
+                              onClick={() => router.push(`/panel/sorteos/${raffle.id}`)}
+                            >
                               <FiEdit2 />
                             </button>
-                            <button className={styles.actionBtn} title="Eliminar">
+                            <button 
+                              className={styles.actionBtn} 
+                              title="Más opciones"
+                            >
                               <FiTrash2 />
                             </button>
                           </div>
