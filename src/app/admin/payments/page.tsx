@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { FiCheck, FiX, FiEye, FiClock, FiAlertCircle, FiDownload } from 'react-icons/fi';
+import { FiCheck, FiX, FiEye, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
 import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
 import { useAuth } from '@/hooks/useAuth';
-import styles from '@/app/panel/panel.module.css';
 
 interface PaymentWithDetails extends Payment {
   userName?: string;
@@ -22,10 +21,14 @@ export default function AdminPaymentsPage() {
   const [validating, setValidating] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     loadPendingPayments();
-  }, []);
+  }, [page]);
 
   const loadPendingPayments = async () => {
     try {
@@ -48,6 +51,7 @@ export default function AdminPaymentsPage() {
       );
       
       setPayments(enrichedPayments);
+      setTotal(enrichedPayments.length);
     } catch (error) {
       console.error('Error loading pending payments:', error);
     } finally {
@@ -61,18 +65,14 @@ export default function AdminPaymentsPage() {
     try {
       setValidating(true);
       
-      // Approve payment and assign tickets
       await adminService.approvePaymentAndAssignTickets(
         selectedPayment.id,
         user.uid
       );
       
-      alert('✅ Pago aprobado y tickets asignados exitosamente');
+      alert('Pago aprobado y tickets asignados exitosamente');
       
-      // Reload list
       await loadPendingPayments();
-      
-      // Close modal
       setSelectedPayment(null);
     } catch (error: any) {
       console.error('Error approving payment:', error);
@@ -91,19 +91,15 @@ export default function AdminPaymentsPage() {
     try {
       setValidating(true);
       
-      // Reject payment
       await firebasePaymentService.rejectPayment(
         selectedPayment.id,
         user.uid,
         rejectReason
       );
       
-      alert('❌ Pago rechazado');
+      alert('Pago rechazado');
       
-      // Reload list
       await loadPendingPayments();
-      
-      // Close modals
       setSelectedPayment(null);
       setShowRejectModal(false);
       setRejectReason('');
@@ -120,18 +116,26 @@ export default function AdminPaymentsPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: { [key: string]: { label: string; color: string } } = {
-      pending: { label: 'Pendiente', color: '#FF9800' },
-      pending_validation: { label: 'En validación', color: '#2196F3' },
-      completed: { label: 'Completado', color: '#4CAF50' },
-      failed: { label: 'Fallido', color: '#F44336' },
-      refunded: { label: 'Reembolsado', color: '#9C27B0' },
+    const statusConfig: { [key: string]: { label: string; color: string; bgColor: string } } = {
+      pending: { label: 'Pendiente', color: '#FF9800', bgColor: '#FFF3E0' },
+      pending_validation: { label: 'En validación', color: '#2196F3', bgColor: '#E3F2FD' },
+      completed: { label: 'Completado', color: '#4CAF50', bgColor: '#E8F5E9' },
+      failed: { label: 'Fallido', color: '#F44336', bgColor: '#FFEBEE' },
+      refunded: { label: 'Reembolsado', color: '#9C27B0', bgColor: '#F3E5F5' },
     };
 
-    const config = statusConfig[status] || { label: status, color: '#757575' };
+    const config = statusConfig[status] || { label: status, color: '#757575', bgColor: '#F5F5F5' };
     
     return (
-      <span className={styles.badge} style={{ backgroundColor: config.color }}>
+      <span style={{
+        backgroundColor: config.bgColor,
+        color: config.color,
+        padding: '6px 12px',
+        borderRadius: '6px',
+        fontSize: '12px',
+        fontWeight: '600',
+        display: 'inline-block',
+      }}>
         {config.label}
       </span>
     );
@@ -139,179 +143,305 @@ export default function AdminPaymentsPage() {
 
   if (loading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.loadingContainer}>
-          <div className={styles.spinner} />
-          <p>Cargando pagos pendientes...</p>
-        </div>
+      <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <p style={{ color: '#64748b', fontSize: '16px' }}>Cargando pagos pendientes...</p>
       </div>
     );
   }
 
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Validación de Pagos</h1>
-        <p className={styles.subtitle}>
-          Revisa y valida los pagos con comprobantes subidos por los usuarios
+    <div>
+      <div style={{ marginBottom: '24px' }}>
+        <h2 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '24px', fontWeight: '700' }}>
+          Validación de Pagos
+        </h2>
+        <p style={{ margin: '0', color: '#64748b', fontSize: '14px' }}>
+          Total: {total} pagos pendientes de validación
         </p>
       </div>
 
-      <div className={styles.stats}>
-        <div className={styles.statCard}>
-          <FiClock className={styles.statIcon} />
-          <div className={styles.statContent}>
-            <div className={styles.statNumber}>{payments.length}</div>
-            <div className={styles.statLabel}>Pagos pendientes</div>
-          </div>
-        </div>
-      </div>
-
       {payments.length === 0 ? (
-        <div className={styles.emptyState}>
-          <FiCheck className={styles.emptyIcon} />
-          <h3>No hay pagos pendientes</h3>
-          <p>Todos los pagos han sido validados</p>
+        <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e8ecf1' }}>
+          <FiCheck style={{ fontSize: '48px', color: '#10b981', marginBottom: '16px' }} />
+          <h3 style={{ color: '#1e293b', fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>No hay pagos pendientes</h3>
+          <p style={{ color: '#64748b', fontSize: '14px', margin: '0' }}>Todos los pagos han sido validados</p>
         </div>
       ) : (
-        <div className={styles.paymentsGrid}>
-          {payments.map((payment) => (
-            <div key={payment.id} className={styles.paymentCard}>
-              <div className={styles.paymentHeader}>
-                <div>
-                  <h3 className={styles.paymentUser}>{payment.userName || 'Usuario'}</h3>
-                  <p className={styles.paymentEmail}>{payment.userEmail || 'N/A'}</p>
-                </div>
-                {getStatusBadge(payment.status)}
-              </div>
+        <>
+          {/* Tabla de pagos */}
+          <div style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e8ecf1', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)' }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e8ecf1' }}>
+                    <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Usuario
+                    </th>
+                    <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Sorteo
+                    </th>
+                    <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Monto
+                    </th>
+                    <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Método
+                    </th>
+                    <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Estado
+                    </th>
+                    <th style={{ padding: '14px 16px', textAlign: 'center', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map((payment) => (
+                    <tr key={payment.id} style={{ borderBottom: '1px solid #e8ecf1', transition: 'background-color 0.2s ease' }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <td style={{ padding: '14px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>
+                        <div>
+                          <div style={{ fontWeight: '600', marginBottom: '2px' }}>{payment.userName || 'Usuario'}</div>
+                          <div style={{ fontSize: '12px', color: '#64748b' }}>{payment.userEmail || 'N/A'}</div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '14px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>
+                        {payment.raffleName || 'N/A'}
+                      </td>
+                      <td style={{ padding: '14px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>
+                        S/. {Number(payment.amount).toFixed(2)}
+                      </td>
+                      <td style={{ padding: '14px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>
+                        {payment.paymentMethod?.toUpperCase() || 'N/A'}
+                      </td>
+                      <td style={{ padding: '14px 16px' }}>
+                        {getStatusBadge(payment.status)}
+                      </td>
+                      <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                        <button
+                          onClick={() => setSelectedPayment(payment)}
+                          style={{
+                            padding: '8px 14px',
+                            backgroundColor: '#667eea',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            transition: 'all 0.2s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            (e.currentTarget as HTMLElement).style.backgroundColor = '#5568d3';
+                            (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                          }}
+                          onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLElement).style.backgroundColor = '#667eea';
+                            (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                          }}
+                        >
+                          <FiEye style={{ fontSize: '14px' }} />
+                          Revisar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-              <div className={styles.paymentDetails}>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Sorteo:</span>
-                  <span className={styles.detailValue}>
-                    {payment.raffleName || 'N/A'}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Tickets:</span>
-                  <span className={styles.detailValue}>{payment.ticketQuantity}</span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Monto:</span>
-                  <span className={styles.detailValue}>
-                    S/. {Number(payment.amount).toFixed(2)}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Método:</span>
-                  <span className={styles.detailValue}>
-                    {payment.paymentMethod?.toUpperCase() || 'N/A'}
-                  </span>
-                </div>
-              </div>
-
-              {payment.ocrProcessed && (
-                <div className={styles.ocrSection}>
-                  <div className={styles.ocrHeader}>
-                    <FiAlertCircle className={styles.ocrIcon} />
-                    <span>Validación OCR</span>
-                  </div>
-                  <div className={styles.ocrDetails}>
-                    <div className={styles.ocrRow}>
-                      <span>Monto detectado:</span>
-                      <span className={styles.ocrValue}>
-                        S/ {payment.ocrExtractedAmount?.toFixed(2) || 'N/A'}
-                      </span>
-                    </div>
-                    <div className={styles.ocrRow}>
-                      <span>Confianza:</span>
-                      <span className={styles.ocrValue}>
-                        {payment.ocrConfidence ? 
-                          `${(payment.ocrConfidence * 100).toFixed(0)}%` : 
-                          'N/A'}
-                      </span>
-                    </div>
-                    <div className={styles.ocrRow}>
-                      <span>Estado:</span>
-                      <span className={payment.ocrValid ? styles.ocrValid : styles.ocrInvalid}>
-                        {payment.ocrValid ? '✓ Válido' : '✗ No válido'}
-                      </span>
-                    </div>
-                    {payment.ocrMessage && (
-                      <div className={styles.ocrRow}>
-                        <span>Mensaje:</span>
-                        <span className={styles.ocrValue}>
-                          {payment.ocrMessage}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
+          {/* Paginación */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '24px' }}>
+            <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
+              Página {page + 1} de {totalPages || 1}
+            </p>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button
-                className={styles.reviewButton}
-                onClick={() => setSelectedPayment(payment)}
+                onClick={() => setPage(Math.max(0, page - 1))}
+                disabled={page === 0}
+                style={{
+                  padding: '8px 14px',
+                  backgroundColor: page === 0 ? '#f1f5f9' : 'white',
+                  border: '1px solid #e8ecf1',
+                  borderRadius: '6px',
+                  cursor: page === 0 ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: page === 0 ? '#cbd5e1' : '#475569',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (page > 0) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
+                    (e.currentTarget as HTMLElement).style.borderColor = '#cbd5e1';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = 'white';
+                  (e.currentTarget as HTMLElement).style.borderColor = '#e8ecf1';
+                }}
               >
-                <FiEye className={styles.buttonIcon} />
-                Revisar comprobante
+                <FiChevronLeft /> Anterior
+              </button>
+              <button
+                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+                disabled={page >= totalPages - 1}
+                style={{
+                  padding: '8px 14px',
+                  backgroundColor: page >= totalPages - 1 ? '#f1f5f9' : 'white',
+                  border: '1px solid #e8ecf1',
+                  borderRadius: '6px',
+                  cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: page >= totalPages - 1 ? '#cbd5e1' : '#475569',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (page < totalPages - 1) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
+                    (e.currentTarget as HTMLElement).style.borderColor = '#cbd5e1';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = 'white';
+                  (e.currentTarget as HTMLElement).style.borderColor = '#e8ecf1';
+                }}
+              >
+                Siguiente <FiChevronRight />
               </button>
             </div>
-          ))}
-        </div>
+          </div>
+        </>
       )}
 
       {/* Modal de rechazo */}
       {showRejectModal && selectedPayment && (
-        <div className={styles.modalOverlay} onClick={() => setShowRejectModal(false)}>
-          <div className={styles.rejectModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>Rechazar Pago</h2>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            backdropFilter: 'blur(4px)',
+          }}
+          onClick={() => setShowRejectModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              padding: '32px',
+              maxWidth: '500px',
+              width: '90%',
+              boxShadow: '0 20px 25px rgba(0, 0, 0, 0.15)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ margin: '0 0 12px 0', color: '#0f172a', fontSize: '20px', fontWeight: '700' }}>
+              Rechazar Pago
+            </h3>
+            <p style={{ margin: '0 0 20px 0', color: '#64748b', fontSize: '14px', lineHeight: '1.6' }}>
+              Por favor, proporciona una razón para rechazar este pago. El usuario recibirá una notificación.
+            </p>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Ejemplo: El monto del comprobante no coincide con el monto esperado..."
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #e8ecf1',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                marginBottom: '20px',
+                minHeight: '100px',
+                boxSizing: 'border-box',
+                color: '#1e293b',
+                transition: 'border-color 0.2s ease',
+              }}
+              onFocus={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = '#667eea';
+                (e.currentTarget as HTMLElement).style.outline = 'none';
+              }}
+              onBlur={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = '#e8ecf1';
+              }}
+            />
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button
-                className={styles.closeButton}
                 onClick={() => setShowRejectModal(false)}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#f1f5f9',
+                  color: '#475569',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#e2e8f0';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#f1f5f9';
+                }}
               >
-                <FiX />
+                Cancelar
               </button>
-            </div>
-
-            <div className={styles.modalContent}>
-              <p className={styles.rejectWarning}>
-                ⚠️ Estás a punto de rechazar este pago. El usuario recibirá un correo con el motivo del rechazo.
-              </p>
-
-              <div className={styles.modalSection}>
-                <h3 className={styles.modalSectionTitle}>Motivo del rechazo *</h3>
-                <textarea
-                  className={styles.notesTextarea}
-                  placeholder="Ejemplo: El monto del comprobante no coincide con el monto esperado..."
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  rows={4}
-                  required
-                />
-              </div>
-
-              <div className={styles.modalActions}>
-                <button
-                  className={styles.cancelButton}
-                  onClick={() => {
-                    setShowRejectModal(false);
-                    setRejectReason('');
-                  }}
-                  disabled={validating}
-                >
-                  Cancelar
-                </button>
-                <button
-                  className={styles.confirmRejectButton}
-                  onClick={handleRejectPayment}
-                  disabled={validating || !rejectReason.trim()}
-                >
-                  <FiX className={styles.buttonIcon} />
-                  {validating ? 'Procesando...' : 'Confirmar rechazo'}
-                </button>
-              </div>
+              <button
+                onClick={handleRejectPayment}
+                disabled={!rejectReason.trim() || validating}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: !rejectReason.trim() || validating ? '#cbd5e1' : '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: !rejectReason.trim() || validating ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (rejectReason.trim() && !validating) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#dc2626';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#ef4444';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                }}
+              >
+                {validating ? 'Procesando...' : 'Rechazar'}
+              </button>
             </div>
           </div>
         </div>
@@ -319,144 +449,241 @@ export default function AdminPaymentsPage() {
 
       {/* Modal de revisión */}
       {selectedPayment && !showRejectModal && (
-        <div className={styles.modalOverlay} onClick={() => setSelectedPayment(null)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>Validar Pago</h2>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            backdropFilter: 'blur(4px)',
+            overflowY: 'auto',
+            padding: '20px',
+          }}
+          onClick={() => setSelectedPayment(null)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              padding: '32px',
+              maxWidth: '700px',
+              width: '100%',
+              boxShadow: '0 20px 25px rgba(0, 0, 0, 0.15)',
+              margin: 'auto',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+              <h2 style={{ margin: 0, color: '#0f172a', fontSize: '22px', fontWeight: '700' }}>Validar Pago</h2>
               <button
-                className={styles.closeButton}
                 onClick={() => setSelectedPayment(null)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#64748b',
+                  padding: '0',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 <FiX />
               </button>
             </div>
 
-            <div className={styles.modalContent}>
-              {/* Información del pago */}
-              <div className={styles.modalSection}>
-                <h3 className={styles.modalSectionTitle}>Información del pago</h3>
-                <div className={styles.modalInfo}>
-                  <div className={styles.modalInfoRow}>
-                    <span>Usuario:</span>
-                    <strong>{selectedPayment.userName}</strong>
-                  </div>
-                  <div className={styles.modalInfoRow}>
-                    <span>Email:</span>
-                    <strong>{selectedPayment.userEmail}</strong>
-                  </div>
-                  <div className={styles.modalInfoRow}>
-                    <span>Sorteo:</span>
-                    <strong>{selectedPayment.raffleName}</strong>
-                  </div>
-                  <div className={styles.modalInfoRow}>
-                    <span>Tickets:</span>
-                    <strong>{selectedPayment.ticketQuantity}</strong>
-                  </div>
-                  <div className={styles.modalInfoRow}>
-                    <span>Monto esperado:</span>
-                    <strong className={styles.expectedAmount}>
-                      S/. {Number(selectedPayment.amount).toFixed(2)}
-                    </strong>
-                  </div>
-                  <div className={styles.modalInfoRow}>
-                    <span>Método:</span>
-                    <strong>{selectedPayment.paymentMethod?.toUpperCase()}</strong>
-                  </div>
+            {/* Información del pago */}
+            <div style={{ marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid #e8ecf1' }}>
+              <h3 style={{ margin: '0 0 16px 0', color: '#1e293b', fontSize: '16px', fontWeight: '700' }}>Información del pago</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Usuario</p>
+                  <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>{selectedPayment.userName}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Email</p>
+                  <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>{selectedPayment.userEmail}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sorteo</p>
+                  <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>{selectedPayment.raffleName}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Tickets</p>
+                  <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>{selectedPayment.ticketQuantity}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Monto esperado</p>
+                  <p style={{ margin: '0', color: '#10b981', fontSize: '16px', fontWeight: '700' }}>S/. {Number(selectedPayment.amount).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Método</p>
+                  <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>{selectedPayment.paymentMethod?.toUpperCase()}</p>
                 </div>
               </div>
+            </div>
 
-              {/* Validación OCR */}
-              {selectedPayment.ocrProcessed && (
-                <div className={styles.modalSection}>
-                  <h3 className={styles.modalSectionTitle}>Resultado OCR</h3>
-                  <div className={styles.ocrResult}>
-                    <div className={styles.ocrResultRow}>
-                      <span>Monto detectado:</span>
-                      <strong className={selectedPayment.ocrValid ? styles.validAmount : styles.invalidAmount}>
-                        S/ {selectedPayment.ocrExtractedAmount?.toFixed(2) || 'N/A'}
-                      </strong>
+            {/* Validación OCR */}
+            {selectedPayment.ocrProcessed && (
+              <div style={{ marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid #e8ecf1' }}>
+                <h3 style={{ margin: '0 0 16px 0', color: '#1e293b', fontSize: '16px', fontWeight: '700' }}>Resultado OCR</h3>
+                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e8ecf1' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600' }}>Monto detectado</p>
+                      <p style={{ margin: '0', color: selectedPayment.ocrValid ? '#10b981' : '#ef4444', fontSize: '16px', fontWeight: '700' }}>
+                        S/. {selectedPayment.ocrExtractedAmount?.toFixed(2) || 'N/A'}
+                      </p>
                     </div>
-                    <div className={styles.ocrResultRow}>
-                      <span>Confianza del OCR:</span>
-                      <strong>
-                        {selectedPayment.ocrConfidence ? 
-                          `${(selectedPayment.ocrConfidence * 100).toFixed(0)}%` : 
-                          'N/A'}
-                      </strong>
+                    <div>
+                      <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600' }}>Confianza</p>
+                      <p style={{ margin: '0', color: '#1e293b', fontSize: '16px', fontWeight: '700' }}>
+                        {selectedPayment.ocrConfidence ? `${(selectedPayment.ocrConfidence * 100).toFixed(0)}%` : 'N/A'}
+                      </p>
                     </div>
-                    <div className={styles.ocrResultRow}>
-                      <span>Estado:</span>
-                      <strong className={selectedPayment.ocrValid ? styles.validAmount : styles.invalidAmount}>
-                        {selectedPayment.ocrValid ? '✓ Válido' : '✗ No válido'}
-                      </strong>
+                    <div>
+                      <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600' }}>Estado</p>
+                      <p style={{ margin: '0', color: selectedPayment.ocrValid ? '#10b981' : '#ef4444', fontSize: '14px', fontWeight: '700' }}>
+                        {selectedPayment.ocrValid ? 'Válido' : 'No válido'}
+                      </p>
                     </div>
                     {selectedPayment.ocrMessage && (
-                      <div className={styles.ocrResultRow}>
-                        <span>Mensaje:</span>
-                        <strong>{selectedPayment.ocrMessage}</strong>
-                      </div>
-                    )}
-                    {selectedPayment.ocrProcessedAt && (
-                      <div className={styles.ocrResultRow}>
-                        <span>Procesado:</span>
-                        <strong>
-                          {new Date(selectedPayment.ocrProcessedAt).toLocaleString('es-PE')}
-                        </strong>
+                      <div>
+                        <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600' }}>Mensaje</p>
+                        <p style={{ margin: '0', color: '#1e293b', fontSize: '14px' }}>{selectedPayment.ocrMessage}</p>
                       </div>
                     )}
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Comprobante */}
-              <div className={styles.modalSection}>
-                <div className={styles.voucherHeader}>
-                  <h3 className={styles.modalSectionTitle}>Comprobante de pago</h3>
-                  {selectedPayment.voucherUrl && (
-                    <button
-                      className={styles.downloadButton}
-                      onClick={() => downloadVoucher(selectedPayment.voucherUrl!)}
-                    >
-                      <FiDownload />
-                      Descargar
-                    </button>
-                  )}
-                </div>
-                {selectedPayment.voucherUrl ? (
-                  <div className={styles.voucherContainer}>
-                    <Image
-                      src={selectedPayment.voucherUrl}
-                      alt="Comprobante"
-                      width={600}
-                      height={800}
-                      className={styles.voucherImage}
-                      unoptimized
-                    />
-                  </div>
-                ) : (
-                  <p className={styles.noVoucher}>No hay comprobante disponible</p>
+            {/* Comprobante */}
+            <div style={{ marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid #e8ecf1' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <h3 style={{ margin: 0, color: '#1e293b', fontSize: '16px', fontWeight: '700' }}>Comprobante de pago</h3>
+                {selectedPayment.voucherUrl && (
+                  <button
+                    onClick={() => downloadVoucher(selectedPayment.voucherUrl!)}
+                    style={{
+                      padding: '8px 14px',
+                      backgroundColor: '#667eea',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.backgroundColor = '#5568d3';
+                      (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.backgroundColor = '#667eea';
+                      (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                    }}
+                  >
+                    <FiDownload style={{ fontSize: '14px' }} />
+                    Descargar
+                  </button>
                 )}
               </div>
+              {selectedPayment.voucherUrl ? (
+                <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #e8ecf1', maxHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc' }}>
+                  <Image
+                    src={selectedPayment.voucherUrl}
+                    alt="Comprobante"
+                    width={600}
+                    height={800}
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                    unoptimized
+                  />
+                </div>
+              ) : (
+                <p style={{ color: '#64748b', fontSize: '14px', margin: '0', textAlign: 'center', padding: '20px' }}>No hay comprobante disponible</p>
+              )}
+            </div>
 
-              {/* Acciones */}
-              <div className={styles.modalActions}>
-                <button
-                  className={styles.rejectButton}
-                  onClick={() => setShowRejectModal(true)}
-                  disabled={validating}
-                >
-                  <FiX className={styles.buttonIcon} />
-                  Rechazar
-                </button>
-                <button
-                  className={styles.approveButton}
-                  onClick={handleApprovePayment}
-                  disabled={validating}
-                >
-                  <FiCheck className={styles.buttonIcon} />
-                  {validating ? 'Procesando...' : 'Aprobar y asignar tickets'}
-                </button>
-              </div>
+            {/* Acciones */}
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowRejectModal(true)}
+                disabled={validating}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: validating ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease',
+                  opacity: validating ? 0.7 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (!validating) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#dc2626';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#ef4444';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                }}
+              >
+                <FiX style={{ fontSize: '14px' }} />
+                Rechazar
+              </button>
+              <button
+                onClick={handleApprovePayment}
+                disabled={validating}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: validating ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease',
+                  opacity: validating ? 0.7 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (!validating) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#059669';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#10b981';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                }}
+              >
+                <FiCheck style={{ fontSize: '14px' }} />
+                {validating ? 'Procesando...' : 'Aprobar'}
+              </button>
             </div>
           </div>
         </div>
