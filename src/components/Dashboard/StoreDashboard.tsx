@@ -19,6 +19,7 @@ import {
   FiDownload
 } from 'react-icons/fi';
 import { firebaseShopService } from '@/services/firebase-shop-service';
+import { raffleService } from '@/services/raffle-service';
 import { Shop } from '@/types/shop';
 import CreateRaffleModal from './CreateRaffleModal';
 import styles from './StoreDashboard.module.css';
@@ -41,14 +42,20 @@ export default function StoreDashboard() {
     totalRevenue: 0
   });
 
-  const [raffles] = useState<any[]>([]);
+  const [raffles, setRaffles] = useState<any[]>([]);
   const [deposits] = useState<any[]>([]);
 
   useEffect(() => {
     if (!isHydrated || !user) return;
-    loadData();
     loadShop();
   }, [user, isHydrated]);
+
+  // Cargar datos cuando la tienda esté disponible
+  useEffect(() => {
+    if (shop?.id) {
+      loadData();
+    }
+  }, [shop?.id]);
 
   const loadShop = async () => {
     if (!user?.id) {
@@ -88,24 +95,28 @@ export default function StoreDashboard() {
   };
 
   const loadData = async () => {
+    if (!shop?.id) {
+      console.warn('No shop ID available for loading data');
+      return;
+    }
+
     try {
-      // TODO: Load data from Firebase
-      // const productsData = await firebaseProductService.getShopProducts(user?.shopId);
-      // const rafflesData = await firebaseRaffleService.getShopRaffles(user?.shopId);
-      // When implementing, uncomment the setters:
-      // const [products, setProducts] = useState<any[]>([]);
-      // const [raffles, setRaffles] = useState<any[]>([]);
-      // setProducts(productsData);
-      // setRaffles(rafflesData);
-      
+      // Cargar sorteos del organizador
+      const rafflesData = await raffleService.getRafflesByShop(shop.id);
+      setRaffles(rafflesData || []);
+
+      // Actualizar estadísticas
       setStats({
         totalProducts: 0,
-        totalRaffles: 0,
+        totalRaffles: rafflesData?.length || 0,
         ticketsSold: 0,
         totalRevenue: 0
       });
+
+      console.log('Raffles loaded:', rafflesData);
     } catch (error) {
       console.error('Error loading data:', error);
+      setRaffles([]);
     }
   };
 
@@ -140,7 +151,10 @@ export default function StoreDashboard() {
 
   const handleRaffleCreated = () => {
     setShowCreateModal(false);
-    loadData(); // Reload data after creating raffle
+    // Recargar sorteos después de crear uno nuevo
+    setTimeout(() => {
+      loadData();
+    }, 1000);
   };
 
   const handleViewRaffles = () => {
