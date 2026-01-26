@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
-import { FiBarChart2, FiTag, FiShoppingBag, FiUsers, FiCreditCard, FiLogOut } from 'react-icons/fi';
+import { FiBarChart2, FiTag, FiShoppingBag, FiUsers, FiLogOut } from 'react-icons/fi';
 
 interface TabItem {
   id: string;
