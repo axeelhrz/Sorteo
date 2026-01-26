@@ -1,12 +1,10 @@
 /* ============================================
-   HOME PAGE - DESIGN SYSTEM IMPLEMENTATION
+   HOME PAGE - PREMIUM REDESIGN
    ============================================ */
 
-/* CONTAINER */
 .container {
   width: 100%;
-  min-height: 100vh;
-  background: var(--bg-primary);
+  overflow: hidden;
 }
 
 /* ============================================
@@ -15,160 +13,138 @@
 
 .hero {
   position: relative;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FC 50%, #F0F4FF 100%);
   overflow: hidden;
-  background: linear-gradient(135deg, var(--primary-600) 0%, #8b5cf6 100%);
-  border-radius: 0;
-  box-shadow: none;
+  padding: var(--space-20) var(--space-6);
 }
 
 .hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-.hero::after {
   content: '';
   position: absolute;
   top: -50%;
   right: -10%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
   border-radius: 50%;
-  pointer-events: none;
+  animation: float 6s ease-in-out infinite;
+  z-index: 0;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite reverse;
+  z-index: 0;
 }
 
 .heroWrapper {
   position: relative;
+  z-index: 1;
   max-width: 1280px;
-  margin: 0 auto;
-  padding: var(--space-20) var(--space-16);
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-20);
+  gap: var(--space-16);
   align-items: center;
-  z-index: 1;
 }
 
 .heroContent {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-6);
-}
-
-.heroLogoContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.heroLogo {
-  animation: float 3s ease-in-out infinite;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
+  gap: var(--space-8);
+  animation: slideInLeft 0.8s ease-out;
 }
 
 .heroTag {
   display: inline-block;
+  width: fit-content;
   padding: var(--space-2) var(--space-4);
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-full);
-  color: white;
-  font-size: 11px;
-  font-weight: 600;
+  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+  color: var(--primary-700);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  backdrop-filter: blur(10px);
-  margin-bottom: var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--primary-200);
 }
 
 .heroTitle {
-  margin: 0;
-  font-size: 48px;
-  font-weight: 700;
-  color: white;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.1;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-  max-width: 700px;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: slideInUp 0.8s ease-out 0.1s both;
 }
 
 .heroSubtitle {
-  margin: 0;
   font-size: 18px;
-  color: rgba(255, 255, 255, 0.95);
-  line-height: 1.6;
-  font-weight: 400;
-  max-width: 650px;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.5;
+  animation: slideInUp 0.8s ease-out 0.2s both;
 }
 
 .heroDescription {
-  margin: 0;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
   line-height: 1.7;
-  max-width: 600px;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  animation: slideInUp 0.8s ease-out 0.3s both;
 }
 
 .heroCTA {
   display: flex;
   gap: var(--space-4);
   margin-top: var(--space-4);
+  animation: slideInUp 0.8s ease-out 0.4s both;
+  flex-wrap: wrap;
 }
 
 .primaryButton,
 .secondaryButton {
-  padding: var(--space-3) var(--space-8);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  white-space: nowrap;
+  padding: 16px 32px;
+  border-radius: var(--radius-xl);
+  font-size: 15px;
+  font-weight: 700;
   letter-spacing: -0.01em;
-  height: 44px;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .primaryButton {
-  background: white;
-  color: var(--primary-600);
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  color: white;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
 }
 
 .primaryButton:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  background: var(--bg-secondary);
+  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
 }
 
 .primaryButton:active {
@@ -176,454 +152,474 @@
 }
 
 .secondaryButton {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
+  background: white;
+  color: var(--primary-600);
+  border: 2px solid var(--primary-200);
+  box-shadow: var(--shadow-sm);
 }
 
 .secondaryButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: var(--primary-50);
+  border-color: var(--primary-300);
   transform: translateY(-2px);
 }
 
 .buttonIconRight {
   font-size: 18px;
-  transition: transform var(--transition-fast);
-}
-
-.primaryButton:hover .buttonIconRight,
-.secondaryButton:hover .buttonIconRight {
-  transform: translateX(4px);
 }
 
 .heroStats {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--space-12);
-  margin-top: var(--space-12);
-  padding: var(--space-7) var(--space-9);
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-xl);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  max-width: fit-content;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+  animation: slideInUp 0.8s ease-out 0.5s both;
 }
 
 .statItem {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .statNumber {
+  font-family: var(--font-display);
   font-size: 32px;
-  font-weight: 700;
-  color: white;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1;
-  margin-bottom: var(--space-2);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  letter-spacing: -0.02em;
 }
 
 .statLabel {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .statDivider {
   width: 1px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 60px;
+  background: var(--border-light);
 }
+
+.heroLogoContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: slideInRight 0.8s ease-out 0.2s both;
+}
+
+.heroLogo {
+  filter: drop-shadow(0 20px 40px rgba(99, 102, 241, 0.15));
+  animation: float 4s ease-in-out infinite;
+}
+
 /* ============================================
    FEATURES SECTION
    ============================================ */
 
 .features {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: var(--space-20) var(--space-16);
+  position: relative;
+  width: 100%;
+  padding: var(--space-24) var(--space-6);
+  background: var(--bg-secondary);
 }
 
-.features .sectionHeader {
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  margin-bottom: var(--space-16);
+  margin-bottom: var(--space-20);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.features .sectionTag {
+.sectionTag {
   display: inline-block;
+  width: fit-content;
   padding: var(--space-2) var(--space-4);
-  background: var(--primary-50);
-  border-radius: var(--radius-full);
-  color: var(--primary-600);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  margin-bottom: var(--space-5);
-}
-
-.features .sectionTitle {
-  margin: 0 0 var(--space-5) 0;
-  font-size: 40px;
+  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+  color: var(--primary-700);
+  font-size: 12px;
   font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--primary-200);
+  margin-bottom: var(--space-4);
 }
 
-.features .sectionSubtitle {
-  margin: 0 auto;
-  font-size: 18px;
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.sectionSubtitle {
+  font-size: 16px;
   color: var(--text-secondary);
-  max-width: 680px;
-  line-height: 1.7;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  line-height: 1.6;
 }
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-8);
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .featureCard {
-  background: var(--bg-primary);
+  position: relative;
+  padding: var(--space-10);
+  background: white;
   border-radius: var(--radius-2xl);
-  padding: var(--space-10) var(--space-8);
-  text-align: left;
   border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow: hidden;
+}
+
+.featureCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-base);
 }
 
 .featureCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--border-medium);
+  border-color: var(--primary-300);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.1);
+  transform: translateY(-8px);
+}
+
+.featureCard:hover::before {
+  transform: scaleX(1);
 }
 
 .featureIcon {
-  font-size: 28px;
-  margin-bottom: var(--space-6);
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+  border-radius: var(--radius-xl);
+  color: var(--primary-600);
+  font-size: 28px;
+  transition: all var(--transition-base);
+}
+
+.featureCard:hover .featureIcon {
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
   color: white;
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, var(--primary-600) 0%, #8b5cf6 100%);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+  transform: scale(1.1);
 }
 
 .featureTitle {
-  margin: 0 0 var(--space-3) 0;
+  font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  line-height: 1.3;
 }
 
 .featureText {
-  margin: 0;
   font-size: 14px;
   color: var(--text-secondary);
-  line-height: 1.7;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  line-height: 1.6;
+  margin: 0;
 }
+
 /* ============================================
    SHARE SECTION
    ============================================ */
 
 .shareSection {
-  max-width: 1280px;
-  margin: 0 auto var(--space-20);
-  padding: 0 var(--space-16);
-}
-
-.shareSectionContent {
-  background: linear-gradient(135deg, var(--primary-600) 0%, #8b5cf6 100%);
-  border-radius: var(--radius-2xl);
-  padding: var(--space-16);
-  text-align: center;
   position: relative;
+  width: 100%;
+  padding: var(--space-20) var(--space-6);
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  color: white;
   overflow: hidden;
 }
 
-.shareSectionContent::before {
+.shareSection::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-  pointer-events: none;
+  top: -50%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.shareSectionContent {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
 }
 
 .shareIcon {
-  display: inline-flex;
+  width: 80px;
+  height: 80px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  color: white;
-  font-size: 28px;
-  margin-bottom: var(--space-7);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-2xl);
+  font-size: 40px;
   backdrop-filter: blur(10px);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-  position: relative;
-  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .shareTitle {
-  margin: 0 0 var(--space-5) 0;
+  font-family: var(--font-display);
   font-size: 32px;
-  font-weight: 700;
-  color: white;
-  position: relative;
-  z-index: 1;
+  font-weight: 800;
+  line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
 .shareText {
-  margin: 0 auto var(--space-8);
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.7;
-  max-width: 720px;
-  position: relative;
-  z-index: 1;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  line-height: 1.6;
+  opacity: 0.95;
 }
 
 .shareHighlight {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-8);
+  padding: var(--space-4) var(--space-6);
   background: rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+  font-size: 15px;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  position: relative;
-  z-index: 1;
 }
 
 .shareHighlightIcon {
-  font-size: 18px;
-  color: white;
+  font-size: 20px;
+  animation: pulse 2s ease-in-out infinite;
 }
 
-.shareHighlight span {
-  font-size: 14px;
-  font-weight: 600;
-  color: white;
-  letter-spacing: -0.01em;
-}
 /* ============================================
    HOW IT WORKS SECTION
    ============================================ */
 
 .howItWorks {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: var(--space-20) var(--space-16);
-}
-
-.howItWorks .sectionHeader {
-  text-align: center;
-  margin-bottom: var(--space-16);
-}
-
-.howItWorks .sectionTag {
-  display: inline-block;
-  padding: var(--space-2) var(--space-4);
-  background: var(--primary-50);
-  border-radius: var(--radius-full);
-  color: var(--primary-600);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  margin-bottom: var(--space-5);
-}
-
-.howItWorks .sectionTitle {
-  margin: 0 0 var(--space-5) 0;
-  font-size: 40px;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-}
-
-.howItWorks .sectionSubtitle {
-  margin: 0 auto;
-  font-size: 18px;
-  color: var(--text-secondary);
-  max-width: 680px;
-  line-height: 1.7;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  position: relative;
+  width: 100%;
+  padding: var(--space-24) var(--space-6);
+  background: white;
 }
 
 .stepsContainer {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-6);
-  max-width: 1000px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-8);
+  max-width: 1280px;
   margin: 0 auto;
+  position: relative;
+}
+
+.stepsContainer::before {
+  content: '';
+  position: absolute;
+  top: 80px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--primary-300) 25%, var(--primary-300) 75%, transparent 100%);
+  z-index: 0;
+  display: none;
 }
 
 .step {
-  text-align: left;
   position: relative;
-  padding: var(--space-10) var(--space-9);
-  background: var(--bg-primary);
+  z-index: 1;
+  padding: var(--space-10);
+  background: var(--bg-secondary);
   border-radius: var(--radius-2xl);
   border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   transition: all var(--transition-base);
+  text-align: center;
 }
 
 .step:hover {
-  border-color: var(--border-medium);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
+  background: white;
+  border-color: var(--primary-300);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.1);
+  transform: translateY(-8px);
 }
 
 .stepNumber {
-  display: inline-block;
-  font-size: 44px;
-  font-weight: 700;
-  color: var(--bg-tertiary);
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1;
-  margin-bottom: var(--space-5);
-  letter-spacing: -0.03em;
 }
 
 .stepTitle {
-  margin: 0 0 var(--space-3) 0;
+  font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  line-height: 1.3;
 }
 
 .stepText {
-  margin: 0;
   font-size: 14px;
   color: var(--text-secondary);
-  line-height: 1.7;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  line-height: 1.6;
+  margin: 0;
 }
+
 /* ============================================
    CTA SECTION
    ============================================ */
 
 .cta {
-  max-width: 1280px;
-  margin: var(--space-20) auto;
-  padding: 0 var(--space-16);
-}
-
-.ctaContent {
-  background: linear-gradient(135deg, var(--primary-600) 0%, #8b5cf6 100%);
-  color: white;
-  text-align: center;
-  padding: var(--space-20) var(--space-16);
-  border-radius: var(--radius-2xl);
   position: relative;
+  width: 100%;
+  padding: var(--space-24) var(--space-6);
+  background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1f3a 100%);
+  color: white;
   overflow: hidden;
 }
 
-.ctaContent::before {
+.cta::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
-  opacity: 0.3;
+  top: -50%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.cta::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+.ctaContent {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
 }
 
 .ctaTitle {
-  margin: 0 0 var(--space-5) 0;
-  font-size: 40px;
-  font-weight: 700;
-  position: relative;
-  z-index: 1;
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
 .ctaText {
-  margin: 0 auto var(--space-10);
-  font-size: 18px;
+  font-size: 16px;
+  line-height: 1.6;
   opacity: 0.9;
-  position: relative;
-  z-index: 1;
-  max-width: 640px;
-  font-weight: 400;
-  letter-spacing: -0.01em;
 }
 
 .ctaButtons {
   display: flex;
   gap: var(--space-4);
   justify-content: center;
-  position: relative;
-  z-index: 1;
+  flex-wrap: wrap;
 }
 
 .ctaPrimaryButton,
 .ctaSecondaryButton {
-  padding: var(--space-3) var(--space-8);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
+  padding: 16px 32px;
+  border-radius: var(--radius-xl);
+  font-size: 15px;
+  font-weight: 700;
   letter-spacing: -0.01em;
-  height: 44px;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .ctaPrimaryButton {
-  background: white;
-  color: var(--primary-600);
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  color: white;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
 }
 
 .ctaPrimaryButton:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  background: var(--bg-secondary);
+  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
 }
 
 .ctaSecondaryButton {
   background: rgba(255, 255, 255, 0.1);
   color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
 }
 
 .ctaSecondaryButton:hover {
   background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
 }
 
@@ -633,126 +629,79 @@
 
 .whatsappButton {
   position: fixed;
-  bottom: var(--space-8);
-  right: var(--space-8);
+  bottom: var(--space-6);
+  right: var(--space-6);
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  background: #25D366;
+  background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%);
   color: white;
   border-radius: 50%;
-  text-decoration: none;
-  box-shadow: var(--shadow-lg);
-  transition: all var(--transition-fast);
-  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+  transition: all var(--transition-base);
+  z-index: 50;
+  border: none;
+  cursor: pointer;
 }
 
 .whatsappButton:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4), 0 12px 30px -8px rgba(37, 211, 102, 0.3);
-  background: #20BA5A;
+  transform: scale(1.1) translateY(-4px);
+  box-shadow: 0 15px 40px rgba(37, 211, 102, 0.4);
 }
 
 .whatsappIcon {
-  font-size: 26px;
+  font-size: 28px;
 }
+
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
 
-/* TABLET (1024px) */
 @media (max-width: 1024px) {
   .heroWrapper {
-    padding: var(--space-16) var(--space-10);
     grid-template-columns: 1fr;
-    gap: var(--space-10);
+    gap: var(--space-12);
   }
 
   .heroLogoContainer {
-    order: -1;
+    display: none;
   }
 
   .heroTitle {
-    font-size: 40px;
+    font-size: 42px;
   }
 
-  .heroStats {
-    gap: var(--space-6);
-    padding: var(--space-6);
-  }
-
-  .statNumber {
-    font-size: 28px;
-  }
-
-  .features,
-  .howItWorks {
-    padding: var(--space-16) var(--space-10);
-  }
-
-  .features .sectionTitle,
-  .howItWorks .sectionTitle {
-    font-size: 36px;
-  }
-
-  .featureGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .shareSectionContent {
-    padding: var(--space-10) var(--space-8);
-  }
-
-  .shareTitle {
-    font-size: 28px;
-  }
-
-  .shareText {
-    font-size: 16px;
-  }
-
-  .stepsContainer {
-    grid-template-columns: 1fr;
-  }
-
-  .ctaContent {
-    padding: var(--space-16) var(--space-10);
+  .sectionTitle {
+    font-size: 32px;
   }
 
   .ctaTitle {
-    font-size: 36px;
+    font-size: 32px;
+  }
+
+  .shareTitle {
+    font-size: 24px;
   }
 }
 
-/* MOBILE (768px) */
 @media (max-width: 768px) {
-  .heroWrapper {
-    padding: var(--space-12) var(--space-6);
-  }
-
-  .heroContent {
-    align-items: center;
-    text-align: center;
+  .hero {
+    min-height: auto;
+    padding: var(--space-16) var(--space-4);
   }
 
   .heroTitle {
     font-size: 32px;
-    letter-spacing: -0.01em;
   }
 
   .heroSubtitle {
     font-size: 16px;
   }
 
-  .heroDescription {
-    font-size: 14px;
-  }
-
   .heroCTA {
     flex-direction: column;
-    width: 100%;
   }
 
   .primaryButton,
@@ -766,56 +715,109 @@
   }
 
   .statDivider {
-    width: 100%;
-    height: 1px;
+    display: none;
   }
 
-  .features,
-  .howItWorks {
-    padding: var(--space-16) var(--space-6);
+  .features {
+    padding: var(--space-16) var(--space-4);
   }
 
-  .features .sectionTitle,
-  .howItWorks .sectionTitle {
-    font-size: 32px;
+  .featureGrid {
+    grid-template-columns: 1fr;
   }
 
-  .features .sectionSubtitle,
-  .howItWorks .sectionSubtitle {
-    font-size: 16px;
+  .sectionTitle {
+    font-size: 28px;
   }
 
   .shareSection {
-    padding: 0 var(--space-6);
-  }
-
-  .shareSectionContent {
-    padding: var(--space-9) var(--space-7);
-  }
-
-  .shareIcon {
-    width: 64px;
-    height: 64px;
-    font-size: 28px;
+    padding: var(--space-16) var(--space-4);
   }
 
   .shareTitle {
     font-size: 24px;
   }
 
-  .shareText {
+  .howItWorks {
+    padding: var(--space-16) var(--space-4);
+  }
+
+  .stepsContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .cta {
+    padding: var(--space-16) var(--space-4);
+  }
+
+  .ctaTitle {
+    font-size: 28px;
+  }
+
+  .ctaButtons {
+    flex-direction: column;
+  }
+
+  .ctaPrimaryButton,
+  .ctaSecondaryButton {
+    width: 100%;
+  }
+
+  .whatsappButton {
+    width: 50px;
+    height: 50px;
+  }
+
+  .whatsappIcon {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .heroTitle {
+    font-size: 24px;
+  }
+
+  .heroSubtitle {
     font-size: 14px;
   }
 
-  .shareHighlight {
-    padding: var(--space-3) var(--space-6);
-    flex-direction: column;
-    gap: var(--space-2);
+  .heroDescription {
+    font-size: 14px;
   }
 
-  .shareHighlight span {
+  .statNumber {
+    font-size: 24px;
+  }
+
+  .statLabel {
+    font-size: 12px;
+  }
+
+  .sectionTitle {
+    font-size: 24px;
+  }
+
+  .featureCard {
+    padding: var(--space-6);
+  }
+
+  .featureIcon {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .featureTitle {
+    font-size: 16px;
+  }
+
+  .featureText {
     font-size: 13px;
-    text-align: center;
   }
 
   .stepNumber {
@@ -830,164 +832,33 @@
     font-size: 13px;
   }
 
-  .ctaContent {
-    padding: var(--space-12) var(--space-8);
-  }
-
   .ctaTitle {
-    font-size: 32px;
+    font-size: 24px;
   }
 
   .ctaText {
-    font-size: 16px;
-  }
-
-  .ctaButtons {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .ctaPrimaryButton,
-  .ctaSecondaryButton {
-    width: 100%;
-  }
-
-  .whatsappButton {
-    width: 56px;
-    height: 56px;
-    bottom: var(--space-6);
-    right: var(--space-6);
-  }
-
-  .whatsappIcon {
-    font-size: 24px;
-  }
-}
-
-/* SMALL MOBILE (480px) */
-@media (max-width: 480px) {
-  .heroWrapper {
-    padding: var(--space-10) var(--space-5);
-  }
-
-  .heroTitle {
-    font-size: 28px;
-  }
-
-  .heroSubtitle {
-    font-size: 15px;
-  }
-
-  .heroDescription {
-    font-size: 13px;
-  }
-
-  .heroTag {
-    font-size: 11px;
-    padding: var(--space-1) var(--space-4);
-  }
-
-  .primaryButton,
-  .secondaryButton {
-    padding: var(--space-3) var(--space-6);
     font-size: 14px;
-  }
-
-  .statNumber {
-    font-size: 24px;
-  }
-
-  .statLabel {
-    font-size: 11px;
-  }
-
-  .features,
-  .howItWorks {
-    padding: var(--space-12) var(--space-5);
-  }
-
-  .features .sectionTitle,
-  .howItWorks .sectionTitle {
-    font-size: 26px;
-  }
-
-  .features .sectionSubtitle,
-  .howItWorks .sectionSubtitle {
-    font-size: 14px;
-  }
-
-  .shareSection {
-    padding: 0 var(--space-5);
-  }
-
-  .shareSectionContent {
-    padding: var(--space-8) var(--space-6);
   }
 
   .shareIcon {
-    width: 56px;
-    height: 56px;
-    font-size: 24px;
-    margin-bottom: var(--space-5);
-  }
-
-  .shareTitle {
-    font-size: 22px;
-  }
-
-  .shareText {
-    font-size: 13px;
-    margin-bottom: var(--space-5);
-  }
-
-  .shareHighlight {
-    padding: var(--space-3) var(--space-5);
-  }
-
-  .shareHighlightIcon {
-    font-size: 16px;
-  }
-
-  .shareHighlight span {
-    font-size: 12px;
-  }
-
-  .step {
-    padding: var(--space-6);
-  }
-
-  .stepNumber {
+    width: 64px;
+    height: 64px;
     font-size: 32px;
   }
 
-  .stepTitle {
-    font-size: 16px;
+  .shareTitle {
+    font-size: 20px;
   }
 
-  .stepText {
-    font-size: 13px;
-  }
-
-  .ctaContent {
-    padding: var(--space-10) var(--space-6);
-  }
-
-  .ctaTitle {
-    font-size: 26px;
-  }
-
-  .ctaText {
+  .shareText {
     font-size: 14px;
   }
 
-  .whatsappButton {
-    width: 56px;
-    height: 56px;
-    bottom: var(--space-5);
-    right: var(--space-5);
-  }
-
-  .whatsappIcon {
-    font-size: 22px;
+  .primaryButton,
+  .secondaryButton,
+  .ctaPrimaryButton,
+  .ctaSecondaryButton {
+    padding: 14px 24px;
+    font-size: 14px;
   }
 }

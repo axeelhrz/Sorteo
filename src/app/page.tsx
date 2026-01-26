@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { FiArrowRight, FiLock, FiTarget, FiZap, FiDollarSign, FiShare2 } from 'react-icons/fi';
+import { FiArrowRight, FiZap, FiDollarSign, FiShare2, FiTrendingUp, FiShield } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import Logo from '@/components/Logo';
+import Testimonials from '@/components/Testimonials';
 import { useAuthStore } from '@/store/auth-store';
 import styles from './home.module.css';
 
@@ -16,7 +17,7 @@ export default function Home() {
       <section className={styles.hero}>
         <div className={styles.heroWrapper}>
           <div className={styles.heroContent}>
-            <span className={styles.heroTag}>Plataforma de oportunidades</span>
+            <span className={styles.heroTag}>🚀 Plataforma de oportunidades</span>
             
             <h1 className={styles.heroTitle}>
               Ganar nunca fue tan fácil
@@ -67,7 +68,7 @@ export default function Home() {
       {/* Features Section */}
       <section className={styles.features}>
         <div className={styles.sectionHeader}>
-          <span className={styles.sectionTag}>Ventajas</span>
+          <span className={styles.sectionTag}>✨ Ventajas</span>
           <h2 className={styles.sectionTitle}>¿Por qué elegirnos?</h2>
           <p className={styles.sectionSubtitle}>
             No es una lotería tradicional. Son oportunidades reales con probabilidades que tú controlas.
@@ -77,7 +78,7 @@ export default function Home() {
         <div className={styles.featureGrid}>
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>
-              <FiLock />
+              <FiShield />
             </div>
             <h3 className={styles.featureTitle}>Transparente y claro</h3>
             <p className={styles.featureText}>
@@ -87,7 +88,7 @@ export default function Home() {
           
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>
-              <FiTarget />
+              <FiTrendingUp />
             </div>
             <h3 className={styles.featureTitle}>Más probabilidades reales</h3>
             <p className={styles.featureText}>
@@ -136,10 +137,13 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <Testimonials />
+
       {/* How It Works Section */}
       <section id="como-funciona" className={styles.howItWorks}>
         <div className={styles.sectionHeader}>
-          <span className={styles.sectionTag}>Proceso simple</span>
+          <span className={styles.sectionTag}>📋 Proceso simple</span>
           <h2 className={styles.sectionTitle}>¿Cómo funciona?</h2>
           <p className={styles.sectionSubtitle}>
             Participa en 4 pasos simples y aumenta tus probabilidades de ganar
