@@ -247,9 +247,9 @@ export default function StoreDashboard() {
               <h2 className={styles.sectionTitle}>Mis Sorteos</h2>
               <p className={styles.sectionSubtitle}>Gestiona todos tus sorteos activos y en progreso</p>
             </div>
-            <button className={styles.createBtn} onClick={handleCreateRaffle} title="Crear un nuevo sorteo">
+            <button className={styles.createBtn} onClick={handleCreateRaffle} title="Crear un nuevo sorteo" type="button">
               <FiPlus />
-              <span>Nuevo</span>
+              <span>Nuevo Sorteo</span>
             </button>
           </div>
 
@@ -258,7 +258,7 @@ export default function StoreDashboard() {
               <FiShoppingBag className={styles.emptyIcon} />
               <h3>No tienes sorteos</h3>
               <p>Crea tu primer sorteo para comenzar a vender tickets y generar ingresos</p>
-              <button className={styles.createBtn} onClick={handleCreateRaffle}>
+              <button className={styles.createBtn} onClick={handleCreateRaffle} type="button">
                 <FiPlus />
                 <span>Crear Sorteo</span>
               </button>
