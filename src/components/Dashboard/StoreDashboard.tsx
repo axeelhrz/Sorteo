@@ -169,6 +169,34 @@ export default function StoreDashboard() {
     setActiveTab('stats');
   };
 
+  const handleActivateRaffle = async (raffleId: string) => {
+    try {
+      // Aquí iría la lógica para activar el sorteo
+      // Por ahora es un placeholder
+      console.log('Activando sorteo:', raffleId);
+      alert('Sorteo activado correctamente');
+      loadData();
+    } catch (error) {
+      console.error('Error activating raffle:', error);
+      alert('Error al activar el sorteo');
+    }
+  };
+
+  const handleDeleteRaffle = async (raffleId: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar este sorteo?')) {
+      return;
+    }
+    try {
+      // Aquí iría la lógica para eliminar el sorteo
+      console.log('Eliminando sorteo:', raffleId);
+      alert('Sorteo eliminado correctamente');
+      loadData();
+    } catch (error) {
+      console.error('Error deleting raffle:', error);
+      alert('Error al eliminar el sorteo');
+    }
+  };
+
   // Prevent hydration mismatch by not rendering user-dependent content until hydrated
   if (!isHydrated) {
     return (
@@ -459,14 +487,14 @@ export default function StoreDashboard() {
                         </td>
                         <td>
                           <span className={`${styles.badge} ${styles[`badge${raffle.status}`]}`}>
-                            {raffle.status === 'draft' && '📝 Borrador'}
-                            {raffle.status === 'pending_approval' && '⏳ Pendiente'}
-                            {raffle.status === 'active' && '🟢 Activo'}
-                            {raffle.status === 'paused' && '⏸️ Pausado'}
-                            {raffle.status === 'sold_out' && '✅ Agotado'}
-                            {raffle.status === 'finished' && '🏁 Finalizado'}
-                            {raffle.status === 'cancelled' && '❌ Cancelado'}
-                            {raffle.status === 'rejected' && '🚫 Rechazado'}
+                            {raffle.status === 'draft' && 'Borrador'}
+                            {raffle.status === 'pending_approval' && 'Pendiente'}
+                            {raffle.status === 'active' && 'Activo'}
+                            {raffle.status === 'paused' && 'Pausado'}
+                            {raffle.status === 'sold_out' && 'Agotado'}
+                            {raffle.status === 'finished' && 'Finalizado'}
+                            {raffle.status === 'cancelled' && 'Cancelado'}
+                            {raffle.status === 'rejected' && 'Rechazado'}
                           </span>
                         </td>
                         <td>
@@ -482,19 +510,24 @@ export default function StoreDashboard() {
                               onClick={() => router.push(`/panel/sorteos/${raffle.id}`)}
                             >
                               <FiEye />
+                              <span className={styles.actionBtnLabel}>Ver</span>
                             </button>
                             <button 
                               className={styles.actionBtn} 
-                              title="Editar"
-                              onClick={() => router.push(`/panel/sorteos/${raffle.id}`)}
+                              title="Activar sorteo"
+                              onClick={() => handleActivateRaffle(raffle.id)}
+                              disabled={raffle.status !== 'draft'}
                             >
                               <FiEdit2 />
+                              <span className={styles.actionBtnLabel}>Activar</span>
                             </button>
                             <button 
                               className={styles.actionBtn} 
-                              title="Más opciones"
+                              title="Eliminar"
+                              onClick={() => handleDeleteRaffle(raffle.id)}
                             >
                               <FiTrash2 />
+                              <span className={styles.actionBtnLabel}>Eliminar</span>
                             </button>
                           </div>
                         </td>

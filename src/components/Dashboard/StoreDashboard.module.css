@@ -579,26 +579,40 @@
 }
 
 .actionBtn {
-  width: 36px;
-  height: 36px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
   background: white;
   border: 1px solid rgba(99, 102, 241, 0.1);
   border-radius: 8px;
   color: #64748b;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 16px;
+  font-size: 14px;
+  min-width: 70px;
+  text-align: center;
 }
 
-.actionBtn:hover {
+.actionBtn:hover:not(:disabled) {
   border-color: #6366f1;
   color: #6366f1;
   background: rgba(99, 102, 241, 0.05);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.actionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionBtnLabel {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 /* Raffle Info */
