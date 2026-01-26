@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { FiUsers, FiShoppingBag, FiClock, FiCheckCircle, FiXCircle, FiPlay, FiTag, FiCreditCard, FiDollarSign, FiBarChart2, FiAlertCircle } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
-import styles from '@/app/dashboard/dashboard.module.css';
+import styles from '@/app/panel/panel.module.css';
 
 interface DashboardStats {
   users: { total: number };
