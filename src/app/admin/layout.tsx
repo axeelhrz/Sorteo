@@ -140,7 +140,7 @@ export default function AdminLayout({
       <div
         style={{
           backgroundColor: 'white',
-          borderBottom: '2px solid #e8ecf1',
+          borderBottom: '1px solid #e8ecf1',
           padding: '0 32px',
           display: 'flex',
           gap: '0',
@@ -148,6 +148,7 @@ export default function AdminLayout({
           position: 'sticky',
           top: '88px',
           zIndex: 99,
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
         }}
       >
         {TABS.map((tab) => (
@@ -155,21 +156,22 @@ export default function AdminLayout({
             key={tab.id}
             onClick={() => router.push(tab.href)}
             style={{
-              padding: '16px 20px',
+              padding: '14px 18px',
               border: 'none',
               backgroundColor: 'transparent',
               color: activeTab === tab.id ? '#667eea' : '#64748b',
-              borderBottom: activeTab === tab.id ? '3px solid #667eea' : 'none',
+              borderBottom: activeTab === tab.id ? '2px solid #667eea' : '2px solid transparent',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
-              fontSize: '14px',
+              gap: '8px',
+              fontSize: '13px',
               fontWeight: activeTab === tab.id ? '600' : '500',
-              transition: 'all 0.25s ease',
+              transition: 'all 0.2s ease',
               whiteSpace: 'nowrap',
               position: 'relative',
-              marginBottom: '-2px',
+              marginBottom: '0',
+              letterSpacing: '0.3px',
             }}
             onMouseEnter={(e) => {
               if (activeTab !== tab.id) {
@@ -184,7 +186,7 @@ export default function AdminLayout({
               }
             }}
           >
-            <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center', opacity: activeTab === tab.id ? 1 : 0.7 }}>
+            <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center', opacity: activeTab === tab.id ? 1 : 0.6 }}>
               {tab.icon}
             </span>
             {tab.label}
