@@ -378,7 +378,7 @@ export const adminService = {
     };
   }> {
     try {
-      const { collection, query, getDocs, where } = await import('firebase/firestore');
+      const { collection, getDocs } = await import('firebase/firestore');
 
       // Get users count
       const usersRef = collection(db, 'users');
