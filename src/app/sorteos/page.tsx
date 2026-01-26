@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { FiArrowRight, FiZap, FiDollarSign, FiShare2, FiTrendingUp, FiShield, FiCheckCircle } from 'react-icons/fi';
+import { FiCheckCircle } from 'react-icons/fi';
 import RaffleCard from '@/components/marketplace/RaffleCard';
 import RaffleFilters from '@/components/marketplace/RaffleFilters';
 import EmptyState from '@/components/marketplace/EmptyState';
