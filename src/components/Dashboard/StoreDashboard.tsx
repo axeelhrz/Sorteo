@@ -20,8 +20,11 @@ import {
 } from 'react-icons/fi';
 import { firebaseShopService } from '@/services/firebase-shop-service';
 import { raffleService } from '@/services/raffle-service';
+import { raffleUpdateService } from '@/services/raffle-update-service';
 import { Shop } from '@/types/shop';
+import { Raffle } from '@/types/raffle';
 import CreateRaffleModal from './CreateRaffleModal';
+import RaffleModals from './RaffleModals';
 import styles from './StoreDashboard.module.css';
 
 type TabType = 'overview' | 'raffles' | 'earnings' | 'stats';
@@ -42,8 +45,11 @@ export default function StoreDashboard() {
     totalRevenue: 0
   });
 
-  const [raffles, setRaffles] = useState<any[]>([]);
+  const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [deposits] = useState<any[]>([]);
+  const [viewModal, setViewModal] = useState({ isOpen: false, raffle: null as Raffle | null });
+  const [activateModal, setActivateModal] = useState({ isOpen: false, raffleId: null as string | null, raffleName: null as string | null });
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, raffleId: null as string | null, raffleName: null as string | null });
 
   useEffect(() => {
     if (!isHydrated || !user) return;
@@ -169,12 +175,21 @@ export default function StoreDashboard() {
     setActiveTab('stats');
   };
 
-  const handleActivateRaffle = async (raffleId: string) => {
+  const handleViewRaffle = (raffle: Raffle) => {
+    setViewModal({ isOpen: true, raffle });
+  };
+
+  const handleOpenActivateModal = (raffleId: string, raffleName: string) => {
+    setActivateModal({ isOpen: true, raffleId, raffleName });
+  };
+
+  const handleOpenDeleteModal = (raffleId: string, raffleName: string) => {
+    setDeleteModal({ isOpen: true, raffleId, raffleName });
+  };
+
+  const handleConfirmActivate = async (raffleId: string) => {
     try {
-      // Aquí iría la lógica para activar el sorteo
-      // Por ahora es un placeholder
-      console.log('Activando sorteo:', raffleId);
-      alert('Sorteo activado correctamente');
+      await raffleUpdateService.activateRaffle(raffleId);
       loadData();
     } catch (error) {
       console.error('Error activating raffle:', error);
@@ -182,14 +197,9 @@ export default function StoreDashboard() {
     }
   };
 
-  const handleDeleteRaffle = async (raffleId: string) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar este sorteo?')) {
-      return;
-    }
+  const handleConfirmDelete = async (raffleId: string) => {
     try {
-      // Aquí iría la lógica para eliminar el sorteo
-      console.log('Eliminando sorteo:', raffleId);
-      alert('Sorteo eliminado correctamente');
+      await raffleUpdateService.deleteRaffle(raffleId);
       loadData();
     } catch (error) {
       console.error('Error deleting raffle:', error);
@@ -507,7 +517,7 @@ export default function StoreDashboard() {
                             <button 
                               className={styles.actionBtn} 
                               title="Ver detalles"
-                              onClick={() => router.push(`/panel/sorteos/${raffle.id}`)}
+                              onClick={() => handleViewRaffle(raffle)}
                             >
                               <FiEye />
                               <span className={styles.actionBtnLabel}>Ver</span>
@@ -515,7 +525,7 @@ export default function StoreDashboard() {
                             <button 
                               className={styles.actionBtn} 
                               title="Activar sorteo"
-                              onClick={() => handleActivateRaffle(raffle.id)}
+                              onClick={() => handleOpenActivateModal(raffle.id, raffle.product?.name || 'Sorteo')}
                               disabled={raffle.status !== 'draft'}
                             >
                               <FiEdit2 />
@@ -524,7 +534,7 @@ export default function StoreDashboard() {
                             <button 
                               className={styles.actionBtn} 
                               title="Eliminar"
-                              onClick={() => handleDeleteRaffle(raffle.id)}
+                              onClick={() => handleOpenDeleteModal(raffle.id, raffle.product?.name || 'Sorteo')}
                             >
                               <FiTrash2 />
                               <span className={styles.actionBtnLabel}>Eliminar</span>
@@ -702,6 +712,18 @@ export default function StoreDashboard() {
         shop={shop}
         onClose={handleCloseModal}
         onSuccess={handleRaffleCreated}
+      />
+
+      {/* Raffle Modals */}
+      <RaffleModals
+        viewModal={viewModal}
+        activateModal={activateModal}
+        deleteModal={deleteModal}
+        onCloseViewModal={() => setViewModal({ isOpen: false, raffle: null })}
+        onCloseActivateModal={() => setActivateModal({ isOpen: false, raffleId: null, raffleName: null })}
+        onCloseDeleteModal={() => setDeleteModal({ isOpen: false, raffleId: null, raffleName: null })}
+        onConfirmActivate={handleConfirmActivate}
+        onConfirmDelete={handleConfirmDelete}
       />
     </div>
   );
