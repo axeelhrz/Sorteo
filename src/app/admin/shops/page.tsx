@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { adminService } from '@/services/admin-service';
-import styles from '../admin.module.css';
+import styles from '@/app/panel/panel.module.css';
 
 interface Shop {
   id: string;

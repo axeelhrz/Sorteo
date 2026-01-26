@@ -6,7 +6,7 @@ import { FiCheck, FiX, FiEye, FiClock, FiAlertCircle, FiDownload } from 'react-i
 import { adminService } from '@/services/admin-service';
 import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
 import { useAuth } from '@/hooks/useAuth';
-import styles from './payments.module.css';
+import styles from '@/app/panel/panel.module.css';
 
 interface PaymentWithDetails extends Payment {
   userName?: string;
