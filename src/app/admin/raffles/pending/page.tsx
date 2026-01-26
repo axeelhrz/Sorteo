@@ -1,44 +1,33 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { FiCheckCircle, FiXCircle, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
-import styles from '@/app/panel/panel.module.css';
 
 interface Raffle {
   id: string;
-  shop: { id: string; name: string };
-  product: { id: string; name: string; value: number };
-  productValue: number;
-  totalTickets: number;
-  requiresDeposit: boolean;
-  createdAt: string;
+  name?: string;
   status: string;
+  createdAt?: any;
+  ticketPrice?: number;
+  totalTickets?: number;
+  soldTickets?: number;
+  shop?: { id: string; name: string };
+  product?: { id: string; name: string };
 }
 
-interface RaffleDetail {
-  id: string;
-  shop: { id: string; name: string; status: string };
-  product: { id: string; name: string; value: number; description: string };
-  productValue: number;
-  totalTickets: number;
-  requiresDeposit: boolean;
-  specialConditions: string;
-  createdAt: string;
-}
-
-export default function PendingRaffles() {
+export default function PendingRafflesPage() {
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedRaffle, setSelectedRaffle] = useState<RaffleDetail | null>(null);
-  const [showDetail, setShowDetail] = useState(false);
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
-  const [actionLoading, setActionLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
+  const [selectedRaffle, setSelectedRaffle] = useState<Raffle | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const limit = 10;
+  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     fetchRaffles();
@@ -47,63 +36,43 @@ export default function PendingRaffles() {
   const fetchRaffles = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getPendingRaffles(limit, page * limit);
-      setRaffles(data.data);
-      setTotal(data.total);
+      const result = await adminService.getPendingRaffles(ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+      setRaffles(result.data);
+      setTotal(result.total);
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar sorteos');
+      setError(err.message || 'Error al cargar sorteos pendientes');
       console.error('Error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleViewDetail = async (raffleId: string) => {
-    try {
-      const data = await adminService.getRaffleDetail(raffleId);
-      setSelectedRaffle(data);
-      setShowDetail(true);
-    } catch (err: any) {
-      alert('Error al cargar detalles del sorteo');
-      console.error('Error:', err);
-    }
-  };
-
   const handleApprove = async (raffleId: string) => {
-    if (!window.confirm('¿Estás seguro de que deseas aprobar este sorteo?')) return;
-
     try {
       setActionLoading(true);
       await adminService.approveRaffle(raffleId);
-      alert('Sorteo aprobado exitosamente');
-      setShowDetail(false);
-      fetchRaffles();
+      setRaffles(raffles.filter(r => r.id !== raffleId));
+      setTotal(total - 1);
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Error al aprobar sorteo');
-      console.error('Error:', err);
+      alert('Error al aprobar: ' + err.message);
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleRejectSubmit = async (raffleId: string) => {
-    if (!rejectReason.trim()) {
-      alert('Por favor ingresa un motivo de rechazo');
-      return;
-    }
-
+  const handleReject = async () => {
+    if (!selectedRaffle) return;
     try {
       setActionLoading(true);
-      await adminService.rejectRaffle(raffleId, rejectReason);
-      alert('Sorteo rechazado exitosamente');
-      setShowRejectModal(false);
+      await adminService.rejectRaffle(selectedRaffle.id, rejectReason);
+      setRaffles(raffles.filter(r => r.id !== selectedRaffle.id));
+      setTotal(total - 1);
+      setShowModal(false);
       setRejectReason('');
-      setShowDetail(false);
-      fetchRaffles();
+      setSelectedRaffle(null);
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Error al rechazar sorteo');
-      console.error('Error:', err);
+      alert('Error al rechazar: ' + err.message);
     } finally {
       setActionLoading(false);
     }
@@ -111,56 +80,143 @@ export default function PendingRaffles() {
 
   if (loading && raffles.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px' }}>
-        <p>Cargando sorteos pendientes...</p>
+      <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <p style={{ color: '#64748b', fontSize: '16px' }}>Cargando sorteos pendientes...</p>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div style={{ padding: '20px', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '8px' }}>
+        {error}
+      </div>
+    );
+  }
+
+  if (raffles.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <p style={{ color: '#64748b', fontSize: '16px' }}>No hay sorteos pendientes de aprobación</p>
+      </div>
+    );
+  }
+
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
   return (
     <div>
-      <h2 style={{ marginBottom: '20px', color: '#2c3e50' }}>Sorteos Pendientes de Aprobación</h2>
+      <div style={{ marginBottom: '24px' }}>
+        <h2 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '24px', fontWeight: '700' }}>
+          Sorteos Pendientes
+        </h2>
+        <p style={{ margin: '0', color: '#64748b', fontSize: '14px' }}>
+          Total: {total} sorteos pendientes de aprobación
+        </p>
+      </div>
 
-      {error && (
-        <div style={{ padding: '15px', backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px', marginBottom: '20px' }}>
-          {error}
-        </div>
-      )}
-
-      {raffles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <p style={{ color: '#7f8c8d' }}>No hay sorteos pendientes de aprobación</p>
-        </div>
-      ) : (
-        <div className={styles.tableContainer}>
-          <table>
+      {/* Table */}
+      <div style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr>
-                <th>Organizador</th>
-                <th>Producto</th>
-                <th>Valor</th>
-                <th>Tickets</th>
-                <th>Depósito</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
+              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: '600', color: '#64748b', fontSize: '13px' }}>
+                  Producto
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: '600', color: '#64748b', fontSize: '13px' }}>
+                  Organizador
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: '600', color: '#64748b', fontSize: '13px' }}>
+                  Precio Ticket
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: '600', color: '#64748b', fontSize: '13px' }}>
+                  Tickets
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'center', fontWeight: '600', color: '#64748b', fontSize: '13px' }}>
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody>
               {raffles.map((raffle) => (
-                <tr key={raffle.id}>
-                  <td>{raffle.shop.name}</td>
-                  <td>{raffle.product.name}</td>
-                  <td>${raffle.productValue.toFixed(2)}</td>
-                  <td>{raffle.totalTickets}</td>
-                  <td>{raffle.requiresDeposit ? '✓ Sí' : '✗ No'}</td>
-                  <td>{new Date(raffle.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    <div className={styles.actionButtons}>
+                <tr key={raffle.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px' }}>
+                    {raffle.product?.name || 'N/A'}
+                  </td>
+                  <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px' }}>
+                    {raffle.shop?.name || 'N/A'}
+                  </td>
+                  <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px' }}>
+                    S/. {raffle.ticketPrice?.toFixed(2) || '0.00'}
+                  </td>
+                  <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px' }}>
+                    {raffle.totalTickets || 0}
+                  </td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                       <button
-                        className={`${styles.btn} ${styles.btnPrimary}`}
-                        onClick={() => handleViewDetail(raffle.id)}
+                        onClick={() => handleApprove(raffle.id)}
+                        disabled={actionLoading}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: '#dcfce7',
+                          color: '#166534',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          transition: 'background-color 0.2s ease',
+                          opacity: actionLoading ? 0.6 : 1,
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!actionLoading) {
+                            (e.currentTarget as HTMLElement).style.backgroundColor = '#bbf7d0';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.backgroundColor = '#dcfce7';
+                        }}
                       >
-                        Ver
+                        <FiCheckCircle style={{ fontSize: '14px' }} />
+                        Aprobar
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedRaffle(raffle);
+                          setShowModal(true);
+                        }}
+                        disabled={actionLoading}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: '#fee2e2',
+                          color: '#991b1b',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          transition: 'background-color 0.2s ease',
+                          opacity: actionLoading ? 0.6 : 1,
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!actionLoading) {
+                            (e.currentTarget as HTMLElement).style.backgroundColor = '#fecaca';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.backgroundColor = '#fee2e2';
+                        }}
+                      >
+                        <FiXCircle style={{ fontSize: '14px' }} />
+                        Rechazar
                       </button>
                     </div>
                   </td>
@@ -168,151 +224,135 @@ export default function PendingRaffles() {
               ))}
             </tbody>
           </table>
-
-          {/* Pagination */}
-          <div className={styles.pagination}>
-            <button
-              className={styles.paginationBtn}
-              disabled={page === 0}
-              onClick={() => setPage(page - 1)}
-            >
-              ← Anterior
-            </button>
-            <span style={{ padding: '8px 12px' }}>
-              Página {page + 1} de {Math.ceil(total / limit)}
-            </span>
-            <button
-              className={styles.paginationBtn}
-              disabled={page >= Math.ceil(total / limit) - 1}
-              onClick={() => setPage(page + 1)}
-            >
-              Siguiente →
-            </button>
-          </div>
         </div>
-      )}
+      </div>
 
-      {/* Detail Modal */}
-      {showDetail && selectedRaffle && (
-        <div className={`${styles.modal} ${showDetail ? styles.open : ''}`}>
-          <div className={styles.modalContent}>
-            <div className={styles.modalHeader}>
-              <h2>Detalles del Sorteo</h2>
-            </div>
-
-            <div className={styles.modalBody}>
-              <div className={styles.formGroup}>
-                <label>Organizador</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>
-                  {selectedRaffle.shop.name}
-                  <span className={`${styles.statusBadge} ${styles[selectedRaffle.shop.status]}`} style={{ marginLeft: '10px' }}>
-                    {selectedRaffle.shop.status}
-                  </span>
-                </p>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Producto</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedRaffle.product.name}</p>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Descripción</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedRaffle.product.description || 'N/A'}</p>
-              </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Valor de Ticket</label>
-                    <p style={{ margin: '5px 0', color: '#2c3e50' }}>${selectedRaffle.productValue.toFixed(2)}</p>
-                  </div>
-
-              <div className={styles.formGroup}>
-                <label>Total de Tickets</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedRaffle.totalTickets}</p>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Requiere Depósito</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>
-                  {selectedRaffle.requiresDeposit ? '✓ Sí' : '✗ No'}
-                </p>
-              </div>
-
-              {selectedRaffle.specialConditions && (
-                <div className={styles.formGroup}>
-                  <label>Condiciones Especiales</label>
-                  <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedRaffle.specialConditions}</p>
-                </div>
-              )}
-            </div>
-
-            <div className={styles.modalFooter}>
-              <button
-                className={`${styles.btn} ${styles.btnSecondary}`}
-                onClick={() => setShowDetail(false)}
-                disabled={actionLoading}
-              >
-                Cerrar
-              </button>
-              <button
-                className={`${styles.btn} ${styles.btnDanger}`}
-                onClick={() => setShowRejectModal(true)}
-                disabled={actionLoading}
-              >
-                Rechazar
-              </button>
-              <button
-                className={`${styles.btn} ${styles.btnSuccess}`}
-                onClick={() => handleApprove(selectedRaffle.id)}
-                disabled={actionLoading}
-              >
-                {actionLoading ? 'Procesando...' : 'Aprobar'}
-              </button>
-            </div>
-          </div>
+      {/* Pagination */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '24px' }}>
+        <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
+          Página {page + 1} de {totalPages || 1}
+        </p>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => setPage(Math.max(0, page - 1))}
+            disabled={page === 0}
+            style={{
+              padding: '8px 12px',
+              backgroundColor: page === 0 ? '#f1f5f9' : 'white',
+              border: '1px solid #e2e8f0',
+              borderRadius: '6px',
+              cursor: page === 0 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '14px',
+              opacity: page === 0 ? 0.5 : 1,
+            }}
+          >
+            <FiChevronLeft /> Anterior
+          </button>
+          <button
+            onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+            disabled={page >= totalPages - 1}
+            style={{
+              padding: '8px 12px',
+              backgroundColor: page >= totalPages - 1 ? '#f1f5f9' : 'white',
+              border: '1px solid #e2e8f0',
+              borderRadius: '6px',
+              cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '14px',
+              opacity: page >= totalPages - 1 ? 0.5 : 1,
+            }}
+          >
+            Siguiente <FiChevronRight />
+          </button>
         </div>
-      )}
+      </div>
 
       {/* Reject Modal */}
-      {showRejectModal && selectedRaffle && (
-        <div className={`${styles.modal} ${showRejectModal ? styles.open : ''}`}>
-          <div className={styles.modalContent}>
-            <div className={styles.modalHeader}>
-              <h2>Rechazar Sorteo</h2>
-            </div>
-
-            <div className={styles.modalBody}>
-              <p style={{ color: '#7f8c8d', marginBottom: '15px' }}>
-                Por favor, proporciona un motivo para rechazar este sorteo. El organizador podrá ver este motivo.
-              </p>
-              <div className={styles.formGroup}>
-                <label>Motivo del Rechazo</label>
-                <textarea
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  placeholder="Ingresa el motivo del rechazo..."
-                  disabled={actionLoading}
-                />
-              </div>
-            </div>
-
-            <div className={styles.modalFooter}>
+      {showModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              padding: '24px',
+              maxWidth: '500px',
+              width: '90%',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ margin: '0 0 16px 0', color: '#0f172a', fontSize: '18px', fontWeight: '700' }}>
+              Rechazar Sorteo
+            </h3>
+            <p style={{ margin: '0 0 16px 0', color: '#64748b', fontSize: '14px' }}>
+              ¿Estás seguro de que deseas rechazar este sorteo? Por favor, proporciona una razón.
+            </p>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Razón del rechazo..."
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                marginBottom: '16px',
+                minHeight: '100px',
+                boxSizing: 'border-box',
+              }}
+            />
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button
-                className={`${styles.btn} ${styles.btnSecondary}`}
-                onClick={() => {
-                  setShowRejectModal(false);
-                  setRejectReason('');
+                onClick={() => setShowModal(false)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#f1f5f9',
+                  color: '#1e293b',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
                 }}
-                disabled={actionLoading}
               >
                 Cancelar
               </button>
               <button
-                className={`${styles.btn} ${styles.btnDanger}`}
-                onClick={() => handleRejectSubmit(selectedRaffle.id)}
-                disabled={actionLoading}
+                onClick={handleReject}
+                disabled={!rejectReason.trim() || actionLoading}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#fee2e2',
+                  color: '#991b1b',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: !rejectReason.trim() || actionLoading ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  opacity: !rejectReason.trim() || actionLoading ? 0.6 : 1,
+                }}
               >
-                {actionLoading ? 'Procesando...' : 'Confirmar Rechazo'}
+                {actionLoading ? 'Rechazando...' : 'Rechazar'}
               </button>
             </div>
           </div>

@@ -237,19 +237,48 @@ export const adminService = {
 
   /**
    * Get pending raffles (admin only)
-   * TODO: Implement proper Firestore query for pending raffles
    */
   async getPendingRaffles(
-    _limit: number,
-    _offset: number,
-    _shopId?: string
+    limit: number,
+    offset: number,
+    shopId?: string
   ): Promise<{ data: any[]; total: number }> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would query Firestore for pending raffles
-      // Parameters: limit, offset, shopId will be used for pagination and filtering
-      console.warn('getPendingRaffles is not fully implemented yet');
-      return { data: [], total: 0 };
+      const { collection, getDocs, query, where } = await import('firebase/firestore');
+      
+      let rafflesRef = collection(db, 'raffles');
+      let q = query(rafflesRef, where('status', '==', 'pending_approval'));
+      
+      const rafflesSnapshot = await getDocs(q);
+      let raffles = rafflesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Filter by shop if provided
+      if (shopId) {
+        raffles = raffles.filter(r => r.shopId === shopId);
+      }
+
+      // Apply pagination
+      const total = raffles.length;
+      const paginatedRaffles = raffles.slice(offset, offset + limit);
+
+      // Enrich with shop and product data
+      const enrichedRaffles = await Promise.all(
+        paginatedRaffles.map(async (raffle) => {
+          const shopDoc = await getDoc(doc(db, 'shops', raffle.shopId));
+          const productDoc = await getDoc(doc(db, 'products', raffle.productId));
+          
+          return {
+            ...raffle,
+            shop: shopDoc.exists() ? { id: shopDoc.id, ...shopDoc.data() } : { id: raffle.shopId, name: 'Unknown' },
+            product: productDoc.exists() ? { id: productDoc.id, ...productDoc.data() } : { id: raffle.productId, name: 'Unknown' }
+          };
+        })
+      );
+
+      return { data: enrichedRaffles, total };
     } catch (error) {
       console.error('Error getting pending raffles:', error);
       throw error;
