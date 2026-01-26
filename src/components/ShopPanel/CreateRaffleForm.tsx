@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Shop, ShopStatus } from '@/types/shop';
 import { raffleService } from '@/services/raffle-service';
 import { productService } from '@/services/product-service';
-import { uploadService } from '@/services/upload-service';
 import styles from '@/app/panel/panel.module.css';
 
 interface CreateRaffleFormProps {
@@ -18,8 +17,6 @@ interface ProductFormData {
   name: string;
   description: string;
   value: string;
-  mainImage: File | null;
-  mainImagePreview: string;
   organizerWhatsapp: string;
   hasDelivery: boolean;
   deliveryType: 'local' | 'national' | 'international' | '';
@@ -39,8 +36,6 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     name: '',
     description: '',
     value: '',
-    mainImage: null,
-    mainImagePreview: '',
     organizerWhatsapp: shop.phone || '',
     hasDelivery: false,
     deliveryType: '',
@@ -49,47 +44,10 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     pickupDistrict: '',
   });
 
-  const [uploadingImage, setUploadingImage] = useState(false);
-
   const handleProductChange = (field: keyof ProductFormData, value: string | boolean | File | null) => {
     setProductData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validar tipo de archivo
-      if (!file.type.startsWith('image/')) {
-        setError('Por favor selecciona un archivo de imagen válido');
-        return;
-      }
-
-      // Validar tamaño (máximo 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('La imagen no debe superar los 5MB');
-        return;
-      }
-
-      // Crear preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProductData((prev) => ({
-          ...prev,
-          mainImage: file,
-          mainImagePreview: reader.result as string,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeImage = () => {
-    setProductData((prev) => ({
-      ...prev,
-      mainImage: null,
-      mainImagePreview: '',
-    }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,11 +57,6 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     // Validaciones
     if (!productData.name.trim()) {
       setError('El nombre del producto es obligatorio');
-      return;
-    }
-
-    if (!productData.mainImage) {
-      setError('Debes subir al menos una foto del producto');
       return;
     }
 
@@ -152,20 +105,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     setLoading(true);
 
     try {
-      // 1. Subir la imagen del producto
-      setUploadingImage(true);
-      let imageUrl = '';
-      try {
-        imageUrl = await uploadService.uploadProductImage(productData.mainImage);
-      } catch (uploadError: any) {
-        setUploadingImage(false);
-        throw new Error(`Error al subir la imagen: ${uploadError.message}`);
-      }
-      setUploadingImage(false);
-
-      // 2. Preparar zonas de entrega
-  
-      // 3. Crear el producto
+      // 1. Crear el producto sin imagen
       let product;
       try {
         product = await productService.createProduct({
@@ -173,7 +113,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
           name: productData.name.trim(),
           description: productData.description.trim(),
           value,
-          mainImage: imageUrl,
+          mainImage: '', // Sin imagen
           height: 10, // Valores por defecto
           width: 10,
           depth: 10,
@@ -186,7 +126,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
         throw new Error('El producto no se creó correctamente');
       }
 
-      // 4. Crear el sorteo con el producto recién creado
+      // 2. Crear el sorteo con el producto recién creado
       const specialConditionsText = [
         specialConditions.trim(),
         `WhatsApp Organizador: ${productData.organizerWhatsapp}`,
@@ -267,73 +207,6 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
           />
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>
-            Foto del producto <span style={{ color: 'red' }}>*</span>
-          </label>
-          {!productData.mainImagePreview ? (
-            <div
-              style={{
-                border: '2px dashed #ccc',
-                borderRadius: '8px',
-                padding: '30px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                backgroundColor: '#f9f9f9',
-              }}
-              onClick={() => document.getElementById('imageInput')?.click()}
-            >
-              <div style={{ fontSize: '48px', marginBottom: '10px' }}>📷</div>
-              <p style={{ margin: '0 0 10px 0', color: '#666' }}>
-                Haz clic para seleccionar una imagen
-              </p>
-              <small style={{ color: '#999' }}>Formatos: JPG, PNG, GIF (máx. 5MB)</small>
-              <input
-                id="imageInput"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{ display: 'none' }}
-              />
-            </div>
-          ) : (
-            <div style={{ position: 'relative' }}>
-              <img
-                src={productData.mainImagePreview}
-                alt="Preview"
-                style={{
-                  width: '100%',
-                  maxWidth: '400px',
-                  height: 'auto',
-                  borderRadius: '8px',
-                  border: '2px solid #ddd',
-                }}
-              />
-              <button
-                type="button"
-                onClick={removeImage}
-                style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  backgroundColor: '#e74c3c',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '30px',
-                  height: '30px',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                ×
-              </button>
-            </div>
-          )}
-        </div>
 
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>
@@ -504,12 +377,8 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
       </div>
 
       <div className={styles.buttonGroup}>
-        <button type="submit" className={styles.primaryButton} disabled={loading || uploadingImage}>
-          {uploadingImage
-            ? 'Subiendo imagen...'
-            : loading
-            ? 'Creando sorteo...'
-            : 'Crear sorteo'}
+        <button type="submit" className={styles.primaryButton} disabled={loading}>
+          {loading ? 'Creando sorteo...' : 'Crear sorteo'}
         </button>
         <button 
           type="button" 
