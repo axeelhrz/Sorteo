@@ -604,14 +604,23 @@ export default function StoreDashboard() {
       {/* Create Raffle Modal */}
       {showCreateModal && (
         <div className={styles.modalOverlay} onClick={handleCloseModal}>
-          <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>Crear Nuevo Sorteo</h2>
-              <button className={styles.modalCloseBtn} onClick={handleCloseModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeaderNew}>
+              <div className={styles.modalHeaderLeft}>
+                <h2 className={styles.modalTitleNew}>Crear Nuevo Sorteo</h2>
+                <p className={styles.modalSubtitle}>Completa los detalles de tu sorteo</p>
+              </div>
+              <button 
+                className={styles.modalCloseBtnNew} 
+                onClick={handleCloseModal}
+                type="button"
+                aria-label="Cerrar modal"
+              >
                 <FiX />
               </button>
             </div>
-            <div className={styles.modalBody}>
+            
+            <div className={styles.modalBodyNew}>
               {shop ? (
                 <CreateRaffleForm 
                   shop={shop} 
@@ -619,19 +628,9 @@ export default function StoreDashboard() {
                   onCancel={handleCloseModal}
                 />
               ) : (
-                <div style={{ padding: '40px', textAlign: 'center' }}>
-                  <p style={{ color: '#64748b', marginBottom: '20px' }}>
-                    Cargando información de la tienda...
-                  </p>
-                  <div style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    border: '4px solid #f3f4f6',
-                    borderTop: '4px solid #6366f1',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite',
-                    margin: '0 auto'
-                  }}></div>
+                <div className={styles.loadingState}>
+                  <div className={styles.spinner}></div>
+                  <p>Cargando información de la tienda...</p>
                 </div>
               )}
             </div>
