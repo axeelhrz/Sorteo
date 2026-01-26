@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://sorteo-self.vercel.app", "http://localhost:3000", "http://localhost:3001"],
+    "method": ["GET", "HEAD", "DELETE", "POST", "PUT", "OPTIONS"],
+    "responseHeader": ["Content-Type", "x-goog-meta-uploaded-name", "x-goog-acl"],
+    "maxAgeSeconds": 3600
+  }
+]
