@@ -1,13 +1,44 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
-import { FiLogOut, FiUsers, FiShoppingBag, FiClock, FiCheckCircle, FiXCircle, FiPlay, FiTag, FiCreditCard, FiDollarSign } from 'react-icons/fi';
+import {
+  FiLogOut,
+  FiUsers,
+  FiShoppingBag,
+  FiClock,
+  FiCheckCircle,
+  FiXCircle,
+  FiPlay,
+  FiTag,
+  FiCreditCard,
+  FiDollarSign,
+  FiBarChart2,
+} from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
-import Logo from '@/components/Logo';
-import styles from '@/app/dashboard/dashboard.module.css';
+import dynamic from 'next/dynamic';
+import styles from './AdminDashboard.module.css';
+
+// Cargar vistas de admin de forma dinámica para no cargar todo al inicio
+const PendingRafflesPage = dynamic(() => import('@/views/admin/raffles/pending/page'), { ssr: false });
+const ActiveRafflesPage = dynamic(() => import('@/views/admin/raffles/active/page'), { ssr: false });
+const FinishedRafflesPage = dynamic(() => import('@/views/admin/raffles/finished/page'), { ssr: false });
+const AdminPaymentsPage = dynamic(() => import('@/views/admin/payments/page'), { ssr: false });
+const AdminUsersPage = dynamic(() => import('@/views/admin/users/page'), { ssr: false });
+const AdminShopsPage = dynamic(() => import('@/views/admin/shops/page'), { ssr: false });
+
+type AdminTab = 'resumen' | 'sorteos-pendientes' | 'sorteos-activos' | 'sorteos-finalizados' | 'pagos' | 'usuarios' | 'organizadores';
+
+const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
+  { id: 'resumen', label: 'Resumen', icon: <FiBarChart2 /> },
+  { id: 'sorteos-pendientes', label: 'Sorteos Pendientes', icon: <FiClock /> },
+  { id: 'sorteos-activos', label: 'Sorteos Activos', icon: <FiPlay /> },
+  { id: 'sorteos-finalizados', label: 'Sorteos Finalizados', icon: <FiCheckCircle /> },
+  { id: 'pagos', label: 'Pagos', icon: <FiCreditCard /> },
+  { id: 'usuarios', label: 'Usuarios', icon: <FiUsers /> },
+  { id: 'organizadores', label: 'Organizadores', icon: <FiShoppingBag /> },
+];
 
 interface DashboardStats {
   users: { total: number };
@@ -33,6 +64,7 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const [activeTab, setActiveTab] = useState<AdminTab>('resumen');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,8 +76,8 @@ export default function AdminDashboard() {
         const data = await adminService.getDashboardStats();
         setStats(data);
         setError(null);
-      } catch (err: any) {
-        setError(err.message || 'Error al cargar estadísticas');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error al cargar estadísticas');
         console.error('Error fetching dashboard stats:', err);
       } finally {
         setLoading(false);
@@ -59,226 +91,202 @@ export default function AdminDashboard() {
     try {
       await logout();
       router.push('/');
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+    } catch (err) {
+      console.error('Error al cerrar sesión:', err);
       router.push('/');
     }
   };
 
   return (
     <div className={styles.dashboard}>
-      <div className={styles.header}>
+      {/* Header - misma estructura que Store */}
+      <header className={styles.header}>
         <div className={styles.headerContent}>
-          <div className={styles.headerTitle}>
-            <Logo size="small" showText={false} />
-            <h1>Panel de Administración</h1>
+          <div className={styles.headerLeft}>
+            <span className={styles.headerTag}>Panel de Control</span>
+            <h1 className={styles.title}>Panel de Administración</h1>
+            <p className={styles.subtitle}>Estadísticas y gestión de la plataforma</p>
           </div>
-          <div className={styles.userSection}>
-            <div className={styles.userInfo}>
+
+          <div className={styles.headerRight}>
+            <div className={styles.userCard}>
               <div className={styles.userAvatar}>
-                <span>{user?.name?.charAt(0).toUpperCase() || 'A'}</span>
+                {user?.name?.charAt(0).toUpperCase() || 'A'}
               </div>
               <div className={styles.userDetails}>
-                <p className={styles.userName}>{user?.name}</p>
-                <p className={styles.email}>{user?.email}</p>
-                <span className={styles.role}>Administrador</span>
+                <span className={styles.userName}>{user?.name || 'Administrador'}</span>
+                <span className={styles.userRole}>Administrador</span>
               </div>
             </div>
+
             <button onClick={handleLogout} className={styles.logoutBtn}>
-              <FiLogOut className={styles.logoutIcon} />
-              Cerrar Sesión
+              <FiLogOut />
+              <span>Salir</span>
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className={styles.content}>
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            <p>Cargando estadísticas...</p>
-          </div>
-        )}
+      {/* Main Content */}
+      <main className={styles.mainContent}>
+        {/* Tabs - control de todo desde aquí */}
+        <div className={styles.tabsContainer}>
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+              aria-current={activeTab === tab.id ? 'page' : undefined}
+            >
+              {tab.icon}
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
 
-        {error && (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#e74c3c' }}>
-            <p>Error: {error}</p>
-          </div>
-        )}
-
-        {stats && (
-          <>
-            <div style={{ marginBottom: '32px' }}>
-              <h2 style={{ margin: '0 0 8px 0', color: '#333', fontSize: '24px', fontWeight: '700' }}>
-                Resumen General
-              </h2>
-              <p style={{ margin: '0', color: '#666', fontSize: '14px' }}>
-                Estadísticas y métricas de la plataforma
-              </p>
-            </div>
-
-            <div className={styles.overviewGrid}>
-              {/* Usuarios */}
-              <div className={styles.card}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiUsers style={{ fontSize: '24px', color: '#667eea' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Usuarios Registrados</h3>
+        {/* Contenido según tab activo */}
+        <div className={styles.tabContent}>
+          {activeTab === 'resumen' && (
+            <>
+              {loading && (
+                <div className={styles.loadingState}>
+                  <div className={styles.spinner} />
+                  <p>Cargando estadísticas...</p>
                 </div>
-                <p className={styles.bigNumber}>{stats.users.total}</p>
-                <p className={styles.subtitle}>Total de usuarios</p>
-              </div>
+              )}
 
-              {/* Organizadores */}
-              <div className={styles.card}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiShoppingBag style={{ fontSize: '24px', color: '#667eea' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Organizadores Totales</h3>
+              {error && (
+                <div className={styles.section} style={{ borderColor: 'rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)' }}>
+                  <p style={{ margin: 0, color: '#dc2626', fontWeight: 600 }}>{error}</p>
                 </div>
-                <p className={styles.bigNumber}>{stats.shops.total}</p>
-                <p className={styles.subtitle}>Total de organizadores</p>
-              </div>
+              )}
 
-              <div className={styles.card} style={{ borderLeft: '4px solid #FFA500' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiClock style={{ fontSize: '24px', color: '#FFA500' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Organizadores Pendientes</h3>
+              {stats && !loading && (
+                <div className={styles.statsGrid}>
+                  <div className={styles.statCard}>
+                    <div className={styles.statHeader}>
+                      <div>
+                        <div className={styles.statLabel}>Usuarios</div>
+                        <div className={styles.statValue}>{stats.users.total}</div>
+                      </div>
+                      <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' }}>
+                        <FiUsers />
+                      </div>
+                    </div>
+                    <div className={styles.statChange}><span>Total registrados</span></div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <div className={styles.statHeader}>
+                      <div>
+                        <div className={styles.statLabel}>Organizadores</div>
+                        <div className={styles.statValue}>{stats.shops.total}</div>
+                      </div>
+                      <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
+                        <FiShoppingBag />
+                      </div>
+                    </div>
+                    <div className={styles.statChange}><span>Total · {stats.shops.pending} pendientes</span></div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <div className={styles.statHeader}>
+                      <div>
+                        <div className={styles.statLabel}>Pendientes aprobación</div>
+                        <div className={styles.statValue}>{stats.raffles.pending}</div>
+                      </div>
+                      <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' }}>
+                        <FiClock />
+                      </div>
+                    </div>
+                    <div className={styles.statChange}><span>Sorteos por aprobar</span></div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <div className={styles.statHeader}>
+                      <div>
+                        <div className={styles.statLabel}>Sorteos activos</div>
+                        <div className={styles.statValue}>{stats.raffles.active}</div>
+                      </div>
+                      <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
+                        <FiPlay />
+                      </div>
+                    </div>
+                    <div className={styles.statChange}><span>En curso</span></div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <div className={styles.statHeader}>
+                      <div>
+                        <div className={styles.statLabel}>Finalizados</div>
+                        <div className={styles.statValue}>{stats.raffles.finished}</div>
+                      </div>
+                      <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }}>
+                        <FiCheckCircle />
+                      </div>
+                    </div>
+                    <div className={styles.statChange}><span>Completados</span></div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <div className={styles.statHeader}>
+                      <div>
+                        <div className={styles.statLabel}>Rechazados / Cancelados</div>
+                        <div className={styles.statValue}>{stats.raffles.rejected + stats.raffles.cancelled}</div>
+                      </div>
+                      <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
+                        <FiXCircle />
+                      </div>
+                    </div>
+                    <div className={styles.statChange}><span>Rechazados y cancelados</span></div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <div className={styles.statHeader}>
+                      <div>
+                        <div className={styles.statLabel}>Tickets vendidos</div>
+                        <div className={styles.statValue}>{stats.tickets.totalSold}</div>
+                      </div>
+                      <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' }}>
+                        <FiTag />
+                      </div>
+                    </div>
+                    <div className={styles.statChange}><span>Total vendidos</span></div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <div className={styles.statHeader}>
+                      <div>
+                        <div className={styles.statLabel}>Pagos</div>
+                        <div className={styles.statValue}>{stats.payments.total}</div>
+                      </div>
+                      <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                        <FiCreditCard />
+                      </div>
+                    </div>
+                    <div className={styles.statChange}><span>{stats.payments.pending} pendientes · {stats.payments.completed} completados</span></div>
+                  </div>
+                  <div className={styles.statCard} style={{ gridColumn: '1 / -1' }}>
+                    <div className={styles.statHeader}>
+                      <div>
+                        <div className={styles.statLabel}>Ingresos totales</div>
+                        <div className={styles.statValue} style={{ fontSize: '36px' }}>
+                          S/. {stats.payments.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                      <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', width: 56, height: 56, fontSize: 28 }}>
+                        <FiDollarSign />
+                      </div>
+                    </div>
+                    <div className={styles.statChange}><span>Ingresos de la plataforma</span></div>
+                  </div>
                 </div>
-                <p className={styles.bigNumber} style={{ color: '#FFA500' }}>{stats.shops.pending}</p>
-                <p className={styles.subtitle}>Esperando verificación</p>
-              </div>
+              )}
+            </>
+          )}
 
-              <div className={styles.card} style={{ borderLeft: '4px solid #27ae60' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiCheckCircle style={{ fontSize: '24px', color: '#27ae60' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Organizadores Verificados</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#27ae60' }}>{stats.shops.verified}</p>
-                <p className={styles.subtitle}>Verificados y activos</p>
-              </div>
-
-              <div className={styles.card} style={{ borderLeft: '4px solid #e74c3c' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiXCircle style={{ fontSize: '24px', color: '#e74c3c' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Organizadores Bloqueados</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#e74c3c' }}>{stats.shops.blocked}</p>
-                <p className={styles.subtitle}>Bloqueados</p>
-              </div>
-
-              {/* Sorteos */}
-              <div className={styles.card} style={{ borderLeft: '4px solid #FFA500' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiClock style={{ fontSize: '24px', color: '#FFA500' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Sorteos Pendientes</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#FFA500' }}>{stats.raffles.pending}</p>
-                <p className={styles.subtitle}>Esperando aprobación</p>
-              </div>
-
-              <div className={styles.card} style={{ borderLeft: '4px solid #27ae60' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiPlay style={{ fontSize: '24px', color: '#27ae60' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Sorteos Activos</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#27ae60' }}>{stats.raffles.active}</p>
-                <p className={styles.subtitle}>En curso</p>
-              </div>
-
-              <div className={styles.card}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiCheckCircle style={{ fontSize: '24px', color: '#667eea' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Sorteos Finalizados</h3>
-                </div>
-                <p className={styles.bigNumber}>{stats.raffles.finished}</p>
-                <p className={styles.subtitle}>Completados</p>
-              </div>
-
-              <div className={styles.card} style={{ borderLeft: '4px solid #e74c3c' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiXCircle style={{ fontSize: '24px', color: '#e74c3c' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Sorteos Rechazados</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#e74c3c' }}>{stats.raffles.rejected}</p>
-                <p className={styles.subtitle}>Rechazados</p>
-              </div>
-
-              <div className={styles.card} style={{ borderLeft: '4px solid #e74c3c' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiXCircle style={{ fontSize: '24px', color: '#e74c3c' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Sorteos Cancelados</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#e74c3c' }}>{stats.raffles.cancelled}</p>
-                <p className={styles.subtitle}>Cancelados</p>
-              </div>
-
-              {/* Tickets */}
-              <div className={styles.card} style={{ borderLeft: '4px solid #27ae60' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiTag style={{ fontSize: '24px', color: '#27ae60' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Tickets Vendidos</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#27ae60' }}>{stats.tickets.totalSold}</p>
-                <p className={styles.subtitle}>Total vendidos</p>
-              </div>
-
-              {/* Payments */}
-              <div className={styles.card}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiCreditCard style={{ fontSize: '24px', color: '#667eea' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Total de Pagos</h3>
-                </div>
-                <p className={styles.bigNumber}>{stats.payments.total}</p>
-                <p className={styles.subtitle}>Transacciones</p>
-              </div>
-
-              <div className={styles.card} style={{ borderLeft: '4px solid #27ae60' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiCheckCircle style={{ fontSize: '24px', color: '#27ae60' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Pagos Completados</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#27ae60' }}>{stats.payments.completed}</p>
-                <p className={styles.subtitle}>Aprobados</p>
-              </div>
-
-              <div className={styles.card} style={{ borderLeft: '4px solid #FFA500' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiClock style={{ fontSize: '24px', color: '#FFA500' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Pagos Pendientes</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#FFA500' }}>{stats.payments.pending}</p>
-                <p className={styles.subtitle}>Esperando validación</p>
-              </div>
-
-              <div className={styles.card} style={{ borderLeft: '4px solid #e74c3c' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiXCircle style={{ fontSize: '24px', color: '#e74c3c' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Pagos Fallidos</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ color: '#e74c3c' }}>{stats.payments.failed}</p>
-                <p className={styles.subtitle}>Rechazados</p>
-              </div>
-
-              <div className={styles.card} style={{ borderLeft: '4px solid #27ae60', gridColumn: 'span 2' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <FiDollarSign style={{ fontSize: '24px', color: '#27ae60' }} />
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Ingresos Totales</h3>
-                </div>
-                <p className={styles.bigNumber} style={{ fontSize: '32px', color: '#27ae60' }}>
-                  S/. {stats.payments.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-                <p className={styles.subtitle}>Ingresos de la plataforma</p>
-              </div>
-            </div>
-
-            <div style={{ marginTop: '40px', textAlign: 'center' }}>
-              <Link href="/admin">
-                <button className={styles.createBtn}>
-                  Ir al Panel de Administración Completo
-                </button>
-              </Link>
-            </div>
-          </>
-        )}
-      </div>
+          {activeTab === 'sorteos-pendientes' && <PendingRafflesPage />}
+          {activeTab === 'sorteos-activos' && <ActiveRafflesPage />}
+          {activeTab === 'sorteos-finalizados' && <FinishedRafflesPage />}
+          {activeTab === 'pagos' && <AdminPaymentsPage />}
+          {activeTab === 'usuarios' && <AdminUsersPage />}
+          {activeTab === 'organizadores' && <AdminShopsPage />}
+        </div>
+      </main>
     </div>
   );
 }

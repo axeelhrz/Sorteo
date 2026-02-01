@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Shop, ShopStatus } from '@/types/shop';
 import { shopService } from '@/services/shop-service';
-import styles from '@/app/panel/panel.module.css';
+import styles from './shop-panel.module.css';
 import { StatusBadge } from './StatusBadge';
 
 interface ShopProfileProps {

@@ -113,8 +113,15 @@ export function DeliveryEvidenceUpload({
         currentUserId
       );
 
+      // 4. Enviar correos: al ganador (evidencia disponible) y al organizador (espera confirmación del ganador)
+      try {
+        await fetch(`/api/raffles/${raffleId}/notify-after-delivery-evidence`, { method: 'POST' });
+      } catch (e) {
+        console.error('Error sending delivery notifications:', e);
+      }
+
       setSuccess(true);
-      
+
       if (onUploadSuccess) {
         onUploadSuccess(winnerInfo);
       }

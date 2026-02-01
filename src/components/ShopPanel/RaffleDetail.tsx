@@ -6,7 +6,7 @@ import { Raffle, RaffleStatus, WinnerInfo } from '@/types/raffle';
 import { raffleService } from '@/services/raffle-service';
 import { winnerVerificationService } from '@/services/winner-verification-service';
 import { useAuthStore } from '@/store/auth-store';
-import styles from '@/app/panel/panel.module.css';
+import styles from './shop-panel.module.css';
 import { StatusBadge } from './StatusBadge';
 import { WinnerValidation } from './WinnerValidation';
 import { DeliveryEvidenceUpload } from './DeliveryEvidenceUpload';
@@ -82,6 +82,10 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
 
   const handleCancel = async () => {
     if (!raffle) return;
+    if (raffle.soldTickets > 0) {
+      alert('Solo puedes solicitar la anulación de una oportunidad si aún no hay tickets comprados.');
+      return;
+    }
     if (confirm('¿Estás seguro de que deseas cancelar este sorteo?')) {
       setActionLoading(true);
       try {
@@ -338,13 +342,19 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
         )}
 
         {(raffle.status === RaffleStatus.DRAFT || raffle.status === RaffleStatus.PENDING_APPROVAL) && (
-          <button
-            onClick={handleCancel}
-            className={styles.dangerButton}
-            disabled={actionLoading}
-          >
-            {actionLoading ? 'Cancelando...' : 'Cancelar sorteo'}
-          </button>
+          raffle.soldTickets === 0 ? (
+            <button
+              onClick={handleCancel}
+              className={styles.dangerButton}
+              disabled={actionLoading}
+            >
+              {actionLoading ? 'Cancelando...' : 'Cancelar sorteo'}
+            </button>
+          ) : (
+            <span className={styles.alert} style={{ padding: '10px 16px', fontSize: '13px' }}>
+              No puedes anular: ya hay {raffle.soldTickets} ticket(s) comprado(s). Solo se puede solicitar anulación si no hay tickets vendidos.
+            </span>
+          )
         )}
 
         <button

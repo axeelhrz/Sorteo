@@ -1,9 +1,11 @@
 import { firebasePaymentService, Payment } from './firebase-payment-service';
+import { firebaseRaffleWriteService } from './firebase-raffle-write-service';
 import { ocrService } from './ocr-service';
 import { emailService } from './email-service';
 import { ticketAssignmentService } from './ticket-assignment-service';
 import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, updateDoc, where, serverTimestamp } from 'firebase/firestore';
+import type { ApproveRaffleParams } from '@/types/raffle';
 
 /**
  * Admin Service for Payment Management
@@ -216,21 +218,83 @@ export const adminService = {
 
   /**
    * Get finished raffles (admin only)
-   * TODO: Implement proper Firestore query for finished raffles
    */
   async getFinishedRaffles(
-    _limit: number,
-    _offset: number,
-    _shopId?: string
+    limit: number,
+    offset: number,
+    shopId?: string
   ): Promise<{ data: any[]; total: number }> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would query Firestore for finished raffles
-      // Parameters: limit, offset, shopId will be used for pagination and filtering
-      console.warn('getFinishedRaffles is not fully implemented yet');
-      return { data: [], total: 0 };
+      const { collection, getDocs, query, where } = await import('firebase/firestore');
+
+      let rafflesRef = collection(db, 'raffles');
+      let q = query(rafflesRef, where('status', '==', 'finished'));
+
+      const rafflesSnapshot = await getDocs(q);
+      let raffles: any[] = rafflesSnapshot.docs.map((docSnap) => {
+        const data = docSnap.data();
+        const toDate = (v: any) => (v?.toDate ? v.toDate() : v instanceof Date ? v : v ? new Date(v) : undefined);
+        return {
+          id: docSnap.id,
+          ...data,
+          createdAt: toDate(data.createdAt),
+          updatedAt: toDate(data.updatedAt),
+          activatedAt: toDate(data.activatedAt),
+          raffleExecutedAt: toDate(data.raffleExecutedAt),
+          paymentToOrganizerAt: toDate(data.paymentToOrganizerAt),
+          winnerInfo: data.winnerInfo,
+          paymentEvidenceUrl: data.paymentEvidenceUrl,
+        };
+      });
+
+      if (shopId) {
+        raffles = raffles.filter((r: any) => r.shopId === shopId);
+      }
+
+      const total = raffles.length;
+      const paginatedRaffles = raffles.slice(offset, offset + limit);
+
+      const enrichedRaffles = await Promise.all(
+        paginatedRaffles.map(async (raffle: any) => {
+          const sId = raffle.shopId as string;
+          const pId = raffle.productId as string;
+
+          const shopDoc = await getDoc(doc(db, 'shops', sId));
+          const productDoc = await getDoc(doc(db, 'products', pId));
+
+          return {
+            ...raffle,
+            shop: shopDoc.exists() ? { id: shopDoc.id, ...shopDoc.data() } : { id: sId, name: 'Unknown' },
+            product: productDoc.exists() ? { id: productDoc.id, ...productDoc.data() } : { id: pId, name: 'Unknown' },
+            tickets: raffle.tickets || [],
+          };
+        })
+      );
+
+      return { data: enrichedRaffles, total };
     } catch (error) {
       console.error('Error getting finished raffles:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Registra el pago al organizador (admin): sube evidencia y envía email al organizador
+   */
+  async registerPaymentToOrganizer(raffleId: string, paymentEvidenceUrl: string): Promise<void> {
+    try {
+      const baseUrl = typeof window !== 'undefined' ? '' : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/admin/raffles/${raffleId}/register-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentEvidenceUrl }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Error al registrar el pago al organizador');
+      }
+    } catch (error) {
+      console.error('Error registering payment to organizer:', error);
       throw error;
     }
   },
@@ -306,13 +370,14 @@ export const adminService = {
 
   /**
    * Approve raffle (admin only)
-   * TODO: Implement proper Firestore update for raffle approval
+   * Actualiza costo por ticket, número de tickets y activa la oportunidad
    */
-  async approveRaffle(_raffleId: string): Promise<void> {
+  async approveRaffle(raffleId: string, params: ApproveRaffleParams): Promise<void> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would update the raffle status in Firestore
-      console.warn('approveRaffle is not fully implemented yet');
+      await firebaseRaffleWriteService.approveRaffle(raffleId, {
+        costPerTicket: params.costPerTicket,
+        totalTickets: params.totalTickets,
+      });
     } catch (error) {
       console.error('Error approving raffle:', error);
       throw error;
@@ -321,13 +386,10 @@ export const adminService = {
 
   /**
    * Reject raffle (admin only)
-   * TODO: Implement proper Firestore update for raffle rejection
    */
-  async rejectRaffle(_raffleId: string, _reason: string): Promise<void> {
+  async rejectRaffle(raffleId: string, reason: string): Promise<void> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would update the raffle status in Firestore
-      console.warn('rejectRaffle is not fully implemented yet');
+      await firebaseRaffleWriteService.rejectRaffle(raffleId, reason);
     } catch (error) {
       console.error('Error rejecting raffle:', error);
       throw error;
@@ -336,19 +398,45 @@ export const adminService = {
 
   /**
    * Get all users (admin only)
-   * TODO: Implement proper Firestore query for users
    */
   async getAllUsers(
-    _limit: number,
-    _offset: number,
-    _filters?: { role?: string; status?: string }
+    limit: number,
+    offset: number,
+    filters?: { role?: string; status?: string }
   ): Promise<{ data: any[]; total: number }> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would query Firestore for users
-      // Parameters: limit, offset, filters will be used for pagination and filtering
-      console.warn('getAllUsers is not fully implemented yet');
-      return { data: [], total: 0 };
+      const { collection, getDocs } = await import('firebase/firestore');
+
+      const usersRef = collection(db, 'users');
+      const usersSnapshot = await getDocs(usersRef);
+
+      const toDate = (v: any) => (v?.toDate ? v.toDate() : v instanceof Date ? v : v ? new Date(v) : undefined);
+
+      let users: any[] = usersSnapshot.docs.map((docSnap) => {
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          name: data.name || data.displayName || 'Sin nombre',
+          email: data.email || '',
+          role: data.role || 'user',
+          createdAt: toDate(data.createdAt) || new Date(0),
+          updatedAt: toDate(data.updatedAt),
+          shopId: data.shopId,
+        };
+      });
+
+      if (filters?.role) {
+        const roleLower = filters.role.toLowerCase();
+        users = users.filter((u: any) => (u.role || '').toLowerCase() === roleLower || (roleLower === 'organizer' && (u.role || '').toLowerCase() === 'shop'));
+      }
+
+      const total = users.length;
+      const paginatedUsers = users.slice(offset, offset + limit);
+
+      return {
+        data: paginatedUsers.map((u) => ({ ...u, createdAt: u.createdAt instanceof Date ? u.createdAt.toISOString() : u.createdAt })),
+        total,
+      };
     } catch (error) {
       console.error('Error getting all users:', error);
       throw error;
@@ -514,19 +602,62 @@ export const adminService = {
 
   /**
    * Get active raffles (admin only)
-   * TODO: Implement proper Firestore query for active raffles
+   * Incluye status 'active' y 'sold_out' (aún no ejecutados).
    */
   async getActiveRaffles(
-    _limit: number,
-    _offset: number,
-    _shopId?: string
+    limit: number,
+    offset: number,
+    shopId?: string
   ): Promise<{ data: any[]; total: number }> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would query Firestore for active raffles
-      // Parameters: limit, offset, shopId will be used for pagination and filtering
-      console.warn('getActiveRaffles is not fully implemented yet');
-      return { data: [], total: 0 };
+      const { collection, getDocs, query, where } = await import('firebase/firestore');
+
+      const rafflesRef = collection(db, 'raffles');
+      // Firestore no permite OR directo; obtenemos 'active' y luego 'sold_out' y unimos
+      const [activeSnap, soldOutSnap] = await Promise.all([
+        getDocs(query(rafflesRef, where('status', '==', 'active'))),
+        getDocs(query(rafflesRef, where('status', '==', 'sold_out'))),
+      ]);
+
+      const toDate = (v: any) => (v?.toDate ? v.toDate() : v instanceof Date ? v : v ? new Date(v) : undefined);
+      const docToRaffle = (docSnap: any) => {
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          ...data,
+          createdAt: toDate(data.createdAt),
+          updatedAt: toDate(data.updatedAt),
+          activatedAt: toDate(data.activatedAt),
+        };
+      };
+
+      let raffles: any[] = [
+        ...activeSnap.docs.map(docToRaffle),
+        ...soldOutSnap.docs.map(docToRaffle),
+      ];
+
+      if (shopId) {
+        raffles = raffles.filter((r: any) => r.shopId === shopId);
+      }
+
+      const total = raffles.length;
+      const paginatedRaffles = raffles.slice(offset, offset + limit);
+
+      const enrichedRaffles = await Promise.all(
+        paginatedRaffles.map(async (raffle: any) => {
+          const sId = raffle.shopId as string;
+          const pId = raffle.productId as string;
+          const shopDoc = await getDoc(doc(db, 'shops', sId));
+          const productDoc = await getDoc(doc(db, 'products', pId));
+          return {
+            ...raffle,
+            shop: shopDoc.exists() ? { id: shopDoc.id, ...shopDoc.data() } : { id: sId, name: 'Unknown' },
+            product: productDoc.exists() ? { id: productDoc.id, ...productDoc.data() } : { id: pId, name: 'Unknown' },
+          };
+        })
+      );
+
+      return { data: enrichedRaffles, total };
     } catch (error) {
       console.error('Error getting active raffles:', error);
       throw error;
@@ -550,16 +681,20 @@ export const adminService = {
 
   /**
    * Execute raffle (admin only)
-   * TODO: Implement proper raffle execution logic
+   * Al completarse el mínimo de tickets, elige ganador aleatorio, envía emails al ganador y al organizador
    */
-  async executeRaffle(_raffleId: string): Promise<void> {
+  async executeRaffle(raffleId: string): Promise<void> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would:
-      // 1. Select a random winner from sold tickets
-      // 2. Update raffle status to finished
-      // 3. Notify the winner
-      console.warn('executeRaffle is not fully implemented yet');
+      const baseUrl = typeof window !== 'undefined' ? '' : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const url = `${baseUrl}/api/admin/raffles/${raffleId}/execute`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Error al ejecutar la oportunidad');
+      }
     } catch (error) {
       console.error('Error executing raffle:', error);
       throw error;
@@ -567,20 +702,59 @@ export const adminService = {
   },
 
   /**
-   * Get all shops/organizers (admin only)
-   * TODO: Implement proper Firestore query for shops
+   * Get all shops/organizers (admin only) from Firestore collection "shops"
    */
   async getAllShops(
-    _limit: number,
-    _offset: number,
-    _filters?: { status?: string }
+    limit: number,
+    offset: number,
+    filters?: { status?: string }
   ): Promise<{ data: any[]; total: number }> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would query Firestore for shops
-      // Parameters: limit, offset, filters will be used for pagination and filtering
-      console.warn('getAllShops is not fully implemented yet');
-      return { data: [], total: 0 };
+      const shopsRef = collection(db, 'shops');
+      let q = query(shopsRef);
+      if (filters?.status) {
+        q = query(shopsRef, where('status', '==', filters.status));
+      }
+      const snapshot = await getDocs(q);
+
+      const toDate = (v: any) => (v?.toDate ? v.toDate() : v instanceof Date ? v : v ? new Date(v) : undefined);
+
+      const shopsWithUsers: any[] = [];
+      for (const docSnap of snapshot.docs) {
+        const data = docSnap.data();
+        const userId = data.userId || '';
+        let userData = { id: userId, name: 'Sin nombre', email: '' };
+        if (userId) {
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          if (userDoc.exists()) {
+            const u = userDoc.data();
+            userData = {
+              id: userDoc.id,
+              name: u?.name || u?.displayName || 'Sin nombre',
+              email: u?.email || '',
+            };
+          }
+        }
+        shopsWithUsers.push({
+          id: docSnap.id,
+          name: data.name || '',
+          description: data.description,
+          status: data.status || 'pending',
+          createdAt: toDate(data.createdAt) || new Date(0),
+          user: userData,
+        });
+      }
+
+      // Ordenar por nombre
+      shopsWithUsers.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+      const total = shopsWithUsers.length;
+      const paginated = shopsWithUsers.slice(offset, offset + limit).map((s) => ({
+        ...s,
+        createdAt: s.createdAt instanceof Date ? s.createdAt.toISOString() : s.createdAt,
+      }));
+
+      return { data: paginated, total };
     } catch (error) {
       console.error('Error getting all shops:', error);
       throw error;
@@ -634,14 +808,58 @@ export const adminService = {
 
   /**
    * Get shop detail with statistics (admin only)
-   * TODO: Implement proper Firestore query for shop details
    */
-  async getShopDetail(_shopId: string): Promise<any> {
+  async getShopDetail(shopId: string): Promise<any> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would query Firestore for shop details and statistics
-      console.warn('getShopDetail is not fully implemented yet');
-      return null;
+      const shopDoc = await getDoc(doc(db, 'shops', shopId));
+      if (!shopDoc.exists()) return null;
+
+      const data = shopDoc.data();
+      const userId = data?.userId || '';
+      let userData = { id: userId, name: 'Sin nombre', email: '' };
+      if (userId) {
+        const userDoc = await getDoc(doc(db, 'users', userId));
+        if (userDoc.exists()) {
+          const u = userDoc.data();
+          userData = {
+            id: userDoc.id,
+            name: u?.name || u?.displayName || 'Sin nombre',
+            email: u?.email || '',
+          };
+        }
+      }
+
+      const toDate = (v: any) => (v?.toDate ? v.toDate() : v instanceof Date ? v : v ? new Date(v) : undefined);
+
+      // Estadísticas de sorteos por shopId
+      const rafflesRef = collection(db, 'raffles');
+      const rafflesSnap = await getDocs(query(rafflesRef, where('shopId', '==', shopId)));
+      let totalRaffles = 0;
+      let activeRaffles = 0;
+      let finishedRaffles = 0;
+      let cancelledRaffles = 0;
+      rafflesSnap.docs.forEach((d) => {
+        const status = (d.data().status || '').toLowerCase();
+        totalRaffles += 1;
+        if (status === 'active' || status === 'sold_out') activeRaffles += 1;
+        else if (status === 'finished') finishedRaffles += 1;
+        else if (status === 'cancelled') cancelledRaffles += 1;
+      });
+
+      return {
+        id: shopDoc.id,
+        name: data?.name || '',
+        description: data?.description,
+        status: data?.status || 'pending',
+        createdAt: toDate(data?.createdAt) instanceof Date ? toDate(data?.createdAt)!.toISOString() : undefined,
+        user: userData,
+        stats: {
+          totalRaffles,
+          activeRaffles,
+          finishedRaffles,
+          cancelledRaffles,
+        },
+      };
     } catch (error) {
       console.error('Error getting shop detail:', error);
       throw error;
@@ -650,13 +868,14 @@ export const adminService = {
 
   /**
    * Change shop status (admin only)
-   * TODO: Implement proper Firestore update for shop status change
    */
-  async changeShopStatus(_shopId: string, _newStatus: string, _reason?: string): Promise<void> {
+  async changeShopStatus(shopId: string, newStatus: string, _reason?: string): Promise<void> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would update the shop status in Firestore
-      console.warn('changeShopStatus is not fully implemented yet');
+      const shopRef = doc(db, 'shops', shopId);
+      await updateDoc(shopRef, {
+        status: newStatus,
+        updatedAt: serverTimestamp(),
+      });
     } catch (error) {
       console.error('Error changing shop status:', error);
       throw error;

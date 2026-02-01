@@ -27,7 +27,7 @@ export default function StoreDashboardPage() {
       return;
     }
 
-    // Check if user is an organizer (SHOP is an alias for ORGANIZER)
+    // Solo organizadores pueden solicitar creación de sorteos; usuarios y admin son redirigidos
     if (user.role !== UserRole.ORGANIZER) {
       router.push('/dashboard');
       return;

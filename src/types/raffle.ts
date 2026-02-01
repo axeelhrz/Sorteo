@@ -29,6 +29,10 @@ export interface Raffle {
   updatedAt: Date;
   activatedAt?: Date;
   raffleExecutedAt?: Date;
+  /** Fecha en que el admin registró el pago al organizador */
+  paymentToOrganizerAt?: Date;
+  /** URL de evidencia del pago al organizador (subida por admin) */
+  paymentEvidenceUrl?: string;
   shop?: Shop;
   product?: Product;
 }
@@ -43,6 +47,14 @@ export interface CreateRaffleDto {
 export interface UpdateRaffleDto {
   thumbnail?: string; // Miniatura del sorteo
   specialConditions?: string;
+  productValue?: number; // Precio por ticket (al aprobar)
+  totalTickets?: number; // Número de tickets (al aprobar)
+}
+
+/** Parámetros que el admin define al aprobar una oportunidad */
+export interface ApproveRaffleParams {
+  costPerTicket: number; // Costo por ticket (S/.)
+  totalTickets: number;   // Número de tickets
 }
 
 export interface RaffleWithRelations extends Raffle {

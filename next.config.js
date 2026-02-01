@@ -64,6 +64,14 @@ const nextConfig = {
   // Compresión
   compress: true,
 
+  // Redirigir /admin y /admin/* a /dashboard/admin
+  async redirects() {
+    return [
+      { source: '/admin', destination: '/dashboard/admin', permanent: true },
+      { source: '/admin/:path*', destination: '/dashboard/admin', permanent: true },
+    ];
+  },
+
   // Generación de sitemap y robots.txt
   async rewrites() {
     return {

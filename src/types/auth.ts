@@ -1,3 +1,22 @@
+/**
+ * Perfiles de la plataforma:
+ *
+ * ADMINISTRADOR (admin):
+ * - Aprueba oportunidades (sorteos)
+ * - Aprueba cantidad/ratio de tickets
+ * - Aprueba precio de tickets
+ * - Gestiona pago al organizador
+ *
+ * ORGANIZADOR (organizer / shop):
+ * - Nombre, correo, contraseña del organizador
+ * - Solicita creación de oportunidades (sorteos)
+ * - NO puede participar en la compra de tickets
+ *
+ * USUARIO (user):
+ * - Nombre, correo, contraseña del usuario
+ * - NO puede solicitar creación de sorteos
+ * - Puede comprar tickets en sorteos activos
+ */
 export enum UserRole {
   ADMIN = 'admin',
   ORGANIZER = 'organizer',

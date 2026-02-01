@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import styles from '@/app/panel/panel.module.css';
+import styles from './shop-panel.module.css';
 
 interface ShopSidebarProps {
   isBlocked?: boolean;

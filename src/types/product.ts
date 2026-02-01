@@ -16,9 +16,13 @@ export interface Product {
   requiresDeposit: boolean;
   category?: string;
   mainImage?: string;
+  images?: string[]; // Fotos adicionales del producto
   status: ProductStatus;
   hasDelivery?: boolean;
   deliveryZones?: string;
+  deliveryCost?: number; // Monto fijo de delivery (opcional; si no se indica, costo va a cuenta del organizador)
+  pickupAddress?: string;
+  pickupDistrict?: string;
   pickupInStore?: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -34,8 +38,12 @@ export interface CreateProductDto {
   depth: number;
   category?: string;
   mainImage?: string;
+  images?: string[];
   hasDelivery?: boolean;
   deliveryZones?: string;
+  deliveryCost?: number;
+  pickupAddress?: string;
+  pickupDistrict?: string;
   pickupInStore?: boolean;
 }
 
@@ -48,7 +56,11 @@ export interface UpdateProductDto {
   depth?: number;
   category?: string;
   mainImage?: string;
+  images?: string[];
   hasDelivery?: boolean;
   deliveryZones?: string;
+  deliveryCost?: number;
+  pickupAddress?: string;
+  pickupDistrict?: string;
   pickupInStore?: boolean;
 }

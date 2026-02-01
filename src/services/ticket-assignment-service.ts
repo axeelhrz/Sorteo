@@ -218,6 +218,33 @@ export const ticketAssignmentService = {
   },
 
   /**
+   * Get all tickets for a raffle (for execution: pick random winner)
+   */
+  async getTicketsForRaffle(raffleId: string): Promise<Ticket[]> {
+    try {
+      const ticketsRef = collection(db, 'tickets');
+      const q = query(ticketsRef, where('raffleId', '==', raffleId), where('status', '==', 'active'));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map((docSnap) => {
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          raffleId: data.raffleId,
+          userId: data.userId,
+          ticketNumber: data.ticketNumber,
+          paymentId: data.paymentId,
+          purchaseDate: data.purchaseDate?.toDate() || new Date(),
+          status: data.status || 'active',
+          createdAt: data.createdAt?.toDate() || new Date(),
+        } as Ticket;
+      });
+    } catch (error) {
+      console.error('Error fetching tickets for raffle:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Get ticket count for a raffle
    */
   async getTicketCountForRaffle(raffleId: string): Promise<number> {

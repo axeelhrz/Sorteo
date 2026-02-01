@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
+import { UserRole } from '@/types/auth';
 import { FiLogOut, FiPlay, FiTag, FiAward, FiShoppingBag } from 'react-icons/fi';
 import styles from './UserDashboard.module.css';
 
@@ -92,6 +93,11 @@ export default function UserDashboard() {
   };
 
   const handleBuyTickets = async (raffleId: string) => {
+    // Solo usuarios pueden comprar tickets; organizadores no pueden participar
+    if (user?.role !== UserRole.USER) {
+      setError('Solo las cuentas de usuario pueden comprar tickets.');
+      return;
+    }
     const quantity = ticketQuantity[raffleId] || 1;
     const raffle = activeRaffles.find(r => r.id === raffleId);
     

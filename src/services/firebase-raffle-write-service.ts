@@ -9,7 +9,7 @@ import {
   DocumentData,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Raffle, RaffleStatus, CreateRaffleDto, UpdateRaffleDto } from '@/types/raffle';
+import { Raffle, RaffleStatus, CreateRaffleDto, UpdateRaffleDto, WinnerInfo } from '@/types/raffle';
 import { Product } from '@/types/product';
 
 // Helper para convertir Firestore timestamp a Date
@@ -44,6 +44,9 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
     updatedAt: convertTimestamp(data.updatedAt),
     activatedAt: data.activatedAt ? convertTimestamp(data.activatedAt) : undefined,
     raffleExecutedAt: data.raffleExecutedAt ? convertTimestamp(data.raffleExecutedAt) : undefined,
+    paymentToOrganizerAt: data.paymentToOrganizerAt ? convertTimestamp(data.paymentToOrganizerAt) : undefined,
+    paymentEvidenceUrl: data.paymentEvidenceUrl,
+    winnerInfo: data.winnerInfo,
   };
 };
 
@@ -112,9 +115,15 @@ export const firebaseRaffleWriteService = {
       if (data.specialConditions !== undefined) {
         updateData.specialConditions = data.specialConditions;
       }
+      if (data.productValue !== undefined) {
+        updateData.productValue = data.productValue;
+      }
+      if (data.totalTickets !== undefined) {
+        updateData.totalTickets = data.totalTickets;
+      }
 
       await updateDoc(raffleRef, updateData);
-      
+
       const updatedDoc = await getDoc(raffleRef);
       if (!updatedDoc.exists()) {
         throw new Error('Sorteo no encontrado');
@@ -123,6 +132,92 @@ export const firebaseRaffleWriteService = {
       return await convertRaffleDoc(updatedDoc as QueryDocumentSnapshot<DocumentData>);
     } catch (error) {
       console.error('Error updating raffle:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Aprueba un sorteo (admin): define costo por ticket, número de tickets y activa la oportunidad
+   */
+  async approveRaffle(
+    id: string,
+    params: { costPerTicket: number; totalTickets: number }
+  ): Promise<Raffle> {
+    try {
+      const raffleRef = doc(db, 'raffles', id);
+      await updateDoc(raffleRef, {
+        productValue: params.costPerTicket,
+        totalTickets: params.totalTickets,
+        status: RaffleStatus.ACTIVE,
+        updatedAt: serverTimestamp(),
+        activatedAt: serverTimestamp(),
+      });
+
+      const updatedDoc = await getDoc(raffleRef);
+      if (!updatedDoc.exists()) {
+        throw new Error('Sorteo no encontrado');
+      }
+
+      return await convertRaffleDoc(updatedDoc as QueryDocumentSnapshot<DocumentData>);
+    } catch (error) {
+      console.error('Error approving raffle:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Rechaza un sorteo (admin)
+   */
+  async rejectRaffle(id: string, _reason?: string): Promise<Raffle> {
+    try {
+      const raffleRef = doc(db, 'raffles', id);
+      await updateDoc(raffleRef, {
+        status: RaffleStatus.REJECTED,
+        updatedAt: serverTimestamp(),
+      });
+
+      const updatedDoc = await getDoc(raffleRef);
+      if (!updatedDoc.exists()) {
+        throw new Error('Sorteo no encontrado');
+      }
+
+      return await convertRaffleDoc(updatedDoc as QueryDocumentSnapshot<DocumentData>);
+    } catch (error) {
+      console.error('Error rejecting raffle:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Ejecuta el sorteo: elige ganador aleatorio, guarda winnerInfo y código único, marca FINISHED
+   */
+  async executeRaffle(
+    id: string,
+    params: { winnerTicketId: string; winnerInfo: Omit<WinnerInfo, 'deliveryEvidence'> & { deliveryEvidence?: any } }
+  ): Promise<Raffle> {
+    try {
+      const raffleRef = doc(db, 'raffles', id);
+      const winnerInfoForFirestore = {
+        ...params.winnerInfo,
+        notifiedAt: params.winnerInfo.notifiedAt || new Date(),
+        deliveryStatus: params.winnerInfo.deliveryStatus || 'pending',
+      };
+      await updateDoc(raffleRef, {
+        winnerTicketId: params.winnerTicketId,
+        winnerInfo: winnerInfoForFirestore,
+        status: RaffleStatus.FINISHED,
+        updatedAt: serverTimestamp(),
+        raffleExecutedAt: serverTimestamp(),
+      });
+
+      const updatedDoc = await getDoc(raffleRef);
+      if (!updatedDoc.exists()) {
+        throw new Error('Sorteo no encontrado');
+      }
+
+      return await convertRaffleDoc(updatedDoc as QueryDocumentSnapshot<DocumentData>);
+    } catch (error) {
+      console.error('Error executing raffle:', error);
       throw error;
     }
   },
@@ -146,6 +241,33 @@ export const firebaseRaffleWriteService = {
       return await convertRaffleDoc(updatedDoc as QueryDocumentSnapshot<DocumentData>);
     } catch (error) {
       console.error('Error submitting raffle for approval:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Registra el pago al organizador (admin): guarda fecha y URL de evidencia
+   */
+  async registerPaymentToOrganizer(
+    id: string,
+    params: { paymentEvidenceUrl: string }
+  ): Promise<Raffle> {
+    try {
+      const raffleRef = doc(db, 'raffles', id);
+      await updateDoc(raffleRef, {
+        paymentToOrganizerAt: serverTimestamp(),
+        paymentEvidenceUrl: params.paymentEvidenceUrl,
+        updatedAt: serverTimestamp(),
+      });
+
+      const updatedDoc = await getDoc(raffleRef);
+      if (!updatedDoc.exists()) {
+        throw new Error('Sorteo no encontrado');
+      }
+
+      return await convertRaffleDoc(updatedDoc as QueryDocumentSnapshot<DocumentData>);
+    } catch (error) {
+      console.error('Error registering payment to organizer:', error);
       throw error;
     }
   },

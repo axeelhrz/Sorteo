@@ -1,7 +1,7 @@
 'use client';
 
 import { Shop } from '@/types/shop';
-import styles from '@/app/panel/panel.module.css';
+import styles from './shop-panel.module.css';
 
 interface ShopHeaderProps {
   shop: Shop;

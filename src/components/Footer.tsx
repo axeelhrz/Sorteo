@@ -65,7 +65,7 @@ export default function Footer() {
                 <Link href="/faq">Guía de Organizadores</Link>
               </li>
               <li>
-                <Link href="/admin">Administración</Link>
+                <Link href="/dashboard/admin">Administración</Link>
               </li>
             </ul>
           </div>

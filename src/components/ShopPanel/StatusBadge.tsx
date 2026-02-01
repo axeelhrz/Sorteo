@@ -2,7 +2,7 @@
 
 import { OrganizerStatus } from '@/types/shop';
 import { RaffleStatus } from '@/types/raffle';
-import styles from '@/app/panel/panel.module.css';
+import styles from './shop-panel.module.css';
 
 interface StatusBadgeProps {
   status: OrganizerStatus | RaffleStatus;

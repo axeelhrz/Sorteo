@@ -1,4 +1,4 @@
-# Configuración de CORS en Firebase Storage
+ # Configuración de CORS en Firebase Storage
 
 ## 📋 Descripción del Problema
 

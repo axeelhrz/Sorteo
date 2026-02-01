@@ -65,6 +65,22 @@ export interface DeliveryReminderEmailData {
   daysRemaining: number;
 }
 
+export interface OpportunityUnderReviewEmailData {
+  email: string;
+  organizerName: string;
+  productName: string;
+  raffleId?: string;
+}
+
+export interface OrganizerPaymentDoneEmailData {
+  email: string;
+  organizerName: string;
+  raffleId: string;
+  productName: string;
+  amountPaid?: number;
+  paymentEvidenceUrl?: string;
+}
+
 /**
  * Servicio de correos
  * Nota: Requiere configuración de Cloud Functions en Firebase
@@ -141,6 +157,61 @@ export const emailService = {
     } catch (error: any) {
       console.error('Error sending password change confirmation:', error);
       // No lanzar error para no bloquear el cambio de contraseña
+    }
+  },
+
+  /**
+   * Envía correo al organizador indicando que su solicitud de oportunidad está en revisión
+   */
+  async sendOpportunityUnderReviewEmail(data: OpportunityUnderReviewEmailData): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-opportunity-under-review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          organizerName: data.organizerName,
+          productName: data.productName,
+          raffleId: data.raffleId,
+        }),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending opportunity under review email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending opportunity under review email:', error);
+      // No lanzar error para no bloquear el flujo de creación
+    }
+  },
+
+  /**
+   * Envía correo al organizador indicando que se procedió con el pago del producto
+   */
+  async sendOrganizerPaymentDoneEmail(data: OrganizerPaymentDoneEmailData): Promise<void> {
+    try {
+      const response = await fetch('/api/emails/send-organizer-payment-done', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          organizerName: data.organizerName,
+          raffleId: data.raffleId,
+          productName: data.productName,
+          amountPaid: data.amountPaid,
+          paymentEvidenceUrl: data.paymentEvidenceUrl,
+        }),
+      });
+
+      if (!response.ok) {
+        console.warn('Error sending organizer payment done email:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Error sending organizer payment done email:', error);
     }
   },
 

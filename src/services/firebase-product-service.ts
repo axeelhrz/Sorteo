@@ -43,7 +43,14 @@ const convertProductDoc = (docSnap: QueryDocumentSnapshot<DocumentData>): Produc
     requiresDeposit: data.requiresDeposit || false,
     category: data.category,
     mainImage: data.mainImage,
+    images: data.images,
     status: data.status || ProductStatus.INACTIVE,
+    hasDelivery: data.hasDelivery,
+    deliveryZones: data.deliveryZones,
+    deliveryCost: data.deliveryCost,
+    pickupAddress: data.pickupAddress,
+    pickupDistrict: data.pickupDistrict,
+    pickupInStore: data.pickupInStore,
     createdAt: convertTimestamp(data.createdAt),
     updatedAt: convertTimestamp(data.updatedAt),
   };
@@ -129,6 +136,13 @@ export const firebaseProductService = {
         requiresDeposit: data.height > 15 || data.width > 15 || data.depth > 15,
         category: data.category || null,
         mainImage: data.mainImage || null,
+        images: data.images || null,
+        hasDelivery: data.hasDelivery ?? null,
+        deliveryZones: data.deliveryZones || null,
+        deliveryCost: data.deliveryCost ?? null,
+        pickupAddress: data.pickupAddress || null,
+        pickupDistrict: data.pickupDistrict || null,
+        pickupInStore: data.pickupInStore ?? null,
         status: ProductStatus.ACTIVE,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -166,6 +180,13 @@ export const firebaseProductService = {
       if (data.depth !== undefined) updateData.depth = data.depth;
       if (data.category !== undefined) updateData.category = data.category;
       if (data.mainImage !== undefined) updateData.mainImage = data.mainImage;
+      if (data.images !== undefined) updateData.images = data.images;
+      if (data.hasDelivery !== undefined) updateData.hasDelivery = data.hasDelivery;
+      if (data.deliveryZones !== undefined) updateData.deliveryZones = data.deliveryZones;
+      if (data.deliveryCost !== undefined) updateData.deliveryCost = data.deliveryCost;
+      if (data.pickupAddress !== undefined) updateData.pickupAddress = data.pickupAddress;
+      if (data.pickupDistrict !== undefined) updateData.pickupDistrict = data.pickupDistrict;
+      if (data.pickupInStore !== undefined) updateData.pickupInStore = data.pickupInStore;
 
       // Recalcular requiresDeposit si cambian las dimensiones
       if (data.height !== undefined || data.width !== undefined || data.depth !== undefined) {

@@ -68,6 +68,27 @@ export async function POST(
       } else {
         console.log('✅ Delivery confirmed email sent successfully');
       }
+
+      // Enviar correo al ganador: su premio fue recibido
+      const winnerEmail = winnerInfo.userEmail;
+      if (winnerEmail) {
+        const winnerReceiptRes = await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/send-winner-receipt-confirmed`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: winnerEmail,
+              name: winnerInfo.userName || 'Ganador',
+              raffleTitle: raffle.product?.name || 'Sorteo',
+              productName: raffle.product?.name || 'Premio',
+            }),
+          }
+        );
+        if (!winnerReceiptRes.ok) {
+          console.warn('Error sending winner receipt confirmed email:', winnerReceiptRes.statusText);
+        }
+      }
     } catch (emailError) {
       console.error('Error sending confirmation email:', emailError);
       // No fallar la confirmación si hay error en el email

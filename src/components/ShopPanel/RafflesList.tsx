@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Raffle, RaffleStatus } from '@/types/raffle';
 import { raffleService } from '@/services/raffle-service';
-import styles from '@/app/panel/panel.module.css';
+import styles from './shop-panel.module.css';
 import { StatusBadge } from './StatusBadge';
 import { EmptyState } from './EmptyState';
 

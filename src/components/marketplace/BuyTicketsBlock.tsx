@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Raffle, RaffleStatus } from '@/types/raffle';
 import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/auth-store';
+import { UserRole } from '@/types/auth';
 import { firebasePaymentService } from '@/services/firebase-payment-service';
 import styles from './BuyTicketsBlock.module.css';
 
@@ -18,6 +20,7 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
 }) => {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
+  const { user } = useAuthStore();
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,6 +90,18 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
           >
             Iniciar sesión
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Las cuentas de organizador no pueden participar en la compra de tickets (SHOP = ORGANIZER)
+  const isOrganizer = user?.role === UserRole.ORGANIZER;
+  if (isOrganizer) {
+    return (
+      <div className={styles.blockContainer}>
+        <div className={styles.messageBox}>
+          <p>Las cuentas de organizador no pueden comprar tickets. Solo los usuarios pueden participar en sorteos.</p>
         </div>
       </div>
     );
