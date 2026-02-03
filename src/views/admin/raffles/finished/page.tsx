@@ -322,6 +322,29 @@ export default function FinishedRaffles() {
                     </div>
                   </li>
                 </ul>
+
+                {/* Cómo se completa el ciclo */}
+                <div className={styles.lifecycleHelp}>
+                  <h4 className={styles.lifecycleHelpTitle}>Cómo se completa el ciclo</h4>
+                  <ul className={styles.lifecycleHelpList}>
+                    <li>
+                      <strong>1. Código único de ganador registrado</strong><br />
+                      Lo hace el <strong>organizador</strong>: en el detalle del sorteo (<code>/sorteos/{selectedRaffle.id}</code>) debe ingresar el código que el ganador le dio al contactarlo. Así se marca que validó al ganador.
+                    </li>
+                    <li>
+                      <strong>2. Organizador entregó producto (evidencia)</strong><br />
+                      Lo hace el <strong>organizador</strong>: en el mismo detalle del sorteo, después de validar el código, puede subir la foto o evidencia de entrega del premio.
+                    </li>
+                    <li>
+                      <strong>3. Ganador confirmó recepción</strong><br />
+                      Lo hace el <strong>ganador</strong>: en su panel (<code>/user-panel/won-raffles</code>), en “Sorteos ganados”, puede ver la evidencia y hacer clic en “Confirmar recepción” cuando reciba el premio.
+                    </li>
+                    <li>
+                      <strong>4. Pago al organizador</strong><br />
+                      Lo hace el <strong>admin</strong>: en este modal se sube la evidencia del pago realizado al organizador (arriba).
+                    </li>
+                  </ul>
+                </div>
               </section>
 
               {/* Registrar pago al organizador */}

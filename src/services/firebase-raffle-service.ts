@@ -10,7 +10,7 @@ import {
   DocumentData,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Raffle, RaffleStatus } from '@/types/raffle';
+import { Raffle, RaffleStatus, WinnerInfo } from '@/types/raffle';
 import { Product } from '@/types/product';
 import { Shop } from '@/types/shop';
 
@@ -48,6 +48,35 @@ const convertTimestamp = (timestamp: any): Date => {
   return new Date();
 };
 
+// Helper para convertir winnerInfo de Firestore
+const convertWinnerInfo = (raw: any): WinnerInfo | undefined => {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const deliveryEvidence = raw.deliveryEvidence
+    ? {
+        photoUrl: raw.deliveryEvidence.photoUrl || '',
+        uploadedAt: convertTimestamp(raw.deliveryEvidence.uploadedAt),
+        uploadedBy: raw.deliveryEvidence.uploadedBy || '',
+        notes: raw.deliveryEvidence.notes,
+        additionalPhotos: raw.deliveryEvidence.additionalPhotos,
+      }
+    : undefined;
+  return {
+    userId: raw.userId || '',
+    userName: raw.userName,
+    userEmail: raw.userEmail,
+    ticketId: raw.ticketId || '',
+    ticketNumber: raw.ticketNumber ?? 0,
+    verificationCode: raw.verificationCode || '',
+    notifiedAt: raw.notifiedAt ? convertTimestamp(raw.notifiedAt) : undefined,
+    claimedAt: raw.claimedAt ? convertTimestamp(raw.claimedAt) : undefined,
+    deliveryStatus: raw.deliveryStatus || 'pending',
+    deliveryEvidence,
+    deliveryConfirmedAt: raw.deliveryConfirmedAt ? convertTimestamp(raw.deliveryConfirmedAt) : undefined,
+    deliveryConfirmedBy: raw.deliveryConfirmedBy,
+    deliveryDeadline: raw.deliveryDeadline ? convertTimestamp(raw.deliveryDeadline) : undefined,
+  };
+};
+
 // Helper para convertir documento de Firestore a Raffle
 const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): Promise<Raffle> => {
   const data = docSnap.data();
@@ -61,6 +90,7 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
     status: data.status || RaffleStatus.DRAFT,
     requiresDeposit: data.requiresDeposit || false,
     winnerTicketId: data.winnerTicketId,
+    winnerInfo: convertWinnerInfo(data.winnerInfo),
     specialConditions: data.specialConditions,
     createdAt: convertTimestamp(data.createdAt),
     updatedAt: convertTimestamp(data.updatedAt),

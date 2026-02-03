@@ -22,7 +22,7 @@ import { firebaseShopService } from '@/services/firebase-shop-service';
 import { raffleService } from '@/services/raffle-service';
 import { raffleUpdateService } from '@/services/raffle-update-service';
 import { Shop } from '@/types/shop';
-import { Raffle } from '@/types/raffle';
+import { Raffle, WinnerInfo } from '@/types/raffle';
 import CreateRaffleModal from './CreateRaffleModal';
 import RaffleModals from './RaffleModals';
 import styles from './StoreDashboard.module.css';
@@ -46,6 +46,7 @@ export default function StoreDashboard() {
   });
 
   const [raffles, setRaffles] = useState<Raffle[]>([]);
+  const [raffleStatusFilter, setRaffleStatusFilter] = useState<'all' | 'active' | 'finished' | 'draft'>('all');
   const [deposits] = useState<any[]>([]);
   const [viewModal, setViewModal] = useState({ isOpen: false, raffle: null as Raffle | null });
   const [activateModal, setActivateModal] = useState({ isOpen: false, raffleId: null as string | null, raffleName: null as string | null });
@@ -433,7 +434,7 @@ export default function StoreDashboard() {
             <div className={styles.sectionHeader}>
               <div>
                 <h2 className={styles.sectionTitle}>Mis Sorteos</h2>
-                <p className={styles.sectionSubtitle}>Gestiona todos tus sorteos activos y en progreso</p>
+                <p className={styles.sectionSubtitle}>Gestiona todos tus sorteos: activos, en progreso y finalizados</p>
               </div>
               <button className={styles.createBtn} onClick={handleCreateRaffle} title="Crear un nuevo sorteo" type="button">
                 <FiPlus />
@@ -441,17 +442,72 @@ export default function StoreDashboard() {
               </button>
             </div>
 
-            {raffles.length === 0 ? (
-              <div className={styles.emptyState}>
-                <FiShoppingBag className={styles.emptyIcon} />
-                <h3>No tienes sorteos</h3>
-                <p>Crea tu primer sorteo para comenzar a vender tickets y generar ingresos</p>
-                <button className={styles.createBtn} onClick={handleCreateRaffle} type="button">
-                  <FiPlus />
-                  <span>Crear Sorteo</span>
+            {/* Filtros por estado */}
+            {raffles.length > 0 && (
+              <div className={styles.raffleFilters}>
+                <button
+                  type="button"
+                  className={`${styles.raffleFilterChip} ${raffleStatusFilter === 'all' ? styles.raffleFilterChipActive : ''}`}
+                  onClick={() => setRaffleStatusFilter('all')}
+                >
+                  Todos ({raffles.length})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.raffleFilterChip} ${raffleStatusFilter === 'active' ? styles.raffleFilterChipActive : ''}`}
+                  onClick={() => setRaffleStatusFilter('active')}
+                >
+                  Activos ({raffles.filter((r) => ['active', 'pending_approval', 'paused', 'sold_out'].includes(r.status)).length})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.raffleFilterChip} ${raffleStatusFilter === 'finished' ? styles.raffleFilterChipActive : ''}`}
+                  onClick={() => setRaffleStatusFilter('finished')}
+                >
+                  Finalizados ({raffles.filter((r) => r.status === 'finished').length})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.raffleFilterChip} ${raffleStatusFilter === 'draft' ? styles.raffleFilterChipActive : ''}`}
+                  onClick={() => setRaffleStatusFilter('draft')}
+                >
+                  Borradores ({raffles.filter((r) => r.status === 'draft').length})
                 </button>
               </div>
-            ) : (
+            )}
+
+            {(() => {
+              const filteredRaffles = raffleStatusFilter === 'all'
+                ? raffles
+                : raffleStatusFilter === 'active'
+                  ? raffles.filter((r) => ['active', 'pending_approval', 'paused', 'sold_out'].includes(r.status))
+                  : raffleStatusFilter === 'finished'
+                    ? raffles.filter((r) => r.status === 'finished')
+                    : raffles.filter((r) => r.status === 'draft');
+              return filteredRaffles.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <FiShoppingBag className={styles.emptyIcon} />
+                  <h3>
+                    {raffleStatusFilter === 'all' ? 'No tienes sorteos' : raffleStatusFilter === 'finished' ? 'No hay sorteos finalizados' : raffleStatusFilter === 'draft' ? 'No hay borradores' : 'No hay sorteos activos'}
+                  </h3>
+                  <p>
+                    {raffleStatusFilter === 'all'
+                      ? 'Crea tu primer sorteo para comenzar a vender tickets y generar ingresos'
+                      : 'Cambia el filtro para ver otros estados'}
+                  </p>
+                  {raffleStatusFilter !== 'all' && (
+                    <button type="button" className={styles.createBtn} onClick={() => setRaffleStatusFilter('all')}>
+                      Ver todos
+                    </button>
+                  )}
+                  {raffleStatusFilter === 'all' && (
+                    <button className={styles.createBtn} onClick={handleCreateRaffle} type="button">
+                      <FiPlus />
+                      <span>Crear Sorteo</span>
+                    </button>
+                  )}
+                </div>
+              ) : (
               <div className={styles.tableWrapper}>
                 <table className={styles.table}>
                   <thead>
@@ -465,7 +521,7 @@ export default function StoreDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {raffles.map((raffle) => (
+                    {filteredRaffles.map((raffle) => (
                       <tr key={raffle.id}>
                         <td>
                           <div className={styles.raffleInfo}>
@@ -546,7 +602,8 @@ export default function StoreDashboard() {
                   </tbody>
                 </table>
               </div>
-            )}
+              );
+            })()}
           </div>
         )}
 
@@ -724,6 +781,15 @@ export default function StoreDashboard() {
         onCloseDeleteModal={() => setDeleteModal({ isOpen: false, raffleId: null, raffleName: null })}
         onConfirmActivate={handleConfirmActivate}
         onConfirmDelete={handleConfirmDelete}
+        onValidationSuccess={(winnerInfo: WinnerInfo) => {
+          if (viewModal.raffle) {
+            setViewModal((prev) => ({
+              ...prev,
+              raffle: { ...prev.raffle!, winnerInfo },
+            }));
+          }
+          loadData();
+        }}
       />
     </div>
   );

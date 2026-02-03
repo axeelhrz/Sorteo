@@ -1,10 +1,9 @@
 'use client';
 
-'use client';
-
 import React, { useState } from 'react';
-import { FiX, FiAlertTriangle } from 'react-icons/fi';
-import { Raffle } from '@/types/raffle';
+import { FiX, FiAlertTriangle, FiCheck } from 'react-icons/fi';
+import { Raffle, WinnerInfo } from '@/types/raffle';
+import { WinnerValidation } from '@/components/ShopPanel/WinnerValidation';
 import styles from './StoreDashboard.module.css';
 
 interface RaffleModalsProps {
@@ -27,6 +26,7 @@ interface RaffleModalsProps {
   onCloseDeleteModal: () => void;
   onConfirmActivate: (raffleId: string) => Promise<void>;
   onConfirmDelete: (raffleId: string) => Promise<void>;
+  onValidationSuccess?: (winnerInfo: WinnerInfo) => void;
 }
 
 export default function RaffleModals({
@@ -38,6 +38,7 @@ export default function RaffleModals({
   onCloseDeleteModal,
   onConfirmActivate,
   onConfirmDelete,
+  onValidationSuccess,
 }: RaffleModalsProps) {
   const [activatingId, setActivatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -109,10 +110,17 @@ export default function RaffleModals({
                       borderRadius: '6px',
                       fontSize: '14px',
                       fontWeight: '700',
-                      textTransform: 'capitalize',
                     }}
                   >
-                    {viewModal.raffle.status}
+                    {viewModal.raffle.status === 'draft' && 'Borrador'}
+                    {viewModal.raffle.status === 'pending_approval' && 'Pendiente'}
+                    {viewModal.raffle.status === 'active' && 'Activo'}
+                    {viewModal.raffle.status === 'paused' && 'Pausado'}
+                    {viewModal.raffle.status === 'sold_out' && 'Agotado'}
+                    {viewModal.raffle.status === 'finished' && 'Finalizado'}
+                    {viewModal.raffle.status === 'cancelled' && 'Cancelado'}
+                    {viewModal.raffle.status === 'rejected' && 'Rechazado'}
+                    {!['draft', 'pending_approval', 'active', 'paused', 'sold_out', 'finished', 'cancelled', 'rejected'].includes(viewModal.raffle.status) && String(viewModal.raffle.status)}
                   </span>
                 </div>
 
@@ -171,6 +179,32 @@ export default function RaffleModals({
                   </div>
                 )}
               </div>
+
+              {/* Validar código del ganador (solo sorteos finalizados) */}
+              {viewModal.raffle.status === 'finished' && viewModal.raffle.winnerTicketId && (
+                <div style={{ marginTop: '28px', paddingTop: '24px', borderTop: '1px solid rgba(99, 102, 241, 0.1)' }}>
+                  {!viewModal.raffle.winnerInfo?.claimedAt ? (
+                    <WinnerValidation
+                      raffleId={viewModal.raffle.id}
+                      onValidationSuccess={(winnerInfo) => {
+                        onValidationSuccess?.(winnerInfo);
+                      }}
+                    />
+                  ) : (
+                    <div style={{ padding: '16px', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                        <FiCheck style={{ color: '#059669', fontSize: '20px', flexShrink: 0 }} />
+                        <span style={{ fontSize: '15px', fontWeight: '700', color: '#065f46' }}>Código del ganador ya validado</span>
+                      </div>
+                      {viewModal.raffle.winnerInfo.claimedAt && (
+                        <p style={{ margin: 0, fontSize: '13px', color: '#047857' }}>
+                          Validado el {new Date(viewModal.raffle.winnerInfo.claimedAt).toLocaleDateString('es-PE', { dateStyle: 'long', timeStyle: 'short' })}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid rgba(99, 102, 241, 0.1)' }}>
                 <button

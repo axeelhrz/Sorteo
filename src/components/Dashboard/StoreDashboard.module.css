@@ -418,6 +418,44 @@
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
+/* Filtros Mis Sorteos */
+.raffleFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.raffleFilterChip {
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.raffleFilterChip:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+}
+
+.raffleFilterChipActive {
+  border-color: #6366f1;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  color: #6366f1;
+}
+
+.raffleFilterChipActive:hover {
+  border-color: #6366f1;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+  color: #6366f1;
+}
+
 /* Quick Actions */
 .actionsGrid {
   display: grid;
