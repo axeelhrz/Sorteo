@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { FiCheck, FiX, FiEye, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiCheck, FiCheckCircle, FiX, FiEye, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
 import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,6 +21,8 @@ export default function AdminPaymentsPage() {
   const [validating, setValidating] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
 
@@ -70,8 +72,8 @@ export default function AdminPaymentsPage() {
         user.uid
       );
       
-      alert('Pago aprobado y tickets asignados exitosamente');
-      
+      setSuccessMessage('Pago aprobado y tickets asignados exitosamente.');
+      setShowSuccessModal(true);
       await loadPendingPayments();
       setSelectedPayment(null);
     } catch (error: any) {
@@ -97,8 +99,8 @@ export default function AdminPaymentsPage() {
         rejectReason
       );
       
-      alert('Pago rechazado');
-      
+      setSuccessMessage('Pago rechazado. El usuario ha sido notificado.');
+      setShowSuccessModal(true);
       await loadPendingPayments();
       setSelectedPayment(null);
       setShowRejectModal(false);
@@ -441,6 +443,63 @@ export default function AdminPaymentsPage() {
                 }}
               >
                 {validating ? 'Procesando...' : 'Rechazar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de éxito (aprobación o rechazo) */}
+      {showSuccessModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1001,
+            backdropFilter: 'blur(6px)',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '32px 24px 24px',
+              maxWidth: '380px',
+              width: '92%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              textAlign: 'center',
+            }}
+          >
+            <FiCheckCircle style={{ fontSize: 56, color: '#059669', marginBottom: 16 }} />
+            <h3 style={{ margin: '0 0 8px 0', fontSize: 20, color: '#0f172a', fontWeight: 700 }}>
+              Listo
+            </h3>
+            <p style={{ margin: 0, color: '#64748b', fontSize: 15, lineHeight: 1.5 }}>
+              {successMessage}
+            </p>
+            <div style={{ marginTop: 24 }}>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#059669',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  boxShadow: '0 2px 8px rgba(5, 150, 105, 0.35)',
+                }}
+              >
+                Aceptar
               </button>
             </div>
           </div>
