@@ -291,9 +291,9 @@ export function DeliveryConfirmation({
         </div>
       </div>
 
-      {/* Modal de confirmación de recepción */}
+      {/* Modal de confirmación de recepción (sin fondo oscuro) */}
       {showConfirmModal && (
-        <div className={styles.modal} onClick={handleCloseConfirmModal}>
+        <div className={`${styles.modal} ${styles.confirmModalOverlay}`} onClick={handleCloseConfirmModal}>
           <div className={`${styles.modalContent} ${styles.confirmModalCard}`} onClick={(e) => e.stopPropagation()}>
             <button
               type="button"

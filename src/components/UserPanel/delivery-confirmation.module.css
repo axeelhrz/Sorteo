@@ -411,6 +411,12 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
+/* Modal de confirmación: sin fondo oscuro */
+.confirmModalOverlay {
+  background: transparent;
+  pointer-events: auto;
+}
+
 /* Modal de confirmación de recepción */
 .confirmModalCard {
   max-width: 420px;
