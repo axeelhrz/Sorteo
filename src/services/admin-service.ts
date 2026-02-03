@@ -300,7 +300,8 @@ export const adminService = {
   },
 
   /**
-   * Get pending raffles (admin only)
+   * Get pending raffles (admin only): todos los sorteos de todos los organizadores
+   * en estado draft o pending_approval para autorizar o rechazar.
    */
   async getPendingRaffles(
     limit: number,
@@ -309,15 +310,23 @@ export const adminService = {
   ): Promise<{ data: any[]; total: number }> {
     try {
       const { collection, getDocs, query, where } = await import('firebase/firestore');
-      
-      let rafflesRef = collection(db, 'raffles');
-      let q = query(rafflesRef, where('status', '==', 'pending_approval'));
-      
+
+      const rafflesRef = collection(db, 'raffles');
+      // Incluir draft y pending_approval: todos los sorteos de todos los organizadores para autorizar
+      const q = query(rafflesRef, where('status', 'in', ['draft', 'pending_approval']));
+
       const rafflesSnapshot = await getDocs(q);
-      let raffles: any[] = rafflesSnapshot.docs.map(docSnap => ({
+      let raffles: any[] = rafflesSnapshot.docs.map((docSnap) => ({
         id: docSnap.id,
-        ...docSnap.data()
+        ...docSnap.data(),
       }));
+
+      // Ordenar por más recientes primero (en memoria para no requerir índice compuesto)
+      raffles.sort((a, b) => {
+        const ta = a.createdAt?.toDate?.()?.getTime() ?? a.createdAt ?? 0;
+        const tb = b.createdAt?.toDate?.()?.getTime() ?? b.createdAt ?? 0;
+        return tb - ta;
+      });
 
       // Filter by shop if provided
       if (shopId) {
