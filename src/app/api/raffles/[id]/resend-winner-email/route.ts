@@ -23,27 +23,52 @@ export async function POST(
     }
 
     const raffleData = raffleSnap.data()!;
-    const winnerInfo = raffleData.winnerInfo;
-    if (!winnerInfo || !winnerInfo.userId) {
+    const winnerInfo = raffleData.winnerInfo as Record<string, unknown> | undefined;
+    if (!winnerInfo) {
       return NextResponse.json(
         { error: 'Este sorteo no tiene ganador registrado' },
         { status: 400 }
       );
     }
 
-    // Email: usar winnerInfo.userEmail o, si falta, leerlo del documento del usuario (users/{userId})
-    let winnerEmail: string = winnerInfo.userEmail ?? '';
-    let winnerName: string = winnerInfo.userName ?? 'Ganador';
-    if (!winnerEmail && winnerInfo.userId) {
-      const userSnap = await db.collection('users').doc(winnerInfo.userId).get();
+    // userId: de winnerInfo o del ticket ganador (winnerTicketId)
+    let winnerUserId: string =
+      (typeof winnerInfo.userId === 'string' ? winnerInfo.userId : '') ||
+      (winnerInfo.user_id as string) ||
+      '';
+    if (!winnerUserId && raffleData.winnerTicketId) {
+      const ticketSnap = await db.collection('tickets').doc(raffleData.winnerTicketId as string).get();
+      if (ticketSnap.exists) {
+        const ticketData = ticketSnap.data() as Record<string, unknown> | undefined;
+        winnerUserId = (ticketData?.userId ?? ticketData?.user_id ?? '') as string;
+      }
+    }
+
+    // Email y nombre: winnerInfo primero; si falta email, leer del documento users/{userId}
+    let winnerEmail: string =
+      (typeof winnerInfo.userEmail === 'string' ? winnerInfo.userEmail : '') ||
+      (winnerInfo.user_email as string) ||
+      (winnerInfo.email as string) ||
+      '';
+    let winnerName: string =
+      (typeof winnerInfo.userName === 'string' ? winnerInfo.userName : '') ||
+      (winnerInfo.user_name as string) ||
+      (winnerInfo.name as string) ||
+      'Ganador';
+
+    if (!winnerEmail && winnerUserId) {
+      const userSnap = await db.collection('users').doc(winnerUserId).get();
       if (userSnap.exists) {
-        const userData = userSnap.data()!;
-        winnerEmail = userData.email ?? userData.mail ?? '';
-        if (!winnerName || winnerName === 'Ganador') {
-          winnerName = userData.name ?? userData.displayName ?? userData.email ?? 'Ganador';
+        const raw = userSnap.data() as Record<string, unknown> | undefined;
+        if (raw) {
+          winnerEmail = (raw.email ?? raw.mail ?? raw.userEmail ?? '') as string;
+          if (!winnerName || winnerName === 'Ganador') {
+            winnerName = (raw.name ?? raw.displayName ?? raw.userName ?? raw.email ?? 'Ganador') as string;
+          }
         }
       }
     }
+
     if (!winnerEmail) {
       return NextResponse.json(
         { error: 'No se encontró correo del ganador. El usuario puede no tener email en su cuenta.' },
@@ -93,8 +118,8 @@ export async function POST(
         productName,
         productDescription,
         productValue,
-        ticketNumber: winnerInfo.ticketNumber,
-        verificationCode: winnerInfo.verificationCode,
+        ticketNumber: (winnerInfo.ticketNumber ?? winnerInfo.ticket_number ?? 0) as number,
+        verificationCode: (winnerInfo.verificationCode ?? winnerInfo.verification_code ?? '') as string,
         shopName,
         shopEmail,
         shopPhone,
