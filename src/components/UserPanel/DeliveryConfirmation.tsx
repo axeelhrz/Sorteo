@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FiCheck, FiAlertTriangle, FiClock, FiImage } from 'react-icons/fi';
+import { FiCheck, FiAlertTriangle, FiClock, FiImage, FiX } from 'react-icons/fi';
 import { winnerVerificationService } from '@/services/winner-verification-service';
 import { WinnerInfo } from '@/types/raffle';
 import styles from './delivery-confirmation.module.css';
@@ -22,13 +22,24 @@ export function DeliveryConfirmation({
   const [loading, setLoading] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+
+  const handleOpenConfirmModal = () => {
+    setConfirmError(null);
+    setShowConfirmModal(true);
+  };
+
+  const handleCloseConfirmModal = () => {
+    if (!loading) {
+      setShowConfirmModal(false);
+      setConfirmError(null);
+    }
+  };
 
   const handleConfirm = async () => {
-    if (!confirm('¿Confirmas que has recibido el premio correctamente?')) {
-      return;
-    }
-
     setLoading(true);
+    setConfirmError(null);
 
     try {
       await winnerVerificationService.confirmDelivery(
@@ -39,13 +50,13 @@ export function DeliveryConfirmation({
         userId
       );
 
-      alert('✅ Recepción confirmada exitosamente. ¡Gracias por participar!');
-      
+      setShowConfirmModal(false);
       if (onConfirmSuccess) {
         onConfirmSuccess();
       }
-    } catch (error: any) {
-      alert(error.message || 'Error al confirmar la recepción');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al confirmar la recepción';
+      setConfirmError(message);
     } finally {
       setLoading(false);
     }
@@ -258,21 +269,14 @@ export function DeliveryConfirmation({
 
         <div className={styles.buttonGroup}>
           <button
-            onClick={handleConfirm}
+            onClick={handleOpenConfirmModal}
             className={styles.confirmButton}
             disabled={loading || isExpired}
           >
-            {loading ? (
-              <>
-                <span className={styles.spinner} />
-                Confirmando...
-              </>
-            ) : (
-              <>
-                <FiCheck />
-                Confirmar Recepción
-              </>
-            )}
+            <>
+              <FiCheck />
+              Confirmar Recepción
+            </>
           </button>
 
           <button
@@ -286,6 +290,60 @@ export function DeliveryConfirmation({
           </button>
         </div>
       </div>
+
+      {/* Modal de confirmación de recepción */}
+      {showConfirmModal && (
+        <div className={styles.modal} onClick={handleCloseConfirmModal}>
+          <div className={`${styles.modalContent} ${styles.confirmModalCard}`} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className={styles.modalClose}
+              onClick={handleCloseConfirmModal}
+              disabled={loading}
+              aria-label="Cerrar"
+            >
+              <FiX size={20} />
+            </button>
+            <h3 className={styles.confirmModalTitle}>¿Confirmas que has recibido el premio correctamente?</h3>
+            <p className={styles.confirmModalText}>
+              Al confirmar, se dará por cerrada la entrega de tu premio. Si tienes algún problema, puedes reportarlo antes.
+            </p>
+            {confirmError && (
+              <p className={styles.confirmModalError} role="alert">
+                {confirmError}
+              </p>
+            )}
+            <div className={styles.confirmModalActions}>
+              <button
+                type="button"
+                onClick={handleCloseConfirmModal}
+                className={styles.confirmModalCancel}
+                disabled={loading}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirm}
+                className={styles.confirmButton}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className={styles.spinner} />
+                    Confirmando...
+                  </>
+                ) : (
+                  <>
+                    <FiCheck />
+                    Sí, confirmar
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de Imagen */}
       {showImageModal && selectedImage && (
