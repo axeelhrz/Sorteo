@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { UserRole } from '@/types/auth';
-import { FiLogOut, FiPlay, FiTag, FiAward, FiShoppingBag, FiTrophy } from 'react-icons/fi';
+import { FiLogOut, FiPlay, FiTag, FiAward, FiShoppingBag, FiStar } from 'react-icons/fi';
 import { ticketAssignmentService } from '@/services/ticket-assignment-service';
 import { firebaseUserParticipationService } from '@/services/firebase-user-participation-service';
 import { winnerVerificationService } from '@/services/winner-verification-service';
@@ -303,7 +303,7 @@ export default function UserDashboard() {
                 className={tabMyRaffles === 'ganados' ? styles.tabActive : styles.tab}
                 onClick={() => setTabMyRaffles('ganados')}
               >
-                <FiTrophy style={{ marginRight: '6px' }} />
+                <FiStar style={{ marginRight: '6px' }} />
                 Sorteos ganados
               </button>
             </div>
@@ -367,7 +367,7 @@ export default function UserDashboard() {
             <>
               {wonRaffles.length === 0 ? (
                 <div className={styles.emptyState}>
-                  <FiTrophy className={styles.emptyIcon} />
+                  <FiStar className={styles.emptyIcon} />
                   <h3>No has ganado sorteos aún</h3>
                   <p>¡Sigue participando! Tus tickets pueden ser los ganadores.</p>
                   <Link href="#raffles" className={styles.buyBtn}>Ver sorteos disponibles</Link>
