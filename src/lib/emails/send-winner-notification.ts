@@ -1,6 +1,14 @@
 import { sendEmail } from '@/lib/emailjs-server';
 
-const TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_WINNER_NOTIFICATION || 'template_winner_notification';
+function getTemplateId(): string {
+  const id = process.env.EMAILJS_TEMPLATE_WINNER_NOTIFICATION?.trim();
+  if (!id) {
+    throw new Error(
+      'EMAILJS_TEMPLATE_WINNER_NOTIFICATION no está configurado. Crea una plantilla en https://dashboard.emailjs.com/admin/templates y pon su ID en .env.local'
+    );
+  }
+  return id;
+}
 
 export interface WinnerNotificationPayload {
   email: string;
@@ -23,6 +31,7 @@ export interface WinnerNotificationPayload {
  * Envía el correo de notificación al ganador. Usado por la API POST y por resend-winner-email.
  */
 export async function sendWinnerNotificationEmail(payload: WinnerNotificationPayload): Promise<string> {
+  const templateId = getTemplateId();
   const formattedDate = new Date(payload.winDate).toLocaleDateString('es-PE', {
     year: 'numeric',
     month: 'long',
@@ -33,7 +42,7 @@ export async function sendWinnerNotificationEmail(payload: WinnerNotificationPay
   const raffleUrl = `${appUrl}/sorteos/${payload.raffleId}/winner`;
 
   return sendEmail({
-    templateId: TEMPLATE_ID,
+    templateId,
     templateParams: {
       to_email: payload.email,
       to_name: payload.name,

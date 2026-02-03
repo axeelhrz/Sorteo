@@ -21,14 +21,19 @@ Todos los correos transaccionales se envían con **EmailJS** (REST API desde el 
   - `/api/emails/send-organizer-raffle-finished` – oportunidad finalizada al organizador.
   - `/api/emails/send-organizer-payment-done` – pago realizado al organizador.
 
-## Plantillas en EmailJS
+## Plantillas en EmailJS (obligatorio)
 
-En [EmailJS Dashboard](https://dashboard.emailjs.com/) debes tener:
+Si ves **"The template ID not found"** (400), es porque el ID que usas no existe en tu cuenta de EmailJS. Los IDs de `.env` deben ser **exactamente** los de plantillas que tú creas en EmailJS.
+
+1. Entra en **[EmailJS → Templates](https://dashboard.emailjs.com/admin/templates)**.
+2. **Crea una plantilla** (o usa una existente) y copia su **Template ID** (ej. `template_xxxxx`).
+3. En tu `.env.local` define la variable con ese ID, por ejemplo:
+   - Notificación al ganador: `EMAILJS_TEMPLATE_WINNER_NOTIFICATION=template_xxxxx` (el ID que te muestra EmailJS para esa plantilla).
+
+En el dashboard debes tener también:
 
 1. **Servicio de email** (Gmail, Outlook, etc.) conectado.
-2. **Plantillas** con las variables que usa cada tipo de correo (por ejemplo `to_email`, `to_name`, `subject`, `message`, `action_url`, `action_text` para la plantilla genérica `template_mgmgrng`).
-
-Para “organizer raffle finished” y “organizer payment done” se usa por defecto la misma plantilla genérica (`template_mgmgrng`) con `subject`, `message`, `action_url`, `action_text`. Si creas plantillas propias, define los IDs en las variables de entorno anteriores.
+2. **Plantillas** con las variables que usa cada tipo de correo. Para la notificación al ganador, la plantilla puede usar por ejemplo: `{{to_email}}`, `{{to_name}}`, `{{raffle_title}}`, `{{product_name}}`, `{{ticket_number}}`, `{{verification_code}}`, `{{shop_name}}`, `{{win_date}}`, `{{raffle_url}}`.
 
 ## Habilitar envío desde el servidor
 

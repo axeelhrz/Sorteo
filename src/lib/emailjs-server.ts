@@ -60,6 +60,15 @@ export async function sendEmail({ templateId, templateParams }: SendEmailOptions
 
   if (!res.ok) {
     const text = await res.text();
+    const isTemplateNotFound =
+      res.status === 400 &&
+      (text.toLowerCase().includes('template') && text.toLowerCase().includes('not found'));
+    if (isTemplateNotFound) {
+      throw new Error(
+        `Plantilla no encontrada en EmailJS (template_id: ${templateId}). ` +
+          `Crea la plantilla en https://dashboard.emailjs.com/admin/templates y pon su ID en la variable de entorno correspondiente (ej. EMAILJS_TEMPLATE_WINNER_NOTIFICATION).`
+      );
+    }
     throw new Error(`EmailJS error ${res.status}: ${text || res.statusText}`);
   }
 
