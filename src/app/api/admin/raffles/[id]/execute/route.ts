@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { ticketAssignmentService } from '@/services/ticket-assignment-service';
-import { firebaseRaffleWriteService } from '@/services/firebase-raffle-write-service';
+import * as admin from 'firebase-admin';
+import { getAdminFirestore } from '@/lib/firebase-admin';
 import { winnerVerificationService } from '@/services/winner-verification-service';
-import { raffleService } from '@/services/raffle-service';
+import { RaffleStatus } from '@/types/raffle';
+
+interface TicketDoc {
+  id: string;
+  raffleId: string;
+  userId: string;
+  ticketNumber: number;
+  status: string;
+}
 
 /**
  * POST /api/admin/raffles/[id]/execute
  * Ejecuta la oportunidad: elige ganador aleatorio, guarda código único, envía emails al ganador y al organizador.
+ * Usa Firebase Admin SDK para evitar errores de permisos en el servidor.
  */
 export async function POST(
   _request: NextRequest,
@@ -20,16 +27,19 @@ export async function POST(
       return NextResponse.json({ error: 'ID de sorteo requerido' }, { status: 400 });
     }
 
-    const raffleRef = doc(db, 'raffles', raffleId);
-    const raffleSnap = await getDoc(raffleRef);
-    if (!raffleSnap.exists()) {
+    const db = getAdminFirestore();
+
+    const raffleSnap = await db.collection('raffles').doc(raffleId).get();
+    if (!raffleSnap.exists) {
       return NextResponse.json({ error: 'Sorteo no encontrado' }, { status: 404 });
     }
 
-    const raffleData = raffleSnap.data();
+    const raffleData = raffleSnap.data()!;
     const status = raffleData.status;
     const soldTickets = raffleData.soldTickets || 0;
     const totalTickets = raffleData.totalTickets || 0;
+    const shopId = raffleData.shopId || '';
+    const productId = raffleData.productId || '';
 
     if (status !== 'active') {
       return NextResponse.json(
@@ -45,7 +55,23 @@ export async function POST(
       );
     }
 
-    const tickets = await ticketAssignmentService.getTicketsForRaffle(raffleId);
+    const ticketsSnap = await db
+      .collection('tickets')
+      .where('raffleId', '==', raffleId)
+      .where('status', '==', 'active')
+      .get();
+
+    const tickets: TicketDoc[] = ticketsSnap.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        raffleId: data.raffleId,
+        userId: data.userId,
+        ticketNumber: data.ticketNumber,
+        status: data.status || 'active',
+      };
+    });
+
     if (!tickets.length) {
       return NextResponse.json(
         { error: 'No hay tickets vendidos para este sorteo' },
@@ -56,10 +82,10 @@ export async function POST(
     const randomIndex = Math.floor(Math.random() * tickets.length);
     const winningTicket = tickets[randomIndex];
 
-    const userRef = doc(db, 'users', winningTicket.userId);
-    const userSnap = await getDoc(userRef);
-    const userName = userSnap.exists() ? (userSnap.data()?.name ?? userSnap.data()?.email ?? 'Ganador') : 'Ganador';
-    const userEmail = userSnap.exists() ? (userSnap.data()?.email ?? '') : '';
+    const userSnap = await db.collection('users').doc(winningTicket.userId).get();
+    const userData = userSnap.exists ? userSnap.data() : null;
+    const userName = userData?.name ?? userData?.email ?? 'Ganador';
+    const userEmail = userData?.email ?? '';
 
     const verificationCode = winnerVerificationService.generateVerificationCode();
 
@@ -74,21 +100,46 @@ export async function POST(
       deliveryStatus: 'pending' as const,
     };
 
-    await firebaseRaffleWriteService.executeRaffle(raffleId, {
+    await db.collection('raffles').doc(raffleId).update({
       winnerTicketId: winningTicket.id,
       winnerInfo,
+      status: RaffleStatus.FINISHED,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      raffleExecutedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    await ticketAssignmentService.markTicketAsWinner(winningTicket.id);
+    await db.collection('tickets').doc(winningTicket.id).update({
+      status: 'winner',
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
-    const raffle = await raffleService.getRaffleById(raffleId);
-    const productName = raffle.product?.name || 'Premio';
-    const productDescription = raffle.product?.description || '';
-    const productValue = raffle.productValue ?? 0;
-    const shopName = raffle.shop?.name || 'Organizador';
-    const shopEmail = raffle.shop?.publicEmail || '';
-    const shopPhone = raffle.shop?.phone || '';
-    const shopSocialMedia = raffle.shop?.socialMedia;
+    let productName = 'Premio';
+    let productDescription = '';
+    let productValue = raffleData.productValue ?? 0;
+    let shopName = 'Organizador';
+    let shopEmail = '';
+
+    if (productId) {
+      const productSnap = await db.collection('products').doc(productId).get();
+      if (productSnap.exists) {
+        const p = productSnap.data()!;
+        productName = p.name || productName;
+        productDescription = p.description || '';
+        productValue = p.value ?? productValue;
+      }
+    }
+    let shopPhone = '';
+    let shopSocialMedia: unknown = undefined;
+    if (shopId) {
+      const shopSnap = await db.collection('shops').doc(shopId).get();
+      if (shopSnap.exists) {
+        const s = shopSnap.data()!;
+        shopName = s.name || shopName;
+        shopEmail = s.publicEmail ?? shopEmail;
+        shopPhone = s.phone ?? '';
+        shopSocialMedia = s.socialMedia;
+      }
+    }
 
     if (userEmail) {
       try {
@@ -117,7 +168,7 @@ export async function POST(
       }
     }
 
-    const organizerEmail = shopEmail || raffle.shop?.publicEmail;
+    const organizerEmail = shopEmail;
     if (organizerEmail) {
       try {
         const amountOrganizer = productValue * soldTickets;
@@ -146,11 +197,9 @@ export async function POST(
       winnerTicketId: winningTicket.id,
       winnerTicketNumber: winningTicket.ticketNumber,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al ejecutar la oportunidad';
     console.error('Error executing raffle:', error);
-    return NextResponse.json(
-      { error: error.message || 'Error al ejecutar la oportunidad' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
