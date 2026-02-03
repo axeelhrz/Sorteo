@@ -7,7 +7,7 @@ import { getAdminFirestore } from '@/lib/firebase-admin';
  * Usa Firebase Admin para leer el sorteo y luego llama a send-winner-notification.
  */
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
