@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FiCheck, FiX, FiAlertCircle, FiCopy } from 'react-icons/fi';
+import { FiCheck, FiX, FiAlertCircle, FiCopy, FiMail } from 'react-icons/fi';
 import { winnerVerificationService } from '@/services/winner-verification-service';
 import { WinnerInfo } from '@/types/raffle';
 import styles from './winner-validation.module.css';
@@ -14,6 +14,8 @@ interface WinnerValidationProps {
 export function WinnerValidation({ raffleId, onValidationSuccess }: WinnerValidationProps) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [validationResult, setValidationResult] = useState<{
     valid: boolean;
     message: string;
@@ -80,6 +82,25 @@ export function WinnerValidation({ raffleId, onValidationSuccess }: WinnerValida
     setCode(formatted);
   };
 
+  const handleResendEmail = async () => {
+    setResendMessage(null);
+    setResendLoading(true);
+    try {
+      const baseUrl = typeof window !== 'undefined' ? '' : process.env.NEXT_PUBLIC_APP_URL || '';
+      const res = await fetch(`${baseUrl}/api/raffles/${raffleId}/resend-winner-email`, { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setResendMessage({ type: 'success', text: 'Correo reenviado al ganador correctamente.' });
+      } else {
+        setResendMessage({ type: 'error', text: data.error || 'Error al reenviar el correo' });
+      }
+    } catch (err) {
+      setResendMessage({ type: 'error', text: err instanceof Error ? err.message : 'Error al reenviar el correo' });
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -87,6 +108,30 @@ export function WinnerValidation({ raffleId, onValidationSuccess }: WinnerValida
         <p className={styles.subtitle}>
           El ganador debe proporcionarte el código único que recibió por correo electrónico
         </p>
+        <button
+          type="button"
+          onClick={handleResendEmail}
+          disabled={resendLoading}
+          className={styles.resendButton}
+          title="Reenviar correo al ganador con su código"
+        >
+          {resendLoading ? (
+            <>
+              <span className={styles.spinner} />
+              Reenviando...
+            </>
+          ) : (
+            <>
+              <FiMail />
+              Reenviar correo al ganador
+            </>
+          )}
+        </button>
+        {resendMessage && (
+          <p className={resendMessage.type === 'success' ? styles.resendSuccess : styles.resendError}>
+            {resendMessage.text}
+          </p>
+        )}
       </div>
 
       <form onSubmit={handleValidateCode} className={styles.form}>
