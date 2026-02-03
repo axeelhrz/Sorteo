@@ -8,9 +8,10 @@ import { getAdminAuth, getAdminFirestore } from '@/lib/firebase-admin';
  */
 export async function POST(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
+    const params = await (typeof context.params.then === 'function' ? context.params : Promise.resolve(context.params));
     const raffleId = params.id;
     if (!raffleId) {
       return NextResponse.json({ error: 'ID de sorteo requerido' }, { status: 400 });
@@ -78,18 +79,19 @@ export async function POST(
     }
 
     // 3) Fallback: email con el que se creó la cuenta en Firebase Auth (fuente canónica)
-    if (!winnerEmail && winnerUserId) {
+    if (!winnerEmail && winnerUserId && winnerUserId.trim().length > 0) {
       try {
         const auth = getAdminAuth();
-        const userRecord = await auth.getUser(winnerUserId);
+        const userRecord = await auth.getUser(winnerUserId.trim());
         if (userRecord.email) {
           winnerEmail = userRecord.email;
         }
         if ((!winnerName || winnerName === 'Ganador') && userRecord.displayName) {
           winnerName = userRecord.displayName;
         }
-      } catch (_e) {
-        // Usuario puede no existir en Auth o estar deshabilitado; se mantiene el error más abajo
+      } catch (authErr) {
+        // Usuario puede no existir en Auth, estar deshabilitado o falta permiso Admin Auth
+        console.warn('Resend winner email: no email from Auth for uid', winnerUserId, authErr);
       }
     }
 
@@ -161,8 +163,10 @@ export async function POST(
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
+      const errMsg = (data && typeof data.error === 'string') ? data.error : 'Error al reenviar el correo';
+      console.error('Resend winner email: internal API failed', res.status, errMsg);
       return NextResponse.json(
-        { error: data.error || 'Error al reenviar el correo' },
+        { error: errMsg },
         { status: res.status }
       );
     }
@@ -174,6 +178,9 @@ export async function POST(
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error al reenviar el correo';
     console.error('Error resending winner email:', error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    );
   }
 }
