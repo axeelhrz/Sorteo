@@ -1,10 +1,16 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { UserRole } from '@/types/auth';
-import { FiLogOut, FiPlay, FiTag, FiAward, FiShoppingBag } from 'react-icons/fi';
+import { FiLogOut, FiPlay, FiTag, FiAward, FiShoppingBag, FiTrophy } from 'react-icons/fi';
+import { ticketAssignmentService } from '@/services/ticket-assignment-service';
+import { firebaseUserParticipationService } from '@/services/firebase-user-participation-service';
+import { winnerVerificationService } from '@/services/winner-verification-service';
+import { DeliveryConfirmation } from '@/components/UserPanel/DeliveryConfirmation';
+import type { WinnerInfo } from '@/types/raffle';
 import styles from './UserDashboard.module.css';
 
 interface Raffle {
@@ -31,6 +37,8 @@ interface RaffleTicket {
   purchasedAt?: string;
 }
 
+type TabMyRaffles = 'participados' | 'ganados';
+
 interface Product {
   id: string;
   name: string;
@@ -43,6 +51,10 @@ export default function UserDashboard() {
   const { user, logout } = useAuthStore();
   const [activeRaffles, setActiveRaffles] = useState<Raffle[]>([]);
   const [myTickets, setMyTickets] = useState<RaffleTicket[]>([]);
+  const [participations, setParticipations] = useState<Raffle[]>([]);
+  const [wonRaffles, setWonRaffles] = useState<Raffle[]>([]);
+  const [winnersInfo, setWinnersInfo] = useState<Map<string, WinnerInfo>>(new Map());
+  const [tabMyRaffles, setTabMyRaffles] = useState<TabMyRaffles>('participados');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,11 +64,12 @@ export default function UserDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        // Obtener sorteos activos
+
         const { raffleService } = await import('@/services/raffle-service');
+        const { productService } = await import('@/services/product-service');
+
         const allRaffles = await raffleService.getAllRaffles();
-        const visibleRaffles = allRaffles.filter((r: any) => 
+        const visibleRaffles = allRaffles.filter((r: any) =>
           r.status !== 'draft' && r.status !== 'rejected' && r.status !== 'pending_approval'
         );
         setActiveRaffles(visibleRaffles.map((r: any) => ({
@@ -64,13 +77,47 @@ export default function UserDashboard() {
           createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
         })));
 
-        // Obtener productos
-        const { productService } = await import('@/services/product-service');
         const allProducts = await productService.getAllProducts();
         setProducts(allProducts);
 
-        // Obtener tickets del usuario (por ahora vacío)
-        setMyTickets([]);
+        if (user?.id) {
+          const tickets = await ticketAssignmentService.getAllUserTickets(user.id);
+          setMyTickets(tickets.map((t) => ({
+            id: t.id,
+            raffleId: t.raffleId,
+            number: t.ticketNumber,
+            status: t.status,
+            purchasedAt: t.purchaseDate instanceof Date ? t.purchaseDate.toISOString() : String(t.purchaseDate),
+          })));
+
+          const parts = await firebaseUserParticipationService.getUserParticipations(user.id);
+          setParticipations(parts.map((r) => ({
+            ...r,
+            createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : (r.createdAt as unknown as string),
+          })));
+
+          const won = await firebaseUserParticipationService.getUserWonRaffles(user.id);
+          setWonRaffles(won.map((r) => ({
+            ...r,
+            createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : (r.createdAt as unknown as string),
+          })));
+
+          const winMap = new Map<string, WinnerInfo>();
+          for (const r of won) {
+            try {
+              const info = await winnerVerificationService.getWinnerInfo(r.id);
+              if (info) winMap.set(r.id, info);
+            } catch (_e) {
+              // ignore
+            }
+          }
+          setWinnersInfo(winMap);
+        } else {
+          setMyTickets([]);
+          setParticipations([]);
+          setWonRaffles([]);
+          setWinnersInfo(new Map());
+        }
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Error al cargar los datos');
@@ -80,7 +127,7 @@ export default function UserDashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [user?.id]);
 
   const handleLogout = async () => {
     try {
@@ -226,7 +273,7 @@ export default function UserDashboard() {
               <div>
                 <div className={styles.statLabel}>Sorteos Participados</div>
                 <div className={styles.statValue}>
-                  {new Set(myTickets.map(t => t.raffleId)).size}
+                  {new Set(myTickets.map((t) => t.raffleId)).size}
                 </div>
               </div>
               <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
@@ -239,8 +286,138 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* Raffles Section */}
+        {/* Tabs: Sorteos participados / Sorteos ganados */}
         <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <button
+                type="button"
+                className={tabMyRaffles === 'participados' ? styles.tabActive : styles.tab}
+                onClick={() => setTabMyRaffles('participados')}
+              >
+                <FiTag style={{ marginRight: '6px' }} />
+                Sorteos participados
+              </button>
+              <button
+                type="button"
+                className={tabMyRaffles === 'ganados' ? styles.tabActive : styles.tab}
+                onClick={() => setTabMyRaffles('ganados')}
+              >
+                <FiTrophy style={{ marginRight: '6px' }} />
+                Sorteos ganados
+              </button>
+            </div>
+          </div>
+
+          {tabMyRaffles === 'participados' && (
+            <>
+              {participations.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <FiTag className={styles.emptyIcon} />
+                  <h3>No has participado en sorteos</h3>
+                  <p>Compra tickets en los sorteos disponibles para aparecer aquí.</p>
+                  <Link href="#raffles" className={styles.buyBtn}>Ver sorteos disponibles</Link>
+                </div>
+              ) : (
+                <div className={styles.tableWrapper}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>Sorteo</th>
+                        <th>Tickets</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {participations.map((r) => {
+                        const ticketCount = myTickets.filter((t) => t.raffleId === r.id).length;
+                        const productName = r.product?.name || products.find((p) => p.id === r.productId)?.name || 'Sorteo';
+                        const statusLabels: { [key: string]: string } = {
+                          active: 'Activo',
+                          sold_out: 'Agotado',
+                          finished: 'Finalizado',
+                          cancelled: 'Cancelado',
+                        };
+                        return (
+                          <tr key={r.id}>
+                            <td>{productName}</td>
+                            <td>{ticketCount}</td>
+                            <td>
+                              <span className={styles.ticketBadge} style={{ backgroundColor: getStatusColor(r.status) }}>
+                                {statusLabels[r.status] || r.status}
+                              </span>
+                            </td>
+                            <td>
+                              <Link href={`/sorteos/${r.id}`} className={styles.viewLink}>
+                                Ver sorteo →
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
+
+          {tabMyRaffles === 'ganados' && (
+            <>
+              {wonRaffles.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <FiTrophy className={styles.emptyIcon} />
+                  <h3>No has ganado sorteos aún</h3>
+                  <p>¡Sigue participando! Tus tickets pueden ser los ganadores.</p>
+                  <Link href="#raffles" className={styles.buyBtn}>Ver sorteos disponibles</Link>
+                </div>
+              ) : (
+                <div className={styles.rafflesGrid} style={{ gridTemplateColumns: '1fr' }}>
+                  {wonRaffles.map((r) => {
+                    const productName = r.product?.name || products.find((p) => p.id === r.productId)?.name || 'Premio';
+                    const winnerInfo = winnersInfo.get(r.id);
+                    return (
+                      <div key={r.id} className={styles.raffleCard} style={{ maxWidth: '100%' }}>
+                        <div className={styles.raffleHeader}>
+                          <h3 className={styles.raffleName}>🏆 {productName}</h3>
+                          <span className={styles.statusBadge} style={{ backgroundColor: '#10b981' }}>
+                            Ganado
+                          </span>
+                        </div>
+                        <p className={styles.rafflePrice}>
+                          Ticket ganador: #{winnerInfo?.ticketNumber ?? '-'}
+                        </p>
+                        {winnerInfo && user && (
+                          <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                            <DeliveryConfirmation
+                              raffleId={r.id}
+                              winnerInfo={winnerInfo}
+                              userId={user.id}
+                              onConfirmSuccess={() => {
+                                winnerVerificationService.getWinnerInfo(r.id).then((info) => {
+                                  if (info) {
+                                    setWinnersInfo((prev) => new Map(prev).set(r.id, info));
+                                  }
+                                });
+                              }}
+                            />
+                          </div>
+                        )}
+                        <Link href={`/sorteos/${r.id}/winner`} className={styles.viewLink} style={{ display: 'inline-block', marginTop: '12px' }}>
+                          Ver detalles del premio →
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Raffles Section */}
+        <div id="raffles" className={styles.section}>
           <div className={styles.sectionHeader}>
             <div>
               <h2 className={styles.sectionTitle}>Sorteos Disponibles</h2>

@@ -32,8 +32,8 @@ export const firebaseUserParticipationService = {
    */
   async getUserParticipations(userId: string): Promise<Raffle[]> {
     try {
-      // Obtener todos los tickets del usuario
-      const ticketsRef = collection(db, 'raffle-tickets');
+      // Obtener todos los tickets del usuario (colección 'tickets')
+      const ticketsRef = collection(db, 'tickets');
       const userTicketsQuery = query(ticketsRef, where('userId', '==', userId));
       const ticketsSnapshot = await getDocs(userTicketsQuery);
 
@@ -189,22 +189,21 @@ export const firebaseUserParticipationService = {
   },
 
   /**
-   * Obtiene los sorteos ganados por el usuario
+   * Obtiene los sorteos ganados por el usuario (donde el ticket ganador es del usuario)
    */
   async getUserWonRaffles(userId: string): Promise<Raffle[]> {
     try {
       const participations = await this.getUserParticipations(userId);
-      
-      // Filtrar solo sorteos finalizados donde el usuario ganó
-      return participations.filter((r) => {
-        if (r.status !== RaffleStatus.FINISHED) {
-          return false;
-        }
+      const finished = participations.filter((r) => r.status === RaffleStatus.FINISHED && r.winnerTicketId);
 
-        // Verificar si el usuario tiene el ticket ganador
-        // Esto se verificaría comparando los tickets del usuario con winnerTicketId
-        return r.winnerTicketId !== undefined && r.winnerTicketId !== null;
-      });
+      const won: Raffle[] = [];
+      for (const r of finished) {
+        const ticketDoc = await getDoc(doc(db, 'tickets', r.winnerTicketId!));
+        if (ticketDoc.exists() && ticketDoc.data()?.userId === userId) {
+          won.push(r);
+        }
+      }
+      return won;
     } catch (error) {
       console.error('Error fetching won raffles:', error);
       throw error;
