@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sendWinnerNotificationEmail } from '@/app/api/emails/send-winner-notification/route';
 import { getAdminAuth, getAdminFirestore } from '@/lib/firebase-admin';
 
 /**
@@ -132,44 +133,31 @@ export async function POST(
       }
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/emails/send-winner-notification`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: winnerEmail,
-        name: winnerName,
-        raffleId,
-        raffleTitle: productName,
-        productName,
-        productDescription,
-        productValue,
-        ticketNumber: (winnerInfo.ticketNumber ?? winnerInfo.ticket_number ?? 0) as number,
-        verificationCode: (winnerInfo.verificationCode ?? winnerInfo.verification_code ?? '') as string,
-        shopName,
-        shopEmail,
-        shopPhone,
-        shopSocialMedia,
-        winDate: (() => {
-          const v = raffleData.raffleExecutedAt;
-          if (!v) return new Date().toISOString();
-          if (typeof v === 'object' && v !== null && 'toDate' in v && typeof (v as { toDate: () => Date }).toDate === 'function') {
-            return (v as { toDate: () => Date }).toDate().toISOString();
-          }
-          return new Date(v as string | number).toISOString();
-        })(),
-      }),
-    });
+    const winDate = (() => {
+      const v = raffleData.raffleExecutedAt;
+      if (!v) return new Date().toISOString();
+      if (typeof v === 'object' && v !== null && 'toDate' in v && typeof (v as { toDate: () => Date }).toDate === 'function') {
+        return (v as { toDate: () => Date }).toDate().toISOString();
+      }
+      return new Date(v as string | number).toISOString();
+    })();
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      const errMsg = (data && typeof data.error === 'string') ? data.error : 'Error al reenviar el correo';
-      console.error('Resend winner email: internal API failed', res.status, errMsg);
-      return NextResponse.json(
-        { error: errMsg },
-        { status: res.status }
-      );
-    }
+    await sendWinnerNotificationEmail({
+      email: winnerEmail,
+      name: winnerName,
+      raffleId,
+      raffleTitle: productName,
+      productName,
+      productDescription,
+      productValue: Number(productValue) || 0,
+      ticketNumber: (winnerInfo.ticketNumber ?? winnerInfo.ticket_number ?? 0) as number,
+      verificationCode: (winnerInfo.verificationCode ?? winnerInfo.verification_code ?? '') as string,
+      shopName,
+      shopEmail,
+      shopPhone,
+      shopSocialMedia,
+      winDate,
+    });
 
     return NextResponse.json({
       success: true,
