@@ -54,3 +54,7 @@ export function getAdminStorage() {
 export function getAdminFirestore() {
   return getFirebaseAdmin().firestore();
 }
+
+export function getAdminAuth() {
+  return getFirebaseAdmin().auth();
+}

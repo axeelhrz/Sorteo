@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminFirestore } from '@/lib/firebase-admin';
+import { getAdminAuth, getAdminFirestore } from '@/lib/firebase-admin';
 
 /**
  * POST /api/raffles/[id]/resend-winner-email
@@ -74,6 +74,22 @@ export async function POST(
             if (typeof nameVal === 'string' && nameVal) winnerName = nameVal;
           }
         }
+      }
+    }
+
+    // 3) Fallback: email con el que se creó la cuenta en Firebase Auth (fuente canónica)
+    if (!winnerEmail && winnerUserId) {
+      try {
+        const auth = getAdminAuth();
+        const userRecord = await auth.getUser(winnerUserId);
+        if (userRecord.email) {
+          winnerEmail = userRecord.email;
+        }
+        if ((!winnerName || winnerName === 'Ganador') && userRecord.displayName) {
+          winnerName = userRecord.displayName;
+        }
+      } catch (_e) {
+        // Usuario puede no existir en Auth o estar deshabilitado; se mantiene el error más abajo
       }
     }
 
