@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { FiSearch, FiPlay, FiTrash2, FiTrendingUp } from 'react-icons/fi';
+import { FiSearch, FiPlay, FiTrash2, FiTrendingUp, FiCheckCircle } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
 import styles from '@/views/admin/admin.module.css';
 
@@ -25,6 +25,7 @@ export default function ActiveRaffles() {
   const [shopFilter, setShopFilter] = useState('');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showExecuteModal, setShowExecuteModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [selectedRaffleId, setSelectedRaffleId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
@@ -83,9 +84,9 @@ export default function ActiveRaffles() {
     try {
       setActionLoading(true);
       await adminService.executeRaffle(selectedRaffleId);
-      alert('Sorteo ejecutado exitosamente');
       setShowExecuteModal(false);
       setSelectedRaffleId(null);
+      setShowSuccessModal(true);
       fetchRaffles();
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'Error al ejecutar sorteo');
@@ -326,6 +327,29 @@ export default function ActiveRaffles() {
                 disabled={actionLoading}
               >
                 {actionLoading ? 'Ejecutando...' : 'Confirmar ejecución'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal - Sorteo ejecutado */}
+      {showSuccessModal && (
+        <div className={`${styles.modal} ${styles.open}`}>
+          <div className={styles.modalContent} style={{ borderRadius: 16, maxWidth: 380, textAlign: 'center' }}>
+            <div className={styles.modalBody} style={{ padding: '32px 24px 24px' }}>
+              <FiCheckCircle style={{ fontSize: 56, color: '#059669', marginBottom: 16 }} />
+              <h2 style={{ margin: '0 0 8px 0', fontSize: 20, color: '#0f172a' }}>Listo</h2>
+              <p style={{ margin: 0, color: '#64748b', fontSize: 15 }}>
+                Sorteo ejecutado exitosamente.
+              </p>
+            </div>
+            <div className={styles.modalFooter} style={{ justifyContent: 'center' }}>
+              <button
+                className={`${styles.btn} ${styles.btnSuccess}`}
+                onClick={() => setShowSuccessModal(false)}
+              >
+                Aceptar
               </button>
             </div>
           </div>

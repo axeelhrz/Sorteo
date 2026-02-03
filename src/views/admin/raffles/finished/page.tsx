@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { FiCheck, FiCircle, FiUpload } from 'react-icons/fi';
+import { FiCheck, FiCircle, FiUpload, FiX, FiExternalLink } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
-import { uploadService } from '@/services/upload-service';
 import styles from '@/views/admin/admin.module.css';
 
 interface WinnerInfo {
@@ -92,14 +91,13 @@ export default function FinishedRaffles() {
     setPaymentError(null);
     setPaymentUploading(true);
     try {
-      const url = await uploadService.uploadImage(paymentFile, 'payment-evidence');
-      await adminService.registerPaymentToOrganizer(selectedRaffle.id, url);
+      const paymentEvidenceUrl = await adminService.registerPaymentToOrganizer(selectedRaffle.id, paymentFile);
       await fetchRaffles();
-      const updated = { ...selectedRaffle, paymentToOrganizerAt: new Date(), paymentEvidenceUrl: url };
+      const updated = { ...selectedRaffle, paymentToOrganizerAt: new Date(), paymentEvidenceUrl };
       setSelectedRaffle(updated);
       setPaymentFile(null);
-    } catch (err: any) {
-      setPaymentError(err.message || 'Error al registrar el pago');
+    } catch (err: unknown) {
+      setPaymentError(err instanceof Error ? err.message : 'Error al registrar el pago');
     } finally {
       setPaymentUploading(false);
     }
@@ -221,87 +219,119 @@ export default function FinishedRaffles() {
         </div>
       )}
 
-      {/* Detail Modal */}
+      {/* Detail Modal - Detalles del Sorteo Finalizado */}
       {showDetail && selectedRaffle && (
-        <div className={`${styles.modal} ${showDetail ? styles.open : ''}`}>
-          <div className={styles.modalContent} style={{ maxWidth: '560px' }}>
-            <div className={styles.modalHeader}>
+        <div className={`${styles.modal} ${styles.open}`}>
+          <div className={styles.detailModalContent}>
+            <div className={styles.detailModalHeader}>
               <h2>Detalles del Sorteo Finalizado</h2>
             </div>
 
-            <div className={styles.modalBody}>
-              <div className={styles.formGroup}>
-                <label>ID Oportunidad</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50', fontFamily: 'monospace' }}>{selectedRaffle.id}</p>
-              </div>
-              <div className={styles.formGroup}>
-                <label>Organizador</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedRaffle.shop.name}</p>
-              </div>
-              <div className={styles.formGroup}>
-                <label>Producto</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>{selectedRaffle.product.name}</p>
-              </div>
-              <div className={styles.formGroup}>
-                <label>Valor de Ticket</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>S/. {selectedRaffle.productValue.toFixed(2)}</p>
-              </div>
-              <div className={styles.formGroup}>
-                <label>Tickets Vendidos</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>
-                  {selectedRaffle.soldTickets} / {selectedRaffle.totalTickets}
-                </p>
-              </div>
-              <div className={styles.formGroup}>
-                <label>Ganador</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>
-                  {getWinnerInfo(selectedRaffle)}
-                  {selectedRaffle.winnerInfo?.userName && ` (${selectedRaffle.winnerInfo.userName})`}
-                </p>
-              </div>
-              <div className={styles.formGroup}>
-                <label>Fecha de Finalización</label>
-                <p style={{ margin: '5px 0', color: '#2c3e50' }}>
-                  {new Date(selectedRaffle.raffleExecutedAt).toLocaleString()}
-                </p>
+            <div className={styles.detailModalBody}>
+              <div className={styles.detailGrid}>
+                <div className={styles.detailGridItem}>
+                  <label>ID Oportunidad</label>
+                  <p className={styles.valueMono}>{selectedRaffle.id}</p>
+                </div>
+                <div className={styles.detailGridItem}>
+                  <label>Organizador</label>
+                  <p className={styles.value}>{selectedRaffle.shop.name}</p>
+                </div>
+                <div className={styles.detailGridItem}>
+                  <label>Producto</label>
+                  <p className={styles.value}>{selectedRaffle.product.name}</p>
+                </div>
+                <div className={styles.detailGridItem}>
+                  <label>Valor de Ticket</label>
+                  <p className={styles.value}>S/. {selectedRaffle.productValue.toFixed(2)}</p>
+                </div>
+                <div className={styles.detailGridItem}>
+                  <label>Tickets Vendidos</label>
+                  <p className={styles.value}>
+                    {selectedRaffle.soldTickets} / {selectedRaffle.totalTickets}
+                  </p>
+                </div>
+                <div className={styles.detailGridItem}>
+                  <label>Ganador</label>
+                  <p className={styles.value}>
+                    {getWinnerInfo(selectedRaffle)}
+                    {selectedRaffle.winnerInfo?.userName && ` (${selectedRaffle.winnerInfo.userName})`}
+                  </p>
+                </div>
+                <div className={styles.detailGridItem} style={{ gridColumn: '1 / -1' }}>
+                  <label>Fecha de Finalización</label>
+                  <p className={styles.value}>
+                    {new Date(selectedRaffle.raffleExecutedAt).toLocaleString()}
+                  </p>
+                </div>
               </div>
 
-              {/* Ciclo de vida */}
-              <div className={styles.formGroup} style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e8ecf1' }}>
-                <label style={{ marginBottom: '10px', display: 'block' }}>Ciclo de vida</label>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '14px' }}>
-                    {selectedRaffle.winnerInfo?.claimedAt ? <FiCheck style={{ color: '#10b981', flexShrink: 0 }} /> : <FiCircle style={{ color: '#94a3b8', flexShrink: 0 }} />}
-                    <span>Código único de ganador registrado: {formatDate(selectedRaffle.winnerInfo?.claimedAt)}</span>
+              {/* Ciclo de vida - Timeline */}
+              <section className={styles.lifecycleSection}>
+                <h3 className={styles.lifecycleSectionTitle}>Ciclo de vida</h3>
+                <ul className={styles.lifecycleTimeline}>
+                  <li className={styles.lifecycleStep}>
+                    <span className={`${styles.lifecycleStepIcon} ${selectedRaffle.winnerInfo?.claimedAt ? styles.done : styles.pending}`}>
+                      {selectedRaffle.winnerInfo?.claimedAt ? <FiCheck size={12} /> : <FiCircle size={12} />}
+                    </span>
+                    <div className={styles.lifecycleStepText}>
+                      Código único de ganador registrado
+                      <div className={styles.lifecycleStepDate}>{formatDate(selectedRaffle.winnerInfo?.claimedAt)}</div>
+                    </div>
                   </li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '14px' }}>
-                    {selectedRaffle.winnerInfo?.deliveryEvidence?.photoUrl ? <FiCheck style={{ color: '#10b981', flexShrink: 0 }} /> : <FiCircle style={{ color: '#94a3b8', flexShrink: 0 }} />}
-                    <span>Organizador entregó producto (evidencia): {selectedRaffle.winnerInfo?.deliveryEvidence?.uploadedAt ? formatDate(selectedRaffle.winnerInfo.deliveryEvidence.uploadedAt) : '—'}</span>
+                  <li className={styles.lifecycleStep}>
+                    <span className={`${styles.lifecycleStepIcon} ${selectedRaffle.winnerInfo?.deliveryEvidence?.photoUrl ? styles.done : styles.pending}`}>
+                      {selectedRaffle.winnerInfo?.deliveryEvidence?.photoUrl ? <FiCheck size={12} /> : <FiCircle size={12} />}
+                    </span>
+                    <div className={styles.lifecycleStepText}>
+                      Organizador entregó producto (evidencia)
+                      <div className={styles.lifecycleStepDate}>
+                        {selectedRaffle.winnerInfo?.deliveryEvidence?.uploadedAt
+                          ? formatDate(selectedRaffle.winnerInfo.deliveryEvidence.uploadedAt)
+                          : '—'}
+                      </div>
+                    </div>
                   </li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '14px' }}>
-                    {selectedRaffle.winnerInfo?.deliveryConfirmedAt ? <FiCheck style={{ color: '#10b981', flexShrink: 0 }} /> : <FiCircle style={{ color: '#94a3b8', flexShrink: 0 }} />}
-                    <span>Ganador confirmó recepción: {formatDate(selectedRaffle.winnerInfo?.deliveryConfirmedAt)}</span>
+                  <li className={styles.lifecycleStep}>
+                    <span className={`${styles.lifecycleStepIcon} ${selectedRaffle.winnerInfo?.deliveryConfirmedAt ? styles.done : styles.pending}`}>
+                      {selectedRaffle.winnerInfo?.deliveryConfirmedAt ? <FiCheck size={12} /> : <FiCircle size={12} />}
+                    </span>
+                    <div className={styles.lifecycleStepText}>
+                      Ganador confirmó recepción
+                      <div className={styles.lifecycleStepDate}>{formatDate(selectedRaffle.winnerInfo?.deliveryConfirmedAt)}</div>
+                    </div>
                   </li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-                    {selectedRaffle.paymentToOrganizerAt ? <FiCheck style={{ color: '#10b981', flexShrink: 0 }} /> : <FiCircle style={{ color: '#94a3b8', flexShrink: 0 }} />}
-                    <span>Pago al organizador: {formatDate(selectedRaffle.paymentToOrganizerAt)}</span>
+                  <li className={styles.lifecycleStep}>
+                    <span className={`${styles.lifecycleStepIcon} ${selectedRaffle.paymentToOrganizerAt ? styles.done : styles.pending}`}>
+                      {selectedRaffle.paymentToOrganizerAt ? <FiCheck size={12} /> : <FiCircle size={12} />}
+                    </span>
+                    <div className={styles.lifecycleStepText}>
+                      Pago al organizador
+                      <div className={styles.lifecycleStepDate}>{formatDate(selectedRaffle.paymentToOrganizerAt)}</div>
+                      {selectedRaffle.paymentEvidenceUrl && (
+                        <a
+                          href={selectedRaffle.paymentEvidenceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.evidenceLink}
+                        >
+                          <FiExternalLink size={14} />
+                          Ver evidencia de pago
+                        </a>
+                      )}
+                    </div>
                   </li>
                 </ul>
-                {selectedRaffle.paymentEvidenceUrl && (
-                  <p style={{ marginTop: '8px', fontSize: '13px' }}>
-                    <a href={selectedRaffle.paymentEvidenceUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1' }}>Ver evidencia de pago</a>
-                  </p>
-                )}
-              </div>
+              </section>
 
               {/* Registrar pago al organizador */}
               {!selectedRaffle.paymentToOrganizerAt && (
-                <div className={styles.formGroup} style={{ marginTop: '16px', padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <label style={{ marginBottom: '8px', display: 'block' }}>Registrar pago al organizador</label>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 12px 0' }}>
+                <div className={styles.uploadSection}>
+                  <p className={styles.uploadSectionTitle}>Registrar pago al organizador</p>
+                  <p className={styles.uploadSectionDesc}>
                     Sube la evidencia del pago realizado al organizador. Se enviará un correo al organizador y se actualizará el registro.
                   </p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px' }}>
+                  <div className={styles.uploadZone}>
                     <input
                       type="file"
                       accept="image/*"
@@ -310,40 +340,45 @@ export default function FinishedRaffles() {
                         setPaymentFile(f || null);
                         setPaymentError(null);
                       }}
-                      style={{ fontSize: '13px' }}
                     />
                     {paymentFile && (
-                      <span style={{ fontSize: '13px', color: '#475569' }}>{paymentFile.name}</span>
+                      <span className={styles.uploadFileChip}>
+                        {paymentFile.name}
+                        <button
+                          type="button"
+                          onClick={() => { setPaymentFile(null); setPaymentError(null); }}
+                          aria-label="Quitar archivo"
+                        >
+                          <FiX size={14} />
+                        </button>
+                      </span>
                     )}
-                    <button
-                      type="button"
-                      className={`${styles.btn} ${styles.btnPrimary}`}
-                      disabled={paymentUploading || !paymentFile}
-                      onClick={handleRegisterPayment}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                    >
-                      {paymentUploading ? (
-                        'Subiendo...'
-                      ) : (
-                        <>
-                          <FiUpload size={14} />
-                          Registrar pago
-                        </>
-                      )}
-                    </button>
                   </div>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.btnPrimary}`}
+                    disabled={paymentUploading || !paymentFile}
+                    onClick={handleRegisterPayment}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                  >
+                    {paymentUploading ? (
+                      'Subiendo...'
+                    ) : (
+                      <>
+                        <FiUpload size={16} />
+                        Registrar pago
+                      </>
+                    )}
+                  </button>
                   {paymentError && (
-                    <p style={{ marginTop: '8px', fontSize: '13px', color: '#dc2626' }}>{paymentError}</p>
+                    <p style={{ marginTop: 12, fontSize: 13, color: '#dc2626', fontWeight: 500 }}>{paymentError}</p>
                   )}
                 </div>
               )}
             </div>
 
-            <div className={styles.modalFooter}>
-              <button
-                className={`${styles.btn} ${styles.btnSecondary}`}
-                onClick={closeDetail}
-              >
+            <div className={styles.detailModalFooter}>
+              <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={closeDetail}>
                 Cerrar
               </button>
             </div>

@@ -279,20 +279,23 @@ export const adminService = {
   },
 
   /**
-   * Registra el pago al organizador (admin): sube evidencia y envía email al organizador
+   * Registra el pago al organizador (admin): sube el archivo de evidencia por API (Firebase Admin Storage) y envía email al organizador.
+   * Devuelve la URL de la evidencia.
    */
-  async registerPaymentToOrganizer(raffleId: string, paymentEvidenceUrl: string): Promise<void> {
+  async registerPaymentToOrganizer(raffleId: string, evidenceFile: File): Promise<string> {
     try {
       const baseUrl = typeof window !== 'undefined' ? '' : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const formData = new FormData();
+      formData.append('evidence', evidenceFile);
       const response = await fetch(`${baseUrl}/api/admin/raffles/${raffleId}/register-payment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentEvidenceUrl }),
+        body: formData,
       });
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
         throw new Error(data.error || 'Error al registrar el pago al organizador');
       }
+      return data.paymentEvidenceUrl || '';
     } catch (error) {
       console.error('Error registering payment to organizer:', error);
       throw error;
