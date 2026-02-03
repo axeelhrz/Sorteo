@@ -300,12 +300,9 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
                   <p><strong>Notas:</strong> {winnerInfo.deliveryEvidence.notes}</p>
                 )}
                 <p style={{ fontSize: '14px', color: '#7f8c8d' }}>
-                  Subido el {new Date(winnerInfo.deliveryEvidence.uploadedAt).toLocaleDateString('es-PE', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
+                  Subido el {new Date(winnerInfo.deliveryEvidence.uploadedAt).toLocaleString('es-PE', {
+                    dateStyle: 'long',
+                    timeStyle: 'short',
                   })}
                 </p>
                 {winnerInfo.deliveryStatus === 'delivered' && winnerInfo.deliveryDeadline && (

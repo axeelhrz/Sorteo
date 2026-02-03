@@ -294,12 +294,9 @@ export default function WinnerPage() {
                 <div className={styles.executionInfo}>
                   <p className={styles.executionLabel}>Fecha de ejecución</p>
                   <p className={styles.executionDate}>
-                    {new Date(raffle.raffleExecutedAt).toLocaleDateString('es-PE', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
+                    {new Date(raffle.raffleExecutedAt).toLocaleString('es-PE', {
+                      dateStyle: 'long',
+                      timeStyle: 'short',
                     })}
                   </p>
                 </div>

@@ -238,12 +238,9 @@ export function WinnerValidation({ raffleId, onValidationSuccess }: WinnerValida
                     <div className={styles.infoItem}>
                       <span className={styles.infoLabel}>Notificado:</span>
                       <span className={styles.infoValue}>
-                        {new Date(validationResult.winnerInfo.notifiedAt).toLocaleDateString('es-PE', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
+                        {new Date(validationResult.winnerInfo.notifiedAt).toLocaleString('es-PE', {
+                          dateStyle: 'long',
+                          timeStyle: 'short',
                         })}
                       </span>
                     </div>
@@ -253,12 +250,9 @@ export function WinnerValidation({ raffleId, onValidationSuccess }: WinnerValida
                     <div className={styles.infoItem}>
                       <span className={styles.infoLabel}>Validado:</span>
                       <span className={styles.infoValue}>
-                        {new Date(validationResult.winnerInfo.claimedAt).toLocaleDateString('es-PE', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
+                        {new Date(validationResult.winnerInfo.claimedAt).toLocaleString('es-PE', {
+                          dateStyle: 'long',
+                          timeStyle: 'short',
                         })}
                       </span>
                     </div>

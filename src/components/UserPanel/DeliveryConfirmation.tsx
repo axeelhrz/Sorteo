@@ -240,12 +240,9 @@ export function DeliveryConfirmation({
         <div className={styles.evidenceInfo}>
           <p>
             <strong>Subido el:</strong>{' '}
-            {new Date(winnerInfo.deliveryEvidence.uploadedAt).toLocaleDateString('es-PE', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
+            {new Date(winnerInfo.deliveryEvidence.uploadedAt).toLocaleString('es-PE', {
+              dateStyle: 'long',
+              timeStyle: 'short',
             })}
           </p>
         </div>

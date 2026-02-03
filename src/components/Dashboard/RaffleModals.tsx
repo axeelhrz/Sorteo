@@ -198,7 +198,7 @@ export default function RaffleModals({
                       </div>
                       {viewModal.raffle.winnerInfo.claimedAt && (
                         <p style={{ margin: 0, fontSize: '13px', color: '#047857' }}>
-                          Validado el {new Date(viewModal.raffle.winnerInfo.claimedAt).toLocaleDateString('es-PE', { dateStyle: 'long', timeStyle: 'short' })}
+                          Validado el {new Date(viewModal.raffle.winnerInfo.claimedAt).toLocaleString('es-PE', { dateStyle: 'long', timeStyle: 'short' })}
                         </p>
                       )}
                     </div>
