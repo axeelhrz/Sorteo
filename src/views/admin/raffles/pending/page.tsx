@@ -87,13 +87,20 @@ export default function PendingRafflesPage() {
   const openApproveModal = (raffle: Raffle) => {
     const productValue = Number(raffle.product?.value ?? raffle.productValue ?? 0);
     const deliveryCost = Number(raffle.product?.deliveryCost ?? 0);
+    // Valores ingresados por el organizador: mostrarlos inicialmente (admin puede modificarlos)
+    const organizerCostPerTicket = Number(raffle.productValue ?? raffle.product?.value ?? 0);
+    const organizerTotalTickets = Number(raffle.totalTickets ?? 0);
+    const totalBase = productValue + deliveryCost || 1;
+    const derivedRatio = organizerTotalTickets > 0 && organizerCostPerTicket > 0
+      ? (organizerTotalTickets * organizerCostPerTicket) / totalBase
+      : 2;
     const defaultCost = defaultCostPerTicket(productValue);
     const defaultTickets = defaultNumberOfTickets(productValue, deliveryCost, 2, defaultCost);
 
     setSelectedRaffle(raffle);
-    setCostPerTicket(defaultCost);
-    setRatio(2);
-    setNumberOfTickets(defaultTickets);
+    setCostPerTicket(organizerCostPerTicket > 0 ? organizerCostPerTicket : defaultCost);
+    setRatio(derivedRatio > 0 ? Math.round(derivedRatio * 100) / 100 : 2);
+    setNumberOfTickets(organizerTotalTickets > 0 ? organizerTotalTickets : defaultTickets);
     setShowApproveModal(true);
   };
 
@@ -185,34 +192,36 @@ export default function PendingRafflesPage() {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      backgroundColor: 'rgba(15, 23, 42, 0.5)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      backdropFilter: 'blur(4px)',
+      backdropFilter: 'blur(6px)',
     },
     box: {
       backgroundColor: 'white',
-      borderRadius: '12px',
-      padding: '32px',
-      maxWidth: '560px',
-      width: '90%',
+      borderRadius: '16px',
+      padding: 0,
+      maxWidth: '520px',
+      width: '92%',
       maxHeight: '90vh',
       overflowY: 'auto' as const,
-      boxShadow: '0 20px 25px rgba(0, 0, 0, 0.15)',
+      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
     },
     input: {
       width: '100%',
-      padding: '10px 12px',
-      border: '1px solid #e8ecf1',
-      borderRadius: '8px',
-      fontSize: '14px',
+      padding: '12px 14px',
+      border: '2px solid #e2e8f0',
+      borderRadius: '10px',
+      fontSize: '15px',
       boxSizing: 'border-box' as const,
+      marginTop: '6px',
+      transition: 'border-color 0.2s',
     },
-    label: { display: 'block', marginBottom: '6px', fontWeight: 600, color: '#374151', fontSize: '14px' },
-    sectionTitle: { margin: '0 0 12px 0', color: '#0f172a', fontSize: '16px', fontWeight: 700 },
-    row: { marginBottom: '14px' },
+    label: { display: 'block', fontWeight: 600, color: '#64748b', fontSize: '11px', textTransform: 'uppercase' as const, letterSpacing: '0.5px' },
+    sectionTitle: { margin: 0, color: '#0f172a', fontSize: '15px', fontWeight: 700 },
+    row: { marginBottom: '18px' },
   };
 
   return (
@@ -348,96 +357,118 @@ export default function PendingRafflesPage() {
       {showApproveModal && selectedRaffle && (
         <div style={modalStyles.overlay} onClick={() => setShowApproveModal(false)}>
           <div style={modalStyles.box} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 20px 0', color: '#0f172a', fontSize: '20px', fontWeight: '700' }}>
-              Aprobar oportunidad
-            </h3>
+            {/* Header */}
+            <div style={{ padding: '24px 24px 16px', borderBottom: '1px solid #f1f5f9' }}>
+              <h3 style={{ margin: 0, color: '#0f172a', fontSize: '20px', fontWeight: 700 }}>
+                Aprobar oportunidad
+              </h3>
+              <p style={{ margin: '6px 0 0 0', fontSize: '12px', color: '#64748b', fontFamily: 'monospace' }}>
+                ID: {selectedRaffle.id}
+              </p>
+            </div>
 
-            <p style={{ ...modalStyles.label, marginBottom: '8px' }}>ID de oportunidad (creado por el sistema)</p>
-            <p style={{ margin: '0 0 20px 0', fontFamily: 'monospace', fontSize: '13px', color: '#475569' }}>
-              {selectedRaffle.id}
-            </p>
-
-            <p style={modalStyles.sectionTitle}>Datos de oportunidad (ingresados por organizador)</p>
-            <div style={{ backgroundColor: '#f8fafc', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
-              <div style={modalStyles.row}>
-                <strong>Producto:</strong> {selectedRaffle.product?.name || 'N/A'}
-              </div>
-              {selectedRaffle.product?.description && (
+            {/* Datos ingresados por el organizador */}
+            <div style={{ padding: '20px 24px' }}>
+              <p style={{ ...modalStyles.sectionTitle, marginBottom: '12px' }}>Datos del organizador</p>
+              <div style={{ backgroundColor: '#f8fafc', borderRadius: '12px', padding: '16px', border: '1px solid #e2e8f0' }}>
                 <div style={modalStyles.row}>
-                  <strong>Descripción:</strong> {selectedRaffle.product.description}
+                  <span style={modalStyles.label}>Producto</span>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: 600, color: '#0f172a' }}>
+                    {selectedRaffle.product?.name || 'N/A'}
+                  </p>
                 </div>
-              )}
-              <div style={modalStyles.row}>
-                <strong>Valor del producto:</strong> S/. {Number(selectedRaffle.product?.value ?? 0).toFixed(2)}
-              </div>
-              <div style={modalStyles.row}>
-                <strong>Entrega:</strong>{' '}
-                {selectedRaffle.product?.hasDelivery
-                  ? `Delivery - Zonas: ${selectedRaffle.product.deliveryZones || 'N/A'} | Costo delivery: S/. ${Number(selectedRaffle.product.deliveryCost ?? 0).toFixed(2)}`
-                  : `Recojo en local - ${selectedRaffle.product?.pickupAddress || 'N/A'}, ${selectedRaffle.product?.pickupDistrict || ''}`}
-              </div>
-              {selectedRaffle.specialConditions && (
+                {selectedRaffle.product?.description && (
+                  <div style={modalStyles.row}>
+                    <span style={modalStyles.label}>Descripción</span>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#475569', lineHeight: 1.4 }}>
+                      {selectedRaffle.product.description}
+                    </p>
+                  </div>
+                )}
                 <div style={modalStyles.row}>
-                  <strong>Condiciones especiales:</strong> {selectedRaffle.specialConditions}
+                  <span style={modalStyles.label}>Valor producto / Ticket (organizador)</span>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: 600, color: '#059669' }}>
+                    S/. {Number(selectedRaffle.product?.value ?? selectedRaffle.productValue ?? 0).toFixed(2)}
+                  </p>
                 </div>
-              )}
+                <div style={modalStyles.row}>
+                  <span style={modalStyles.label}>Entrega</span>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#475569' }}>
+                    {selectedRaffle.product?.hasDelivery
+                      ? `Delivery — Zonas: ${selectedRaffle.product.deliveryZones || 'N/A'} · Costo: S/. ${Number(selectedRaffle.product.deliveryCost ?? 0).toFixed(2)}`
+                      : `Recojo: ${selectedRaffle.product?.pickupAddress || 'N/A'}, ${selectedRaffle.product?.pickupDistrict || ''}`}
+                  </p>
+                </div>
+                {selectedRaffle.specialConditions && (
+                  <div style={modalStyles.row}>
+                    <span style={modalStyles.label}>Condiciones especiales</span>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>{selectedRaffle.specialConditions}</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <p style={modalStyles.sectionTitle}>Definir aprobación (puedes variar)</p>
-            <div style={modalStyles.row}>
-              <label style={modalStyles.label}>Costo de tickets (S/.)</label>
-              <input
-                type="number"
-                min="0.01"
-                step="0.01"
-                value={costPerTicket}
-                onChange={(e) => setCostPerTicket(parseFloat(e.target.value) || 0)}
-                style={modalStyles.input}
-              />
-              <small style={{ color: '#64748b', fontSize: '12px' }}>
-                Por defecto: 0-50 → S/1, 50.01-100 → S/2, 100.1+ → S/5
-              </small>
-            </div>
-            <div style={modalStyles.row}>
-              <label style={modalStyles.label}>Ratio de tickets</label>
-              <input
-                type="number"
-                min="0.1"
-                step="0.1"
-                value={ratio}
-                onChange={(e) => setRatio(parseFloat(e.target.value) || 0)}
-                style={modalStyles.input}
-              />
-              <small style={{ color: '#64748b', fontSize: '12px' }}>
-                Por defecto: 2 (doble de la suma valor producto + costo delivery)
-              </small>
-            </div>
-            <div style={modalStyles.row}>
-              <label style={modalStyles.label}>Número de tickets</label>
-              <input
-                type="number"
-                min="1"
-                value={numberOfTickets}
-                onChange={(e) => setNumberOfTickets(parseInt(e.target.value, 10) || 0)}
-                style={modalStyles.input}
-              />
-              <small style={{ color: '#64748b', fontSize: '12px' }}>
-                Por defecto: entero de (valor producto + costo delivery) × ratio / costo por ticket
-              </small>
+            {/* Definir aprobación: valores iniciales = organizador, editables por admin */}
+            <div style={{ padding: '0 24px 24px' }}>
+              <p style={{ ...modalStyles.sectionTitle, marginBottom: '14px' }}>Aprobación (valores del organizador; puedes modificarlos)</p>
+              <div style={{ display: 'grid', gap: '16px' }}>
+                <div>
+                  <label style={modalStyles.label}>Costo por ticket (S/.)</label>
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={costPerTicket}
+                    onChange={(e) => setCostPerTicket(parseFloat(e.target.value) || 0)}
+                    style={modalStyles.input}
+                  />
+                  <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
+                    Igual al valor ingresado por el organizador; puedes cambiarlo.
+                  </small>
+                </div>
+                <div>
+                  <label style={modalStyles.label}>Ratio</label>
+                  <input
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    value={ratio}
+                    onChange={(e) => setRatio(parseFloat(e.target.value) || 0)}
+                    style={modalStyles.input}
+                  />
+                  <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
+                    (valor producto + delivery) × ratio / costo ticket ≈ número de tickets
+                  </small>
+                </div>
+                <div>
+                  <label style={modalStyles.label}>Número de tickets</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={numberOfTickets}
+                    onChange={(e) => setNumberOfTickets(parseInt(e.target.value, 10) || 0)}
+                    style={modalStyles.input}
+                  />
+                  <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
+                    Se recalcula al cambiar costo o ratio; puedes editarlo manualmente.
+                  </small>
+                </div>
+              </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
+            {/* Footer */}
+            <div style={{ padding: '16px 24px 24px', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setShowApproveModal(false)}
                 style={{
-                  padding: '10px 20px',
+                  padding: '12px 20px',
                   backgroundColor: '#f1f5f9',
                   color: '#475569',
                   border: 'none',
-                  borderRadius: '8px',
+                  borderRadius: '10px',
                   cursor: 'pointer',
                   fontSize: '14px',
-                  fontWeight: '600',
+                  fontWeight: 600,
                 }}
               >
                 Cancelar
@@ -446,14 +477,15 @@ export default function PendingRafflesPage() {
                 onClick={handleApprove}
                 disabled={actionLoading || numberOfTickets < 1}
                 style={{
-                  padding: '10px 20px',
-                  backgroundColor: numberOfTickets < 1 ? '#cbd5e1' : '#10b981',
+                  padding: '12px 24px',
+                  backgroundColor: numberOfTickets < 1 ? '#cbd5e1' : '#059669',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '8px',
+                  borderRadius: '10px',
                   cursor: actionLoading || numberOfTickets < 1 ? 'not-allowed' : 'pointer',
                   fontSize: '14px',
-                  fontWeight: '600',
+                  fontWeight: 600,
+                  boxShadow: numberOfTickets >= 1 ? '0 2px 8px rgba(5, 150, 105, 0.35)' : 'none',
                 }}
               >
                 {actionLoading ? 'Aprobando...' : 'Aprobar oportunidad'}
