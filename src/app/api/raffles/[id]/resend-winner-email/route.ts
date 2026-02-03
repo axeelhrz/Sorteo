@@ -11,7 +11,7 @@ export async function POST(
   context: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    const params = await (typeof context.params.then === 'function' ? context.params : Promise.resolve(context.params));
+    const params = await Promise.resolve(context.params);
     const raffleId = params.id;
     if (!raffleId) {
       return NextResponse.json({ error: 'ID de sorteo requerido' }, { status: 400 });
