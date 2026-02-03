@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendWinnerNotificationEmail } from '@/app/api/emails/send-winner-notification/route';
+import { sendWinnerNotificationEmail } from '@/lib/emails/send-winner-notification';
 import { getAdminAuth, getAdminFirestore } from '@/lib/firebase-admin';
 
 /**
