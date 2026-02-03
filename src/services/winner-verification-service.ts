@@ -144,7 +144,7 @@ export const winnerVerificationService = {
         photoUrl: data.photoUrl,
         uploadedAt: new Date(),
         uploadedBy,
-        notes: data.notes,
+        notes: data.notes ?? '',
         additionalPhotos: data.additionalPhotos || [],
       };
       
