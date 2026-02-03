@@ -82,9 +82,23 @@ gsutil cors set cors.json gs://sorteo-b8fb0.firebasestorage.app
 
 ---
 
-## 4. Resumen de cambios hechos en el código
+## 4. Evidencia de entrega (delivery-evidence) y 403 en Storage
+
+**Problema:** Al subir la evidencia de entrega del premio (foto) desde el panel del organizador, Firebase Storage devolvía **403 (storage/unauthorized)** porque las reglas del bucket no permitían escritura en `delivery-evidence/` para el usuario del cliente.
+
+**Solución en la app:** La subida de evidencia de entrega se hace **desde el servidor** mediante **Firebase Admin Storage**:
+
+1. El organizador envía la(s) imagen(es) al backend: `POST /api/uploads/delivery-evidence` (FormData con campo `file`).
+2. El backend sube el archivo a Storage con el Admin SDK y devuelve la URL firmada.
+
+No hace falta cambiar las reglas de Storage para `delivery-evidence/`; el servidor usa la cuenta de servicio (misma que para Firestore Admin).
+
+---
+
+## 5. Resumen de cambios hechos en el código
 
 - **Checkout:** El comprobante se envía a `/api/payments/confirm-with-voucher` (mismo origen) en lugar de subirse desde el navegador a Storage → se evita CORS en ese flujo.
+- **Evidencia de entrega:** Las imágenes se envían a `/api/uploads/delivery-evidence` y el servidor las sube con Firebase Admin Storage → se evita el 403 en el cliente.
 - **Enlaces /panel:** Se reemplazaron por `/dashboard`, `/dashboard/store` o `/sorteos/[id]` para evitar 404.
 
 Si después de ajustar las reglas de Firestore el error de permisos sigue, revisa que el usuario esté logueado y que su token se envíe correctamente en las peticiones.

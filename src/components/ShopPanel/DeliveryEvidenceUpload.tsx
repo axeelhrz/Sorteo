@@ -3,9 +3,24 @@
 import { useState } from 'react';
 import { FiUpload, FiX, FiImage, FiCheck } from 'react-icons/fi';
 import { winnerVerificationService } from '@/services/winner-verification-service';
-import { uploadService } from '@/services/upload-service';
 import { WinnerInfo } from '@/types/raffle';
 import styles from './delivery-evidence-upload.module.css';
+
+/** Sube una imagen de evidencia de entrega vía API (Firebase Admin Storage). Evita 403 en el cliente. */
+async function uploadDeliveryEvidenceImage(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch('/api/uploads/delivery-evidence', {
+    method: 'POST',
+    body: formData,
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error((data?.error as string) || 'Error al subir la imagen');
+  }
+  const data = await res.json();
+  return data.fileUrl as string;
+}
 
 interface DeliveryEvidenceUploadProps {
   raffleId: string;
@@ -92,13 +107,13 @@ export function DeliveryEvidenceUpload({
     setSuccess(false);
 
     try {
-      // 1. Subir foto principal
-      const mainPhotoUrl = await uploadService.uploadImage(mainPhoto, 'delivery-evidence');
+      // 1. Subir foto principal (vía API con Firebase Admin Storage para evitar 403)
+      const mainPhotoUrl = await uploadDeliveryEvidenceImage(mainPhoto);
 
       // 2. Subir fotos adicionales
       const additionalPhotoUrls: string[] = [];
       for (const photo of additionalPhotos) {
-        const url = await uploadService.uploadImage(photo, 'delivery-evidence');
+        const url = await uploadDeliveryEvidenceImage(photo);
         additionalPhotoUrls.push(url);
       }
 
