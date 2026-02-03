@@ -41,11 +41,31 @@ export async function sendWinnerNotificationEmail(payload: WinnerNotificationPay
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const raffleUrl = `${appUrl}/sorteos/${payload.raffleId}/winner`;
 
+  const shopContact = [
+    payload.shopName ? `Organizador: ${payload.shopName}` : '',
+    payload.shopEmail ? `Email: ${payload.shopEmail}` : '',
+    payload.shopPhone ? `Teléfono: ${payload.shopPhone}` : '',
+  ]
+    .filter(Boolean)
+    .join(' | ');
+
+  const message =
+    `¡Felicidades! Has ganado el sorteo.\n\n` +
+    `Premio: ${payload.productName}\n` +
+    `Número de ticket: #${payload.ticketNumber}\n\n` +
+    `Tu código de verificación (guárdalo para reclamar tu premio):\n${payload.verificationCode}\n\n` +
+    `Fecha del sorteo: ${formattedDate}\n` +
+    (shopContact ? `${shopContact}\n\n` : '') +
+    `Ver detalles y reclamar: ${raffleUrl}`;
+
   return sendEmail({
     templateId,
     templateParams: {
       to_email: payload.email,
       to_name: payload.name,
+      name: payload.name,
+      time: formattedDate,
+      message,
       raffle_title: payload.raffleTitle || payload.productName,
       product_name: payload.productName,
       product_description: payload.productDescription || 'Premio del sorteo',
