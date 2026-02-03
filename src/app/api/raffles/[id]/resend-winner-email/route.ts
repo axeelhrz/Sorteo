@@ -31,39 +31,47 @@ export async function POST(
       );
     }
 
-    // userId: de winnerInfo o del ticket ganador (winnerTicketId)
-    let winnerUserId: string =
-      (typeof winnerInfo.userId === 'string' ? winnerInfo.userId : '') ||
-      (winnerInfo.user_id as string) ||
-      '';
-    if (!winnerUserId && raffleData.winnerTicketId) {
-      const ticketSnap = await db.collection('tickets').doc(raffleData.winnerTicketId as string).get();
+    // 1) Obtener userId del ticket ganador (fuente más fiable)
+    let winnerUserId = '';
+    const rawWinnerTicketId = raffleData.winnerTicketId;
+    const winnerTicketId = typeof rawWinnerTicketId === 'string'
+      ? rawWinnerTicketId
+      : (rawWinnerTicketId && typeof rawWinnerTicketId === 'object' && 'id' in rawWinnerTicketId)
+        ? (rawWinnerTicketId as { id: string }).id
+        : '';
+    if (winnerTicketId) {
+      const ticketSnap = await db.collection('tickets').doc(winnerTicketId).get();
       if (ticketSnap.exists) {
         const ticketData = ticketSnap.data() as Record<string, unknown> | undefined;
-        winnerUserId = (ticketData?.userId ?? ticketData?.user_id ?? '') as string;
+        winnerUserId = String(ticketData?.userId ?? ticketData?.user_id ?? '');
       }
     }
+    if (!winnerUserId) {
+      winnerUserId = String(winnerInfo.userId ?? winnerInfo.user_id ?? '');
+    }
 
-    // Email y nombre: winnerInfo primero; si falta email, leer del documento users/{userId}
-    let winnerEmail: string =
-      (typeof winnerInfo.userEmail === 'string' ? winnerInfo.userEmail : '') ||
-      (winnerInfo.user_email as string) ||
-      (winnerInfo.email as string) ||
-      '';
-    let winnerName: string =
-      (typeof winnerInfo.userName === 'string' ? winnerInfo.userName : '') ||
-      (winnerInfo.user_name as string) ||
-      (winnerInfo.name as string) ||
-      'Ganador';
+    // 2) Email y nombre: primero winnerInfo, luego documento users/{userId}
+    let winnerEmail = String(winnerInfo.userEmail ?? winnerInfo.user_email ?? winnerInfo.email ?? '').trim();
+    let winnerName = String(winnerInfo.userName ?? winnerInfo.user_name ?? winnerInfo.name ?? 'Ganador').trim() || 'Ganador';
 
     if (!winnerEmail && winnerUserId) {
       const userSnap = await db.collection('users').doc(winnerUserId).get();
       if (userSnap.exists) {
-        const raw = userSnap.data() as Record<string, unknown> | undefined;
-        if (raw) {
-          winnerEmail = (raw.email ?? raw.mail ?? raw.userEmail ?? '') as string;
+        const raw = userSnap.data();
+        if (raw && typeof raw === 'object') {
+          const obj = raw as Record<string, unknown>;
+          for (const [key, value] of Object.entries(obj)) {
+            if (typeof value !== 'string') continue;
+            if (key.toLowerCase().includes('email') || key.toLowerCase().includes('mail')) {
+              if (value.includes('@')) {
+                winnerEmail = value;
+                break;
+              }
+            }
+          }
           if (!winnerName || winnerName === 'Ganador') {
-            winnerName = (raw.name ?? raw.displayName ?? raw.userName ?? raw.email ?? 'Ganador') as string;
+            const nameVal = obj.name ?? obj.displayName ?? obj.userName ?? obj.email;
+            if (typeof nameVal === 'string' && nameVal) winnerName = nameVal;
           }
         }
       }
