@@ -100,16 +100,33 @@ function CheckoutContent() {
     setError(null);
 
     try {
-      await firebasePaymentService.confirmPaymentWithVoucher(
-        payment.id,
-        voucherFile,
-        selectedMethod
-      );
+      // Subir comprobante vía API del mismo origen para evitar CORS con Firebase Storage
+      const formData = new FormData();
+      formData.append('voucher', voucherFile);
+      formData.append('paymentId', payment.id);
+      formData.append('paymentMethod', selectedMethod);
+      formData.append('amount', String((payment as any).amount ?? payment.totalAmount ?? 0));
+      formData.append('ticketQuantity', String((payment as any).ticketQuantity ?? 1));
+
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('/api/payments/confirm-with-voucher', {
+        method: 'POST',
+        body: formData,
+        headers,
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Error ${res.status}`);
+      }
 
       router.push(`/payment-success?paymentId=${payment.id}&pending=true`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error confirming payment:', err);
-      setError(err.response?.data?.message || 'Error al confirmar el pago');
+      setError(err instanceof Error ? err.message : 'Error al confirmar el pago');
       setConfirmingPayment(false);
     }
   };

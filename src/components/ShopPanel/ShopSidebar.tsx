@@ -17,23 +17,23 @@ export function ShopSidebar({ isBlocked = false }: ShopSidebarProps) {
     <aside className={styles.sidebar}>
       <nav className={styles.sidebarNav}>
         <Link
-          href="/panel/organizador"
-          className={`${styles.navLink} ${isActive('/panel/organizador') ? styles.active : ''}`}
+          href="/dashboard/store"
+          className={`${styles.navLink} ${isActive('/dashboard/store') ? styles.active : ''}`}
         >
           📋 Mi organizador
         </Link>
 
         <Link
-          href="/panel/sorteos"
-          className={`${styles.navLink} ${isActive('/panel/sorteos') ? styles.active : ''}`}
+          href="/dashboard/store"
+          className={`${styles.navLink} ${isActive('/dashboard/store') ? styles.active : ''}`}
         >
           🎲 Mis sorteos
         </Link>
 
         {!isBlocked && (
           <Link
-            href="/panel/sorteos/crear"
-            className={`${styles.navLink} ${isActive('/panel/sorteos/crear') ? styles.active : ''}`}
+            href="/dashboard/store"
+            className={`${styles.navLink} ${isActive('/dashboard/store') ? styles.active : ''}`}
           >
             ➕ Crear sorteo
           </Link>

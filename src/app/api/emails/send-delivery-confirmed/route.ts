@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       winner_name: winnerName,
       message: `¡Excelente! ${winnerName} ha confirmado la recepción de su premio. 
                 El proceso de entrega para el sorteo "${raffleTitle}" ha sido completado exitosamente.`,
-      action_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/panel/sorteos`,
+      action_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/store`,
       action_text: 'Ver mis sorteos',
     };
 

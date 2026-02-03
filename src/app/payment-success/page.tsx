@@ -134,7 +134,7 @@ function PaymentSuccessContent() {
         <div className={styles.actions}>
           <button
             className={styles.primaryButton}
-            onClick={() => router.push('/panel/sorteos')}
+            onClick={() => router.push('/dashboard/store')}
           >
             Ver mis sorteos
           </button>

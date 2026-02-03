@@ -46,10 +46,10 @@ export async function POST(request: NextRequest) {
     const storageRef = ref(storage, fileName);
     
     const arrayBuffer = await voucher.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    
-    await uploadBytes(storageRef, buffer, {
-      contentType: voucher.type,
+    const bytes = new Uint8Array(arrayBuffer);
+
+    await uploadBytes(storageRef, bytes, {
+      contentType: voucher.type || 'image/jpeg',
     });
 
     // Get download URL

@@ -72,7 +72,7 @@ export function RafflesList({ shopId }: RafflesListProps) {
         icon="🎲"
         action={{
           label: 'Crear sorteo',
-          onClick: () => (window.location.href = '/panel/sorteos/crear'),
+          onClick: () => (window.location.href = '/dashboard/store'),
         }}
       />
     );
@@ -121,7 +121,7 @@ export function RafflesList({ shopId }: RafflesListProps) {
               <td className={styles.tableCell}>{new Date(raffle.createdAt).toLocaleDateString()}</td>
               <td className={styles.tableCell}>
                 <div className={styles.cardActions}>
-                  <Link href={`/panel/sorteos/${raffle.id}`} className={styles.cardActionPrimary}>
+                  <Link href={`/sorteos/${raffle.id}`} className={styles.cardActionPrimary}>
                     Ver
                   </Link>
                   {(raffle.status === RaffleStatus.DRAFT || raffle.status === RaffleStatus.PENDING_APPROVAL) && (

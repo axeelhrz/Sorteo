@@ -59,7 +59,7 @@ export default function Footer() {
                 <Link href="/register">Registrar Organizador</Link>
               </li>
               <li>
-                <Link href="/panel">Panel de Control</Link>
+                <Link href="/dashboard">Panel de Control</Link>
               </li>
               <li>
                 <Link href="/faq">Guía de Organizadores</Link>
