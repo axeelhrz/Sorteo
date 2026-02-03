@@ -105,8 +105,8 @@ function CheckoutContent() {
       formData.append('voucher', voucherFile);
       formData.append('paymentId', payment.id);
       formData.append('paymentMethod', selectedMethod);
-      formData.append('amount', String((payment as any).amount ?? payment.totalAmount ?? 0));
-      formData.append('ticketQuantity', String((payment as any).ticketQuantity ?? 1));
+      formData.append('amount', String(payment.amount ?? 0));
+      formData.append('ticketQuantity', String(payment.ticketQuantity ?? 1));
 
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const headers: Record<string, string> = {};
