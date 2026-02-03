@@ -44,7 +44,26 @@ Ajusta las reglas al resto de colecciones según quién deba leer/escribir.
 
 ---
 
-## 2. Comprobante de pago (voucher) y CORS en Storage
+## 2. Subida de comprobante (API) y credenciales de servidor
+
+La ruta `/api/payments/confirm-with-voucher` sube el comprobante **desde el servidor** usando **Firebase Admin SDK**. Para que funcione en producción (Vercel) o en local, debes configurar una de estas variables:
+
+- **`FIREBASE_SERVICE_ACCOUNT_JSON`** (recomendado): contenido completo del JSON de la cuenta de servicio como **una sola línea** (sin saltos de línea).  
+  - **Local:** en `.env.local` añade una línea así (sustituye `...` por el JSON en una línea):
+    ```bash
+    FIREBASE_SERVICE_ACCOUNT_JSON={"type":"service_account","project_id":"sorteo-b8fb0",...}
+    ```
+    Para convertir el JSON a una línea: quita todos los saltos de línea y espacios entre claves/valores, o en la terminal (macOS/Linux): `cat tu-archivo.json | jq -c .`
+  - **Vercel:** Project → Settings → Environment Variables → añade `FIREBASE_SERVICE_ACCOUNT_JSON` y pega el JSON en una sola línea.
+- **`GOOGLE_APPLICATION_CREDENTIALES`** (alternativa local): ruta al archivo `.json` de la cuenta de servicio (ej. `./service-account.json`). No subas ese archivo a Git.
+
+**Importante:** No subas el JSON de la cuenta de servicio al repositorio ni lo compartas. Si ya lo hiciste, rota la clave en Firebase Console (Service accounts → Generate new private key) y usa la nueva.
+
+Sin una de estas dos, la API devolverá **500** con un mensaje que indica que faltan credenciales. No uses el SDK de Firebase del navegador en esta ruta; en Node.js debe usarse Admin.
+
+---
+
+## 3. Comprobante de pago (voucher) y CORS en Storage
 
 **Problema:** Al subir el comprobante en checkout, el navegador podía hacer la subida directa a Firebase Storage y fallar por CORS.
 
@@ -63,7 +82,7 @@ gsutil cors set cors.json gs://sorteo-b8fb0.firebasestorage.app
 
 ---
 
-## 3. Resumen de cambios hechos en el código
+## 4. Resumen de cambios hechos en el código
 
 - **Checkout:** El comprobante se envía a `/api/payments/confirm-with-voucher` (mismo origen) en lugar de subirse desde el navegador a Storage → se evita CORS en ese flujo.
 - **Enlaces /panel:** Se reemplazaron por `/dashboard`, `/dashboard/store` o `/sorteos/[id]` para evitar 404.

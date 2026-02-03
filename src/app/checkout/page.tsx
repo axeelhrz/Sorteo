@@ -120,7 +120,8 @@ function CheckoutContent() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || `Error ${res.status}`);
+        const msg = data.details || data.error || `Error ${res.status}`;
+        throw new Error(msg);
       }
 
       router.push(`/payment-success?paymentId=${payment.id}&pending=true`);
