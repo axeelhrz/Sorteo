@@ -33,7 +33,7 @@ export async function POST(
       );
     }
 
-    // 1) Obtener userId del ticket ganador (fuente más fiable)
+    // 1) Obtener userId (uid) del ticket ganador. Los tickets guardan userId = uid del comprador (ej. sr3zRicrZrUoSa190BLZEo2IeRY2).
     let winnerUserId = '';
     const rawWinnerTicketId = raffleData.winnerTicketId;
     const winnerTicketId = typeof rawWinnerTicketId === 'string'
@@ -45,16 +45,34 @@ export async function POST(
       const ticketSnap = await db.collection('tickets').doc(winnerTicketId).get();
       if (ticketSnap.exists) {
         const ticketData = ticketSnap.data() as Record<string, unknown> | undefined;
-        winnerUserId = String(ticketData?.userId ?? ticketData?.user_id ?? '');
+        const rawUserId = ticketData?.userId ?? ticketData?.user_id;
+        // En Firestore userId puede ser string o DocumentReference (reference tiene .id = uid)
+        if (typeof rawUserId === 'string' && rawUserId.trim()) {
+          winnerUserId = rawUserId.trim();
+        } else if (rawUserId && typeof rawUserId === 'object' && 'id' in rawUserId) {
+          winnerUserId = String((rawUserId as { id: string }).id);
+        }
       }
     }
     if (!winnerUserId) {
-      winnerUserId = String(winnerInfo.userId ?? winnerInfo.user_id ?? '');
+      const raw = winnerInfo.userId ?? winnerInfo.user_id;
+      winnerUserId = typeof raw === 'string' ? raw : (raw && typeof raw === 'object' && 'id' in raw ? String((raw as { id: string }).id) : '');
     }
 
-    // 2) Email y nombre: primero winnerInfo, luego documento users/{userId}
+    // 2) Email y nombre: prioridad Firebase Auth (correo con el que se registró), luego winnerInfo, luego users/{uid}
     let winnerEmail = String(winnerInfo.userEmail ?? winnerInfo.user_email ?? winnerInfo.email ?? '').trim();
     let winnerName = String(winnerInfo.userName ?? winnerInfo.user_name ?? winnerInfo.name ?? 'Ganador').trim() || 'Ganador';
+
+    if (winnerUserId && winnerUserId.trim().length > 0) {
+      try {
+        const auth = getAdminAuth();
+        const userRecord = await auth.getUser(winnerUserId.trim());
+        if (userRecord.email) winnerEmail = userRecord.email;
+        if ((!winnerName || winnerName === 'Ganador') && userRecord.displayName) winnerName = userRecord.displayName;
+      } catch (authErr) {
+        console.warn('Resend winner email: Auth getUser failed for uid', winnerUserId, authErr);
+      }
+    }
 
     if (!winnerEmail && winnerUserId) {
       const userSnap = await db.collection('users').doc(winnerUserId).get();
@@ -76,23 +94,6 @@ export async function POST(
             if (typeof nameVal === 'string' && nameVal) winnerName = nameVal;
           }
         }
-      }
-    }
-
-    // 3) Fallback: email con el que se creó la cuenta en Firebase Auth (fuente canónica)
-    if (!winnerEmail && winnerUserId && winnerUserId.trim().length > 0) {
-      try {
-        const auth = getAdminAuth();
-        const userRecord = await auth.getUser(winnerUserId.trim());
-        if (userRecord.email) {
-          winnerEmail = userRecord.email;
-        }
-        if ((!winnerName || winnerName === 'Ganador') && userRecord.displayName) {
-          winnerName = userRecord.displayName;
-        }
-      } catch (authErr) {
-        // Usuario puede no existir en Auth, estar deshabilitado o falta permiso Admin Auth
-        console.warn('Resend winner email: no email from Auth for uid', winnerUserId, authErr);
       }
     }
 
@@ -164,7 +165,8 @@ export async function POST(
       message: 'Correo reenviado al ganador correctamente',
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Error al reenviar el correo';
+    const message =
+      error instanceof Error ? error.message : typeof error === 'string' ? error : 'Error al reenviar el correo';
     console.error('Error resending winner email:', error);
     return NextResponse.json(
       { error: message },

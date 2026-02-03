@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as admin from 'firebase-admin';
-import { getAdminFirestore } from '@/lib/firebase-admin';
+import { getAdminAuth, getAdminFirestore } from '@/lib/firebase-admin';
 import { winnerVerificationService } from '@/services/winner-verification-service';
 import { RaffleStatus } from '@/types/raffle';
 
@@ -84,8 +84,18 @@ export async function POST(
 
     const userSnap = await db.collection('users').doc(winningTicket.userId).get();
     const userData = userSnap.exists ? userSnap.data() : null;
-    const userName = userData?.name ?? userData?.email ?? 'Ganador';
-    const userEmail = userData?.email ?? '';
+    let userName = userData?.name ?? userData?.displayName ?? userData?.email ?? 'Ganador';
+    let userEmail = (userData?.email ?? '') as string;
+    if (!userEmail && winningTicket.userId) {
+      try {
+        const auth = getAdminAuth();
+        const userRecord = await auth.getUser(winningTicket.userId);
+        if (userRecord.email) userEmail = userRecord.email;
+        if ((!userName || userName === 'Ganador') && userRecord.displayName) userName = userRecord.displayName;
+      } catch (_e) {
+        // Sin permiso Auth o usuario no existe en Auth; se mantiene userEmail vacío
+      }
+    }
 
     const verificationCode = winnerVerificationService.generateVerificationCode();
 

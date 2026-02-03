@@ -92,7 +92,10 @@ export function WinnerValidation({ raffleId, onValidationSuccess }: WinnerValida
       if (res.ok) {
         setResendMessage({ type: 'success', text: 'Correo reenviado al ganador correctamente.' });
       } else {
-        setResendMessage({ type: 'error', text: data.error || 'Error al reenviar el correo' });
+        const errMsg =
+          (data && typeof data.error === 'string' && data.error) ||
+          `Error del servidor (${res.status}). Revisa la consola o la configuración de EmailJS.`;
+        setResendMessage({ type: 'error', text: errMsg });
       }
     } catch (err) {
       setResendMessage({ type: 'error', text: err instanceof Error ? err.message : 'Error al reenviar el correo' });
