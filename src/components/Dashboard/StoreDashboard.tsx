@@ -790,6 +790,16 @@ export default function StoreDashboard() {
           }
           loadData();
         }}
+        currentUserId={user?.id}
+        onEvidenceUploadSuccess={(winnerInfo: WinnerInfo) => {
+          if (viewModal.raffle) {
+            setViewModal((prev) => ({
+              ...prev,
+              raffle: { ...prev.raffle!, winnerInfo },
+            }));
+          }
+          loadData();
+        }}
       />
     </div>
   );

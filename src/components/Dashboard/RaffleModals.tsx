@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { FiX, FiAlertTriangle, FiCheck } from 'react-icons/fi';
 import { Raffle, WinnerInfo } from '@/types/raffle';
 import { WinnerValidation } from '@/components/ShopPanel/WinnerValidation';
+import { DeliveryEvidenceUpload } from '@/components/ShopPanel/DeliveryEvidenceUpload';
 import styles from './StoreDashboard.module.css';
 
 interface RaffleModalsProps {
@@ -27,6 +28,9 @@ interface RaffleModalsProps {
   onConfirmActivate: (raffleId: string) => Promise<void>;
   onConfirmDelete: (raffleId: string) => Promise<void>;
   onValidationSuccess?: (winnerInfo: WinnerInfo) => void;
+  /** ID del organizador (para subir evidencia de entrega). */
+  currentUserId?: string;
+  onEvidenceUploadSuccess?: (winnerInfo: WinnerInfo) => void;
 }
 
 export default function RaffleModals({
@@ -39,6 +43,8 @@ export default function RaffleModals({
   onConfirmActivate,
   onConfirmDelete,
   onValidationSuccess,
+  currentUserId,
+  onEvidenceUploadSuccess,
 }: RaffleModalsProps) {
   const [activatingId, setActivatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -191,17 +197,66 @@ export default function RaffleModals({
                       }}
                     />
                   ) : (
-                    <div style={{ padding: '16px', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                        <FiCheck style={{ color: '#059669', fontSize: '20px', flexShrink: 0 }} />
-                        <span style={{ fontSize: '15px', fontWeight: '700', color: '#065f46' }}>Código del ganador ya validado</span>
+                    <>
+                      <div style={{ padding: '16px', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                          <FiCheck style={{ color: '#059669', fontSize: '20px', flexShrink: 0 }} />
+                          <span style={{ fontSize: '15px', fontWeight: '700', color: '#065f46' }}>Código del ganador ya validado</span>
+                        </div>
+                        {viewModal.raffle.winnerInfo.claimedAt && (
+                          <p style={{ margin: 0, fontSize: '13px', color: '#047857' }}>
+                            Validado el {new Date(viewModal.raffle.winnerInfo.claimedAt).toLocaleString('es-PE', { dateStyle: 'long', timeStyle: 'short' })}
+                          </p>
+                        )}
                       </div>
-                      {viewModal.raffle.winnerInfo.claimedAt && (
-                        <p style={{ margin: 0, fontSize: '13px', color: '#047857' }}>
-                          Validado el {new Date(viewModal.raffle.winnerInfo.claimedAt).toLocaleString('es-PE', { dateStyle: 'long', timeStyle: 'short' })}
-                        </p>
+
+                      {/* Evidencia de entrega: subir o ver ya subida */}
+                      {!viewModal.raffle.winnerInfo.deliveryEvidence ? (
+                        currentUserId && (
+                          <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid rgba(99, 102, 241, 0.1)' }}>
+                            <DeliveryEvidenceUpload
+                              raffleId={viewModal.raffle.id}
+                              currentUserId={currentUserId}
+                              onUploadSuccess={(winnerInfo) => {
+                                onEvidenceUploadSuccess?.(winnerInfo);
+                              }}
+                            />
+                          </div>
+                        )
+                      ) : (
+                        <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid rgba(99, 102, 241, 0.1)' }}>
+                          <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: '12px' }}>
+                            Evidencia de entrega
+                          </h3>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {viewModal.raffle.winnerInfo.deliveryEvidence.photoUrl && (
+                              <a
+                                href={viewModal.raffle.winnerInfo.deliveryEvidence.photoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ display: 'block', maxWidth: '280px' }}
+                              >
+                                <img
+                                  src={viewModal.raffle.winnerInfo.deliveryEvidence.photoUrl}
+                                  alt="Evidencia de entrega"
+                                  style={{ width: '100%', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)' }}
+                                />
+                              </a>
+                            )}
+                            {viewModal.raffle.winnerInfo.deliveryEvidence.notes && (
+                              <p style={{ margin: 0, fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}>
+                                {viewModal.raffle.winnerInfo.deliveryEvidence.notes}
+                              </p>
+                            )}
+                            {viewModal.raffle.winnerInfo.deliveryEvidence.uploadedAt && (
+                              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                                Subido el {new Date(viewModal.raffle.winnerInfo.deliveryEvidence.uploadedAt).toLocaleString('es-PE', { dateStyle: 'long', timeStyle: 'short' })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       )}
-                    </div>
+                    </>
                   )}
                 </div>
               )}
