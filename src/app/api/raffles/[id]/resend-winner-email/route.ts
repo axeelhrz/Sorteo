@@ -24,9 +24,29 @@ export async function POST(
 
     const raffleData = raffleSnap.data()!;
     const winnerInfo = raffleData.winnerInfo;
-    if (!winnerInfo || !winnerInfo.userEmail) {
+    if (!winnerInfo || !winnerInfo.userId) {
       return NextResponse.json(
-        { error: 'Este sorteo no tiene ganador con correo registrado' },
+        { error: 'Este sorteo no tiene ganador registrado' },
+        { status: 400 }
+      );
+    }
+
+    // Email: usar winnerInfo.userEmail o, si falta, leerlo del documento del usuario (users/{userId})
+    let winnerEmail: string = winnerInfo.userEmail ?? '';
+    let winnerName: string = winnerInfo.userName ?? 'Ganador';
+    if (!winnerEmail && winnerInfo.userId) {
+      const userSnap = await db.collection('users').doc(winnerInfo.userId).get();
+      if (userSnap.exists) {
+        const userData = userSnap.data()!;
+        winnerEmail = userData.email ?? userData.mail ?? '';
+        if (!winnerName || winnerName === 'Ganador') {
+          winnerName = userData.name ?? userData.displayName ?? userData.email ?? 'Ganador';
+        }
+      }
+    }
+    if (!winnerEmail) {
+      return NextResponse.json(
+        { error: 'No se encontró correo del ganador. El usuario puede no tener email en su cuenta.' },
         { status: 400 }
       );
     }
@@ -66,8 +86,8 @@ export async function POST(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: winnerInfo.userEmail,
-        name: winnerInfo.userName || 'Ganador',
+        email: winnerEmail,
+        name: winnerName,
         raffleId,
         raffleTitle: productName,
         productName,
