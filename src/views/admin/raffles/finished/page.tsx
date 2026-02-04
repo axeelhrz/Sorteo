@@ -119,11 +119,14 @@ export default function FinishedRaffles() {
   }
 
   return (
-    <div>
-      <h2 style={{ marginBottom: '20px', color: '#2c3e50' }}>Sorteos Finalizados</h2>
+    <div className={styles.finishedPage}>
+      <div className={styles.finishedPageHeader}>
+        <h2 className={styles.finishedPageTitle}>Sorteos Finalizados</h2>
+        <p className={styles.finishedPageSubtitle}>Oportunidades ejecutadas y ganadores asignados</p>
+      </div>
 
       {error && (
-        <div style={{ padding: '15px', backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px', marginBottom: '20px' }}>
+        <div className={styles.finishedError}>
           {error}
         </div>
       )}
@@ -144,57 +147,70 @@ export default function FinishedRaffles() {
       </div>
 
       {raffles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <p style={{ color: '#7f8c8d' }}>No hay sorteos finalizados</p>
+        <div className={styles.finishedEmpty}>
+          <p className={styles.finishedEmptyText}>No hay sorteos finalizados</p>
+          <p className={styles.finishedEmptyHint}>Las oportunidades que se ejecuten aparecerán aquí.</p>
         </div>
       ) : (
         <div className={styles.tableContainer}>
-          <table>
-            <thead>
-              <tr>
-                <th>Organizador</th>
-                <th>Producto</th>
-                <th>Valor</th>
-                <th>Tickets Vendidos</th>
-                <th>Ganador</th>
-                <th>Fecha Finalización</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {raffles.map((raffle) => (
-                <tr key={raffle.id}>
-                  <td>{raffle.shop.name}</td>
-                  <td>{raffle.product.name}</td>
-                  <td>${raffle.productValue.toFixed(2)}</td>
-                  <td>
-                    {raffle.soldTickets} / {raffle.totalTickets}
-                  </td>
-                  <td>{getWinnerInfo(raffle)}</td>
-                  <td>{new Date(raffle.raffleExecutedAt).toLocaleDateString()}</td>
-                  <td>
-                    <span className={`${styles.statusBadge} ${styles[raffle.status]}`}>
-                      {raffle.status === 'finished' ? 'Finalizado' : 'Agotado'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className={styles.actionButtons}>
+          <div className={styles.tableScroll}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th className={styles.finishedTh}>Organizador</th>
+                  <th className={styles.finishedTh}>Producto</th>
+                  <th className={styles.finishedTh}>Valor</th>
+                  <th className={styles.finishedTh}>Tickets</th>
+                  <th className={styles.finishedTh}>Ganador</th>
+                  <th className={styles.finishedTh}>Fecha fin</th>
+                  <th className={styles.finishedTh}>Estado</th>
+                  <th className={styles.finishedThActions}>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {raffles.map((raffle) => (
+                  <tr key={raffle.id} className={styles.finishedRow}>
+                    <td className={styles.finishedTdOrg}>{raffle.shop.name}</td>
+                    <td className={styles.finishedTdProduct}>{raffle.product.name}</td>
+                    <td className={styles.finishedTdValue}>
+                      S/. {raffle.productValue.toFixed(2)}
+                    </td>
+                    <td className={styles.finishedTdTickets}>
+                      <span className={styles.ticketsCount}>
+                        {raffle.soldTickets} / {raffle.totalTickets}
+                      </span>
+                    </td>
+                    <td className={styles.finishedTdWinner}>{getWinnerInfo(raffle)}</td>
+                    <td className={styles.finishedTdDate}>
+                      {new Date(raffle.raffleExecutedAt).toLocaleDateString('es-PE', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })}
+                    </td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${styles[raffle.status]}`}>
+                        {raffle.status === 'finished' ? 'Finalizado' : 'Agotado'}
+                      </span>
+                    </td>
+                    <td className={styles.finishedTdActions}>
                       <button
-                        className={`${styles.btn} ${styles.btnPrimary}`}
+                        type="button"
+                        className={`${styles.btn} ${styles.btnPrimary} ${styles.btnVer}`}
                         onClick={() => {
                           setSelectedRaffle(raffle);
                           setShowDetail(true);
                         }}
                       >
+                        <FiExternalLink size={14} />
                         Ver
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {/* Pagination */}
           <div className={styles.pagination}>

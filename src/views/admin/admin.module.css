@@ -399,6 +399,154 @@
   border-bottom: none;
 }
 
+/* Página Sorteos Finalizados */
+.finishedPage {
+  max-width: 1200px;
+}
+
+.finishedPageHeader {
+  margin-bottom: 24px;
+}
+
+.finishedPageTitle {
+  margin: 0 0 6px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.finishedPageSubtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.finishedError {
+  padding: 14px 18px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.finishedEmpty {
+  text-align: center;
+  padding: 48px 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.finishedEmptyText {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.finishedEmptyHint {
+  margin: 0;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+/* Tabla Sorteos Finalizados - diseño mejorado */
+.tableScroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tableContainer .table {
+  min-width: 880px;
+}
+
+.finishedTh {
+  padding: 16px 18px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
+  border-bottom: 2px solid rgba(99, 102, 241, 0.12);
+  white-space: nowrap;
+}
+
+.finishedThActions {
+  padding: 16px 18px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
+  border-bottom: 2px solid rgba(99, 102, 241, 0.12);
+}
+
+.finishedRow td {
+  padding: 16px 18px;
+  font-size: 14px;
+  color: #334155;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.finishedRow:hover td {
+  background-color: rgba(99, 102, 241, 0.03);
+}
+
+.finishedTdOrg {
+  font-weight: 600;
+  color: #0f172a;
+  max-width: 160px;
+}
+
+.finishedTdProduct {
+  font-weight: 500;
+  color: #0f172a;
+  max-width: 200px;
+}
+
+.finishedTdValue {
+  font-weight: 700;
+  color: #059669;
+  white-space: nowrap;
+}
+
+.ticketsCount {
+  font-weight: 600;
+  color: #475569;
+}
+
+.finishedTdWinner {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.finishedTdDate {
+  color: #64748b;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.finishedTdActions {
+  text-align: center;
+}
+
+.btnVer {
+  padding: 8px 16px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 /* Sorteos activos: barra de progreso */
 .activeProgressWrap {
   display: flex;
