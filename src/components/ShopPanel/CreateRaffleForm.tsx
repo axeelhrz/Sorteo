@@ -264,6 +264,10 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
                       formData.append('image', files[i]);
                       const res = await fetch('/api/uploads/products/image', { method: 'POST', body: formData });
                       const data = await res.json();
+                      if (!res.ok) {
+                        setError(data.error || 'Error al subir la imagen');
+                        return;
+                      }
                       if (data.fileUrl) {
                         if (!mainImageUrl) setMainImageUrl(data.fileUrl);
                         else setExtraImageUrls((prev) => [...prev, data.fileUrl]);
