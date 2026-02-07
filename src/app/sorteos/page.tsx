@@ -96,7 +96,7 @@ export default function SorteosPage() {
           <span className={styles.heroTag}>Explora y participa</span>
           <h1 className={styles.heroTitle}>Oportunidades Disponibles</h1>
           <p className={styles.heroSubtitle}>
-            Descubre productos de alto valor con tickets de bajo costo. Tú decides cuánto participar.
+            Descubre productos de alto valor con tickets de bajo costo. Controla tu ventaja y acelera tu oportunidad cuando quieras.
           </p>
         </div>
       </section>
@@ -178,7 +178,7 @@ export default function SorteosPage() {
       <section className={styles.howItWorks}>
         <div className={styles.sectionHeader}>
           <span className={styles.sectionTag}>Proceso</span>
-          <h2 className={styles.sectionTitle}>Cómo funciona</h2>
+          <h2 className={styles.sectionTitle}>Vive la experiencia</h2>
           <p className={styles.sectionSubtitle}>
             Un proceso simple y transparente en 4 pasos
           </p>
@@ -189,7 +189,7 @@ export default function SorteosPage() {
             <div className={styles.stepNumber}>01</div>
             <h3 className={styles.stepTitle}>Explora</h3>
             <p className={styles.stepText}>
-              Descubre oportunidades únicas en nuestro catálogo curado
+              Descubre oportunidades activas, revisa los premios y los tickets disponibles. Elige dónde quieres entrar y cómo jugar tu ventaja.
             </p>
           </div>
 
@@ -197,15 +197,15 @@ export default function SorteosPage() {
             <div className={styles.stepNumber}>02</div>
             <h3 className={styles.stepTitle}>Participa</h3>
             <p className={styles.stepText}>
-              Adquiere tickets y aumenta tus probabilidades de ganar
+              Consigue tus tickets y aumenta tus posibilidades. Comparte tu oportunidad y ayuda a que avance más rápido.
             </p>
           </div>
 
           <div className={styles.step}>
             <div className={styles.stepNumber}>03</div>
-            <h3 className={styles.stepTitle}>Sorteo</h3>
+            <h3 className={styles.stepTitle}>Resultado</h3>
             <p className={styles.stepText}>
-              El sistema ejecuta el sorteo automáticamente al completarse
+              Cuando se completan los tickets disponibles, el sistema define el resultado de forma automática, clara y verificable.
             </p>
           </div>
 
@@ -213,7 +213,7 @@ export default function SorteosPage() {
             <div className={styles.stepNumber}>04</div>
             <h3 className={styles.stepTitle}>Gana</h3>
             <p className={styles.stepText}>
-              El ganador se elige aleatoriamente y recibe notificación
+              Si eres el ganador, coordinas la entrega y recibes tu premio sin complicaciones. Así de simple.
             </p>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function SorteosPage() {
           </div>
           <div className={styles.benefitItem}>
             <FiCheckCircle className={styles.benefitIcon} />
-            <span>Cumplimiento normativo garantizado</span>
+            <span>Experiencias claras y organizadores responsables</span>
           </div>
         </div>
       </section>

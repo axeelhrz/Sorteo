@@ -27,8 +27,8 @@ export default function CreateRaffleModal({
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerContent}>
-            <h2 className={styles.title}>Crear Nuevo Sorteo</h2>
-            <p className={styles.subtitle}>Completa los detalles de tu sorteo</p>
+            <h2 className={styles.title}>Crear Nueva Oportunidad</h2>
+            <p className={styles.subtitle}>Completa los detalles de tu oportunidad</p>
           </div>
           <button
             className={styles.closeBtn}

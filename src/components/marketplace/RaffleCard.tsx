@@ -13,7 +13,8 @@ interface RaffleCardProps {
 const RaffleCard: React.FC<RaffleCardProps> = ({ raffle }) => {
   // Calcular tickets disponibles y porcentaje vendido
   const availableTickets = raffle.totalTickets - raffle.soldTickets;
-  const soldPercentage = (raffle.soldTickets / raffle.totalTickets) * 100;
+  const soldPercentage = raffle.totalTickets > 0 ? (raffle.soldTickets / raffle.totalTickets) * 100 : 0;
+  const imageSrc = raffle.thumbnail || raffle.product?.mainImage;
 
   // Determinar badge según estado
   const getBadgeClass = () => {
@@ -50,10 +51,10 @@ const RaffleCard: React.FC<RaffleCardProps> = ({ raffle }) => {
       <div className={styles.card}>
         {/* Image Container */}
         <div className={styles.imageContainer}>
-          {raffle.thumbnail ? (
+          {imageSrc ? (
             <Image
-              src={raffle.thumbnail}
-              alt={raffle.product?.name || 'Raffle'}
+              src={imageSrc}
+              alt={raffle.product?.name || 'Producto'}
               fill
               className={styles.image}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -87,18 +88,16 @@ const RaffleCard: React.FC<RaffleCardProps> = ({ raffle }) => {
             </h3>
 
             {/* Shop Section */}
-            {raffle.shop && (
-              <div className={styles.shopSection}>
-                <p className={styles.shopName}>
-                  Por: {raffle.shop.name}
-                </p>
-              </div>
-            )}
+            <div className={styles.shopSection}>
+              <p className={styles.shopName}>
+                Por: {raffle.shop?.name || 'Organizador'}
+              </p>
+            </div>
           </div>
 
           {/* Value */}
           <div className={styles.value}>
-            <span className={styles.valueLabel}>Valor del premio</span>
+            <span className={styles.valueLabel}>Unidad de participación</span>
             <div className={styles.valueAmount}>
               S/. {raffle.productValue.toFixed(2)}
             </div>
@@ -110,25 +109,27 @@ const RaffleCard: React.FC<RaffleCardProps> = ({ raffle }) => {
           {/* Progress Section */}
           <div className={styles.progressSection}>
             <div className={styles.progressHeader}>
-              <span className={styles.progressLabel}>Venta de tickets</span>
+              <span className={styles.progressLabel}>Tickets participando</span>
               <span className={styles.progressCount}>
                 {raffle.soldTickets} / {raffle.totalTickets}
               </span>
             </div>
 
-            <div className={styles.progressBar}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${Math.min(soldPercentage, 100)}%` }}
-              />
+            <div className={styles.progressRow}>
+              <div className={styles.progressBar}>
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${Math.min(soldPercentage, 100)}%` }}
+                />
+              </div>
+              <span className={styles.progressPercent}>
+                {Math.round(soldPercentage)}%
+              </span>
             </div>
 
             <div className={styles.progressFooter}>
               <span className={styles.remainingTickets}>
-                {availableTickets} disponibles
-              </span>
-              <span className={styles.progressPercent}>
-                {Math.round(soldPercentage)}%
+                Tickets disponibles: {availableTickets}
               </span>
             </div>
           </div>

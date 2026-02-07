@@ -79,8 +79,8 @@ export default function RaffleModals({
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeaderNew}>
               <div className={styles.modalHeaderLeft}>
-                <h2 className={styles.modalTitleNew}>Detalles del Sorteo</h2>
-                <p className={styles.modalSubtitle}>Información completa del sorteo</p>
+                <h2 className={styles.modalTitleNew}>Detalles de la Oportunidad</h2>
+                <p className={styles.modalSubtitle}>Información completa de la oportunidad</p>
               </div>
               <button className={styles.modalCloseBtnNew} onClick={onCloseViewModal} type="button">
                 <FiX size={20} />
@@ -143,10 +143,10 @@ export default function RaffleModals({
                   </p>
                 </div>
 
-                {/* Valor del Ticket */}
+                {/* Valor del Producto */}
                 <div>
                   <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: '12px' }}>
-                    Valor del Ticket
+                    Valor del Producto
                   </h3>
                   <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#10b981' }}>
                     S/. {viewModal.raffle.productValue.toFixed(2)}

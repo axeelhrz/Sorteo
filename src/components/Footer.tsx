@@ -1,12 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
+import { FaWhatsapp } from 'react-icons/fa';
 import { FiMail, FiPhone, FiMapPin, FiLock, FiCheckCircle, FiAward, FiShield } from 'react-icons/fi';
+import { useAuth } from '@/hooks/useAuth';
+import { UserRole } from '@/types/auth';
 import styles from './Footer.module.css';
+
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '984908819';
+const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@tiketea.com';
+const WHATSAPP_URL = `https://wa.me/51${WHATSAPP_NUMBER.replace(/\D/g, '')}?text=Hola%20👋%0A%0AEstoy%20visitando%20TIKETEA%20y%20quiero%20más%20información%20sobre%20cómo%20funcionan%20las%20oportunidades%20y%20la%20compra%20de%20tickets.%0A%0A¿Podrían%20ayudarme,%20por%20favor?`;
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { user, isHydrated } = useAuth();
+  const isAdmin = isHydrated && user?.role === UserRole.ADMIN;
 
   return (
     <footer className={styles.footer}>
@@ -21,13 +29,13 @@ export default function Footer() {
                 <Link href="/">Inicio</Link>
               </li>
               <li>
+                <Link href="/register">Registrarse</Link>
+              </li>
+              <li>
                 <Link href="/sorteos">Explorar Sorteos</Link>
               </li>
               <li>
                 <Link href="/faq">Preguntas Frecuentes</Link>
-              </li>
-              <li>
-                <Link href="/register">Registrarse</Link>
               </li>
             </ul>
           </div>
@@ -64,9 +72,11 @@ export default function Footer() {
               <li>
                 <Link href="/faq">Guía de Organizadores</Link>
               </li>
-              <li>
-                <Link href="/dashboard/admin">Administración</Link>
-              </li>
+              {isAdmin && (
+                <li>
+                  <Link href="/dashboard/admin">Administración</Link>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -83,11 +93,6 @@ export default function Footer() {
               <li>
                 <Link href="/legal/refund-policy">Política de Reembolsos</Link>
               </li>
-              <li>
-                <a href="#" onClick={(e) => { e.preventDefault(); alert('Configuración de cookies'); }}>
-                  Configuración de Cookies
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -97,11 +102,13 @@ export default function Footer() {
             <div className={styles.contactInfo}>
               <div className={styles.contactItem}>
                 <FiMail className={styles.contactIcon} />
-                <a href="mailto:support@tiketea.com">support@tiketea.com</a>
+                <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
               </div>
               <div className={styles.contactItem}>
                 <FiPhone className={styles.contactIcon} />
-                <a href="tel:+51XXXXXXXXX">+51 XXXXXXXXX</a>
+                <a href={`https://wa.me/51${WHATSAPP_NUMBER.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer">
+                  +51 {WHATSAPP_NUMBER}
+                </a>
               </div>
               <div className={styles.contactItem}>
                 <FiMapPin className={styles.contactIcon} />
@@ -109,21 +116,9 @@ export default function Footer() {
               </div>
             </div>
             <div className={styles.socialLinks}>
-              <a href="#" title="Facebook" className={styles.socialLink}>
-                <FaFacebook />
-              </a>
-              <a href="#" title="Twitter" className={styles.socialLink}>
-                <FaTwitter />
-              </a>
-              <a href="#" title="Instagram" className={styles.socialLink}>
-                <FaInstagram />
-              </a>
-              <a href="#" title="LinkedIn" className={styles.socialLink}>
-                <FaLinkedin />
-              </a>
-              <a 
-                href="https://wa.me/51XXXXXXXXX?text=Hola%20👋%0A%0AEstoy%20visitando%20TIKETEA%20y%20quiero%20más%20información%20sobre%20cómo%20funcionan%20las%20oportunidades%20y%20la%20compra%20de%20tickets.%0A%0A¿Podrían%20ayudarme,%20por%20favor?" 
-                title="WhatsApp" 
+              <a
+                href={WHATSAPP_URL}
+                title="WhatsApp"
                 className={styles.socialLink}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -143,7 +138,7 @@ export default function Footer() {
               <FiLock />
             </div>
             <div className={styles.trustText}>
-              <h4>100% Seguro</h4>
+              <h4>Seguro</h4>
               <p>Encriptación SSL y procesamiento seguro de pagos</p>
             </div>
           </div>
@@ -152,8 +147,8 @@ export default function Footer() {
               <FiCheckCircle />
             </div>
             <div className={styles.trustText}>
-              <h4>Verificado</h4>
-              <p>Organizadores y usuarios verificados</p>
+              <h4>Autogestionado</h4>
+              <p>Cada Organizador publica y gestiona sus propias oportunidades dentro de la plataforma.</p>
             </div>
           </div>
           <div className={styles.trustItem}>
@@ -162,7 +157,7 @@ export default function Footer() {
             </div>
             <div className={styles.trustText}>
               <h4>Transparente</h4>
-              <p>Sorteos criptográficamente verificables</p>
+              <p>Resultados automáticos, claros y verificables dentro del sistema.</p>
             </div>
           </div>
           <div className={styles.trustItem}>
@@ -170,8 +165,8 @@ export default function Footer() {
               <FiShield />
             </div>
             <div className={styles.trustText}>
-              <h4>Protegido</h4>
-              <p>Garantía de entrega de premios</p>
+              <h4>Condiciones claras</h4>
+              <p>Reglas, procesos y responsabilidades definidos para cada oportunidad.</p>
             </div>
           </div>
         </div>

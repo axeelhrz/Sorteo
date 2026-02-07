@@ -19,7 +19,7 @@ const testimonials: Testimonial[] = [
     name: 'Carlos Mendoza',
     role: 'Usuario desde hace 6 meses',
     avatar: 'CM',
-    content: 'TIKETEA cambió mi forma de ver las oportunidades. Gané un laptop de $1500 con solo $50 invertidos. ¡Increíble!',
+    content: 'TIKETEA cambió mi forma de ver las oportunidades. Gané un laptop de S/ 5,500 con solo S/ 185 invertidos. ¡Increíble!',
     rating: 5,
   },
   {

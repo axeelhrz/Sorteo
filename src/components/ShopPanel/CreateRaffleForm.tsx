@@ -108,7 +108,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     }
 
     if (shop.status === ShopStatus.BLOCKED) {
-      setError('Tu organizador está bloqueado y no puede crear sorteos');
+      setError('Tu organizador está bloqueado y no puede crear oportunidades');
       return;
     }
 
@@ -163,11 +163,11 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
           specialConditions: specialConditionsText || undefined,
         });
       } catch (raffleError: any) {
-        throw new Error(`Error al crear el sorteo: ${raffleError.message}`);
+        throw new Error(`Error al crear la oportunidad: ${raffleError.message}`);
       }
 
       if (!raffle || !raffle.id) {
-        throw new Error('El sorteo no se creó correctamente');
+        throw new Error('La oportunidad no se creó correctamente');
       }
 
       // 3. Enviar para aprobación (solicitud en revisión)
@@ -199,7 +199,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
       }
     } catch (err: any) {
       console.error('Error creating raffle:', err);
-      setError(err.message || 'Error al crear el sorteo y producto');
+      setError(err.message || 'Error al crear la oportunidad y producto');
       setLoading(false);
     }
   };
@@ -208,13 +208,11 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     return (
       <div className={styles.raffleDetail}>
         <div className={styles.alert + ' ' + styles.alertError}>
-          Tu organizador está bloqueado y no puede crear nuevos sorteos. Contacta con soporte para más información.
+          Tu organizador está bloqueado y no puede crear nuevas oportunidades. Contacta con soporte para más información.
         </div>
       </div>
     );
   }
-
-  const totalTickets = productData.value ? Math.floor(parseFloat(productData.value) * 2) : 0;
 
   return (
     <form onSubmit={handleSubmit} className={styles.raffleForm}>
@@ -323,11 +321,9 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
             placeholder="0.00"
             required
           />
-          {productData.value && (
-            <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
-              Se generarán {totalTickets} tickets (Valor × 2)
-            </small>
-          )}
+          <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
+            Debe coincidir con el valor de venta real y será abonado al Organizador al finalizar correctamente la oportunidad.
+          </small>
         </div>
 
         <div className={styles.formGroup}>
@@ -431,12 +427,14 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
                 placeholder="Ej: 15.00"
               />
               <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
-                Si indicas un monto, se sumará al valor del producto y se te entregará al finalizar la oportunidad con las evidencias de entrega. Si no indicas monto, el costo de envío va a tu cuenta y recibirás solo el valor del producto.
+                Si indicas un monto, este se sumará al valor del producto y se te entregará al finalizar la oportunidad con la evidencia de entrega.
+                <br />
+                Si no indicas un monto, el costo de envío será asumido por el Organizador y se abonará únicamente el valor del producto.
               </small>
             </div>
 
             <div style={{ backgroundColor: '#eff6ff', border: '1px solid #93c5fd', borderRadius: '8px', padding: '12px', marginBottom: '16px', fontSize: '13px', color: '#1e40af' }}>
-              <strong>NOTA:</strong> Si la oportunidad ofrece delivery, el ganador debe brindar una dirección dentro de la zona de cobertura. Si el ganador no puede dar dirección en zona y se coordina recojo en local, el valor indicado como delivery quedará a favor de la plataforma.
+              <strong>NOTA:</strong> Si la oportunidad incluye delivery, el ganador deberá proporcionar una dirección dentro de la zona de cobertura. De no ser posible, se coordinará recojo en local y el costo de delivery no será sumado al monto final abonado al Organizador.
             </div>
           </>
         ) : (
@@ -477,7 +475,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
       </div>
 
       <div className={styles.raffleFormSection}>
-        <h2 className={styles.raffleFormSectionTitle}>3. Condiciones especiales del sorteo (opcional)</h2>
+        <h2 className={styles.raffleFormSectionTitle}>3. Condiciones especiales de la oportunidad (opcional)</h2>
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Condiciones especiales</label>
           <textarea

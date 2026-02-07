@@ -48,7 +48,7 @@ export default function GlobalHeader() {
           <div className={styles.logoWrapper}>
             <Logo size="small" showText={false} imageSize={36} />
           </div>
-          <span className={styles.logoText}>TIKETEA</span>
+          <span className={styles.logoText}>TIKETEA ONLINE</span>
         </Link>
 
         <nav className={`${styles.nav} ${menuOpen ? styles.navOpen : ''}`}>

@@ -7,6 +7,7 @@ export interface RaffleFilters {
   status?: string;
   minValue?: number;
   maxValue?: number;
+  deliveryType?: 'all' | 'delivery' | 'pickup';
   search?: string;
   sortBy?: 'newest' | 'closest' | 'price-asc' | 'price-desc';
   page?: number;

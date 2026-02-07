@@ -87,20 +87,13 @@ export default function PendingRafflesPage() {
   const openApproveModal = (raffle: Raffle) => {
     const productValue = Number(raffle.product?.value ?? raffle.productValue ?? 0);
     const deliveryCost = Number(raffle.product?.deliveryCost ?? 0);
-    // Valores ingresados por el organizador: mostrarlos inicialmente (admin puede modificarlos)
-    const organizerCostPerTicket = Number(raffle.productValue ?? raffle.product?.value ?? 0);
-    const organizerTotalTickets = Number(raffle.totalTickets ?? 0);
-    const totalBase = productValue + deliveryCost || 1;
-    const derivedRatio = organizerTotalTickets > 0 && organizerCostPerTicket > 0
-      ? (organizerTotalTickets * organizerCostPerTicket) / totalBase
-      : 2;
-    const defaultCost = defaultCostPerTicket(productValue);
-    const defaultTickets = defaultNumberOfTickets(productValue, deliveryCost, 2, defaultCost);
+    const defaultUnit = defaultCostPerTicket(productValue);
+    const defaultTickets = defaultNumberOfTickets(productValue, deliveryCost, 2, defaultUnit);
 
     setSelectedRaffle(raffle);
-    setCostPerTicket(organizerCostPerTicket > 0 ? organizerCostPerTicket : defaultCost);
-    setRatio(derivedRatio > 0 ? Math.round(derivedRatio * 100) / 100 : 2);
-    setNumberOfTickets(organizerTotalTickets > 0 ? organizerTotalTickets : defaultTickets);
+    setCostPerTicket(defaultUnit);
+    setRatio(2);
+    setNumberOfTickets(defaultTickets);
     setShowApproveModal(true);
   };
 
@@ -231,7 +224,7 @@ export default function PendingRafflesPage() {
           Aprobar Oportunidad
         </h2>
         <p style={{ margin: '0', color: '#64748b', fontSize: '14px' }}>
-          Revisa las solicitudes de los organizadores. Puedes variar costo por ticket, ratio y número de tickets antes de aprobar.
+          Revisa las solicitudes de los organizadores. Puedes variar unidad de participación, ratio y número de tickets antes de aprobar.
         </p>
       </div>
 
@@ -386,7 +379,7 @@ export default function PendingRafflesPage() {
                   </div>
                 )}
                 <div style={modalStyles.row}>
-                  <span style={modalStyles.label}>Valor producto / Ticket (organizador)</span>
+                  <span style={modalStyles.label}>Valor producto (organizador)</span>
                   <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: 600, color: '#059669' }}>
                     S/. {Number(selectedRaffle.product?.value ?? selectedRaffle.productValue ?? 0).toFixed(2)}
                   </p>
@@ -413,7 +406,7 @@ export default function PendingRafflesPage() {
               <p style={{ ...modalStyles.sectionTitle, marginBottom: '14px' }}>Aprobación (valores del organizador; puedes modificarlos)</p>
               <div style={{ display: 'grid', gap: '16px' }}>
                 <div>
-                  <label style={modalStyles.label}>Costo por ticket (S/.)</label>
+                  <label style={modalStyles.label}>Unidad de participación (S/.)</label>
                   <input
                     type="number"
                     min="0.01"
@@ -423,7 +416,7 @@ export default function PendingRafflesPage() {
                     style={modalStyles.input}
                   />
                   <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
-                    Igual al valor ingresado por el organizador; puedes cambiarlo.
+                    Por defecto según valor del producto: 0-50 → S/1, 50.01-100 → S/2, 100.1+ → S/5. Puedes modificarlo.
                   </small>
                 </div>
                 <div>
@@ -437,7 +430,7 @@ export default function PendingRafflesPage() {
                     style={modalStyles.input}
                   />
                   <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
-                    (valor producto + delivery) × ratio / costo ticket ≈ número de tickets
+                    (valor producto + delivery) × ratio / unidad de participación ≈ número de tickets
                   </small>
                 </div>
                 <div>

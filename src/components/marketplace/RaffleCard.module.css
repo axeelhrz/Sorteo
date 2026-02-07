@@ -219,13 +219,20 @@
   letter-spacing: 0;
 }
 
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
 .progressBar {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   height: 10px;
   background: rgba(99, 102, 241, 0.08);
   border-radius: 6px;
   overflow: hidden;
-  margin-bottom: 4px;
   position: relative;
 }
 
@@ -238,11 +245,7 @@
 }
 
 .progressFooter {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   font-size: 13px;
-  gap: 8px;
 }
 
 .remainingTickets {
@@ -252,6 +255,7 @@
 }
 
 .progressPercent {
+  flex-shrink: 0;
   font-weight: 800;
   color: #6366f1;
   letter-spacing: 0;

@@ -8,14 +8,11 @@ import {
   FiPackage, 
   FiShoppingBag, 
   FiDollarSign, 
-  FiTrendingUp,
   FiPlus,
   FiEdit2,
   FiTrash2,
   FiEye,
-  FiBarChart2,
   FiCreditCard,
-  FiCalendar,
   FiDownload
 } from 'react-icons/fi';
 import { firebaseShopService } from '@/services/firebase-shop-service';
@@ -27,7 +24,7 @@ import CreateRaffleModal from './CreateRaffleModal';
 import RaffleModals from './RaffleModals';
 import styles from './StoreDashboard.module.css';
 
-type TabType = 'overview' | 'raffles' | 'earnings' | 'stats';
+type TabType = 'overview' | 'raffles' | 'earnings';
 
 export default function StoreDashboard() {
   const router = useRouter();
@@ -51,6 +48,8 @@ export default function StoreDashboard() {
   const [viewModal, setViewModal] = useState({ isOpen: false, raffle: null as Raffle | null });
   const [activateModal, setActivateModal] = useState({ isOpen: false, raffleId: null as string | null, raffleName: null as string | null });
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, raffleId: null as string | null, raffleName: null as string | null });
+  const [isEditingOrgName, setIsEditingOrgName] = useState(false);
+  const [editingOrgName, setEditingOrgName] = useState('');
 
   useEffect(() => {
     if (!isHydrated || !user) return;
@@ -137,6 +136,26 @@ export default function StoreDashboard() {
     }
   };
 
+  const handleSaveOrgName = async () => {
+    if (!shop?.id || !editingOrgName.trim()) {
+      setIsEditingOrgName(false);
+      return;
+    }
+    try {
+      await firebaseShopService.updateShopName(shop.id, editingOrgName.trim());
+      setShop((prev) => prev ? { ...prev, name: editingOrgName.trim() } : null);
+      setIsEditingOrgName(false);
+    } catch (error) {
+      console.error('Error updating organizer name:', error);
+    }
+  };
+
+  const handleStartEditOrgName = () => {
+    if (!shop) return;
+    setEditingOrgName(shop.name || '');
+    setIsEditingOrgName(true);
+  };
+
   const handleCreateRaffle = () => {
     console.log('handleCreateRaffle called');
     console.log('shop:', shop);
@@ -162,18 +181,6 @@ export default function StoreDashboard() {
     setTimeout(() => {
       loadData();
     }, 1000);
-  };
-
-  const handleViewRaffles = () => {
-    setActiveTab('raffles');
-  };
-
-  const handleViewEarnings = () => {
-    setActiveTab('earnings');
-  };
-
-  const handleViewStats = () => {
-    setActiveTab('stats');
   };
 
   const handleViewRaffle = (raffle: Raffle) => {
@@ -217,7 +224,7 @@ export default function StoreDashboard() {
             <div className={styles.headerLeft}>
               <span className={styles.headerTag}>Panel de Control</span>
               <h1 className={styles.title}>Panel de Organizador</h1>
-              <p className={styles.subtitle}>Gestiona tus sorteos y productos</p>
+              <p className={styles.subtitle}>Gestiona tus Oportunidades</p>
             </div>
             <div className={styles.headerRight}>
               <div className={styles.userCard}>
@@ -246,16 +253,36 @@ export default function StoreDashboard() {
           <div className={styles.headerLeft}>
             <span className={styles.headerTag}>Panel de Control</span>
             <h1 className={styles.title}>Panel de Organizador</h1>
-            <p className={styles.subtitle}>Gestiona tus sorteos y productos</p>
+            <p className={styles.subtitle}>Gestiona tus Oportunidades</p>
           </div>
           
           <div className={styles.headerRight}>
             <div className={styles.userCard}>
               <div className={styles.userAvatar}>
-                {user?.name?.charAt(0).toUpperCase() || '-'}
+                {(shop?.name || user?.name || 'O').charAt(0).toUpperCase()}
               </div>
               <div className={styles.userDetails}>
-                <span className={styles.userName}>{user?.name || 'Usuario'}</span>
+                {isEditingOrgName ? (
+                  <input
+                    type="text"
+                    value={editingOrgName}
+                    onChange={(e) => setEditingOrgName(e.target.value)}
+                    onBlur={handleSaveOrgName}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSaveOrgName()}
+                    className={styles.orgNameInput}
+                    autoFocus
+                  />
+                ) : (
+                  <span
+                    className={styles.userName}
+                    onClick={shop ? handleStartEditOrgName : undefined}
+                    title={shop ? 'Haz clic para editar' : undefined}
+                    style={shop ? undefined : { cursor: 'default' }}
+                  >
+                    {shop?.name || 'Organizador'}
+                    <FiEdit2 className={styles.editIcon} />
+                  </span>
+                )}
                 <span className={styles.userRole}>Organizador</span>
               </div>
             </div>
@@ -280,11 +307,19 @@ export default function StoreDashboard() {
             <span>Resumen</span>
           </button>
           <button 
+            className={styles.tab}
+            onClick={handleCreateRaffle}
+            type="button"
+          >
+            <FiPlus />
+            <span>Crear Oportunidad</span>
+          </button>
+          <button 
             className={`${styles.tab} ${activeTab === 'raffles' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('raffles')}
           >
             <FiShoppingBag />
-            <span>Mis Sorteos</span>
+            <span>Mis Oportunidades</span>
           </button>
           <button 
             className={`${styles.tab} ${activeTab === 'earnings' ? styles.tabActive : ''}`}
@@ -292,13 +327,6 @@ export default function StoreDashboard() {
           >
             <FiDollarSign />
             <span>Ganancias</span>
-          </button>
-          <button 
-            className={`${styles.tab} ${activeTab === 'stats' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('stats')}
-          >
-            <FiBarChart2 />
-            <span>Estadísticas</span>
           </button>
         </div>
 
@@ -310,41 +338,11 @@ export default function StoreDashboard() {
           <div className={styles.statCard}>
             <div className={styles.statHeader}>
               <div>
-                <div className={styles.statLabel}>Productos</div>
-                <div className={styles.statValue}>{stats.totalProducts}</div>
-              </div>
-              <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-                <FiPackage />
-              </div>
-            </div>
-            <div className={styles.statChange}>
-              <span>↑ 0% este mes</span>
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <div>
-                <div className={styles.statLabel}>Sorteos Activos</div>
+                <div className={styles.statLabel}>Oportunidades Activas</div>
                 <div className={styles.statValue}>{stats.totalRaffles}</div>
               </div>
               <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
                 <FiShoppingBag />
-              </div>
-            </div>
-            <div className={styles.statChange}>
-              <span>↑ 0% este mes</span>
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <div>
-                <div className={styles.statLabel}>Tickets Vendidos</div>
-                <div className={styles.statValue}>{stats.ticketsSold}</div>
-              </div>
-              <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-                <FiTrendingUp />
               </div>
             </div>
             <div className={styles.statChange}>
@@ -368,64 +366,6 @@ export default function StoreDashboard() {
           </div>
         </div>
 
-            {/* Quick Actions Section */}
-            <div className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <div>
-              <h2 className={styles.sectionTitle}>Acciones Rápidas</h2>
-              <p className={styles.sectionSubtitle}>Accede rápidamente a las funciones principales</p>
-            </div>
-          </div>
-
-          <div className={styles.actionsGrid}>
-            <button className={styles.actionCard} onClick={handleCreateRaffle} title="Crear un nuevo sorteo">
-              <div className={styles.actionIcon}>
-                <FiPlus />
-              </div>
-              <div className={styles.actionTitle}>Crear Sorteo</div>
-              <div className={styles.actionDesc}>Nuevo sorteo</div>
-            </button>
-
-            <button className={styles.actionCard} onClick={handleViewRaffles} title="Ver todos tus sorteos activos">
-              <div className={styles.actionIcon}>
-                <FiShoppingBag />
-              </div>
-              <div className={styles.actionTitle}>Mis Sorteos</div>
-              <div className={styles.actionDesc}>Ver todos</div>
-            </button>
-
-            <button className={styles.actionCard} onClick={handleViewEarnings} title="Revisa tus ganancias totales">
-              <div className={styles.actionIcon}>
-                <FiDollarSign />
-              </div>
-              <div className={styles.actionTitle}>Ganancias</div>
-              <div className={styles.actionDesc}>Ingresos</div>
-            </button>
-
-            <button className={styles.actionCard} onClick={handleViewStats} title="Ver estadísticas y análisis">
-              <div className={styles.actionIcon}>
-                <FiTrendingUp />
-              </div>
-              <div className={styles.actionTitle}>Estadísticas</div>
-              <div className={styles.actionDesc}>Análisis</div>
-            </button>
-          </div>
-        </div>
-
-            {/* Recent Activity */}
-            <div className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <div>
-                  <h2 className={styles.sectionTitle}>Actividad Reciente</h2>
-                  <p className={styles.sectionSubtitle}>Últimas acciones en tu tienda</p>
-                </div>
-              </div>
-              <div className={styles.emptyState}>
-                <FiCalendar className={styles.emptyIcon} />
-                <h3>Sin actividad reciente</h3>
-                <p>Aquí verás las últimas acciones realizadas en tu tienda</p>
-              </div>
-            </div>
           </>
         )}
 
@@ -433,12 +373,12 @@ export default function StoreDashboard() {
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <div>
-                <h2 className={styles.sectionTitle}>Mis Sorteos</h2>
-                <p className={styles.sectionSubtitle}>Gestiona todos tus sorteos: activos, en progreso y finalizados</p>
+                <h2 className={styles.sectionTitle}>Mis Oportunidades</h2>
+                <p className={styles.sectionSubtitle}>Gestiona todas tus oportunidades: activas, en progreso y finalizadas</p>
               </div>
-              <button className={styles.createBtn} onClick={handleCreateRaffle} title="Crear un nuevo sorteo" type="button">
+              <button className={styles.createBtn} onClick={handleCreateRaffle} title="Crear una nueva oportunidad" type="button">
                 <FiPlus />
-                <span>Nuevo Sorteo</span>
+                <span>Nueva Oportunidad</span>
               </button>
             </div>
 
@@ -488,11 +428,11 @@ export default function StoreDashboard() {
                 <div className={styles.emptyState}>
                   <FiShoppingBag className={styles.emptyIcon} />
                   <h3>
-                    {raffleStatusFilter === 'all' ? 'No tienes sorteos' : raffleStatusFilter === 'finished' ? 'No hay sorteos finalizados' : raffleStatusFilter === 'draft' ? 'No hay borradores' : 'No hay sorteos activos'}
+                    {raffleStatusFilter === 'all' ? 'No tienes oportunidades' : raffleStatusFilter === 'finished' ? 'No hay oportunidades finalizadas' : raffleStatusFilter === 'draft' ? 'No hay borradores' : 'No hay oportunidades activas'}
                   </h3>
                   <p>
                     {raffleStatusFilter === 'all'
-                      ? 'Crea tu primer sorteo para comenzar a vender tickets y generar ingresos'
+                      ? 'Crea tu primera oportunidad para comenzar a vender tickets y generar ingresos'
                       : 'Cambia el filtro para ver otros estados'}
                   </p>
                   {raffleStatusFilter !== 'all' && (
@@ -503,7 +443,7 @@ export default function StoreDashboard() {
                   {raffleStatusFilter === 'all' && (
                     <button className={styles.createBtn} onClick={handleCreateRaffle} type="button">
                       <FiPlus />
-                      <span>Crear Sorteo</span>
+                      <span>Crear Oportunidad</span>
                     </button>
                   )}
                 </div>
@@ -512,9 +452,9 @@ export default function StoreDashboard() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th>Sorteo</th>
+                      <th>Oportunidad</th>
                       <th>Tickets</th>
-                      <th>Valor Ticket</th>
+                      <th>Valor del Producto</th>
                       <th>Estado</th>
                       <th>Creado</th>
                       <th>Acciones</th>
@@ -580,8 +520,8 @@ export default function StoreDashboard() {
                             </button>
                             <button 
                               className={styles.actionBtn} 
-                              title="Activar sorteo"
-                              onClick={() => handleOpenActivateModal(raffle.id, raffle.product?.name || 'Sorteo')}
+                              title="Activar oportunidad"
+                              onClick={() => handleOpenActivateModal(raffle.id, raffle.product?.name || 'Oportunidad')}
                               disabled={raffle.status !== 'draft'}
                             >
                               <FiEdit2 />
@@ -590,7 +530,7 @@ export default function StoreDashboard() {
                             <button 
                               className={styles.actionBtn} 
                               title="Eliminar"
-                              onClick={() => handleOpenDeleteModal(raffle.id, raffle.product?.name || 'Sorteo')}
+                              onClick={() => handleOpenDeleteModal(raffle.id, raffle.product?.name || 'Oportunidad')}
                             >
                               <FiTrash2 />
                               <span className={styles.actionBtnLabel}>Eliminar</span>
@@ -682,85 +622,6 @@ export default function StoreDashboard() {
           </div>
         )}
 
-        {activeTab === 'stats' && (
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <div>
-                <h2 className={styles.sectionTitle}>Estadísticas</h2>
-                <p className={styles.sectionSubtitle}>Análisis detallado de tu tienda</p>
-              </div>
-            </div>
-
-            {/* Stats Overview */}
-            <div className={styles.statsGrid}>
-              <div className={styles.statCard}>
-                <div className={styles.statHeader}>
-                  <div>
-                    <div className={styles.statLabel}>Tasa de Conversión</div>
-                    <div className={styles.statValue}>0%</div>
-                  </div>
-                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-                    <FiTrendingUp />
-                  </div>
-                </div>
-                <div className={styles.statChange}>
-                  <span>Visitantes a compradores</span>
-                </div>
-              </div>
-
-              <div className={styles.statCard}>
-                <div className={styles.statHeader}>
-                  <div>
-                    <div className={styles.statLabel}>Ticket Promedio</div>
-                    <div className={styles.statValue}>S/. 0.00</div>
-                  </div>
-                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-                    <FiDollarSign />
-                  </div>
-                </div>
-                <div className={styles.statChange}>
-                  <span>Valor promedio por venta</span>
-                </div>
-              </div>
-
-              <div className={styles.statCard}>
-                <div className={styles.statHeader}>
-                  <div>
-                    <div className={styles.statLabel}>Sorteos Completados</div>
-                    <div className={styles.statValue}>0</div>
-                  </div>
-                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-                    <FiShoppingBag />
-                  </div>
-                </div>
-                <div className={styles.statChange}>
-                  <span>Total finalizados</span>
-                </div>
-              </div>
-
-              <div className={styles.statCard}>
-                <div className={styles.statHeader}>
-                  <div>
-                    <div className={styles.statLabel}>Satisfacción</div>
-                    <div className={styles.statValue}>0%</div>
-                  </div>
-                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }}>
-                    <FiBarChart2 />
-                  </div>
-                </div>
-                <div className={styles.statChange}>
-                  <span>Calificación promedio</span>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.emptyState}>
-              <FiBarChart2 className={styles.emptyIcon} />
-              <h3>Estadísticas en desarrollo</h3>
-              <p>Pronto podrás ver gráficos detallados y análisis avanzados de tu tienda</p>
-            </div>
-          </div>
-        )}
       </main>
 
       {/* Create Raffle Modal */}

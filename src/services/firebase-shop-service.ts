@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, getDoc, doc, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, updateDoc, serverTimestamp, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Shop, ShopStatus } from '@/types/shop';
 
@@ -64,6 +64,19 @@ export const firebaseShopService = {
       return shops.sort((a, b) => a.name.localeCompare(b.name));
     } catch (error) {
       console.error('Error fetching verified shops:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Actualiza el nombre del organizador
+   */
+  async updateShopName(shopId: string, name: string): Promise<void> {
+    try {
+      const shopRef = doc(db, 'shops', shopId);
+      await updateDoc(shopRef, { name, updatedAt: serverTimestamp() });
+    } catch (error) {
+      console.error('Error updating shop name:', error);
       throw error;
     }
   },

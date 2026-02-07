@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FiArrowRight, FiZap, FiDollarSign, FiShare2, FiTrendingUp, FiShield, FiMessageCircle } from 'react-icons/fi';
+import { FiArrowRight, FiZap, FiDollarSign, FiShare2, FiTrendingUp, FiShield } from 'react-icons/fi';
 import Logo from '@/components/Logo';
 import Testimonials from '@/components/Testimonials';
 import { useAuthStore } from '@/store/auth-store';
@@ -27,7 +27,7 @@ export default function Home() {
             </p>
             
             <p className={styles.heroDescription}>
-              En TIKETEA no compras productos ni participas en rifas tradicionales. Adquieres oportunidades limitadas, donde tú decides cuántos tickets tomar y cuánto aumentar tus probabilidades.
+              En TIKETEA no compras productos ni participas en rifas. Adquieres oportunidades limitadas, donde tú decides cuántos tickets tomar y cuánto aumentar tus probabilidades.
             </p>
             
             <div className={styles.heroCTA}>
@@ -39,27 +39,10 @@ export default function Home() {
                 Cómo funciona
               </Link>
             </div>
-
-            <div className={styles.heroStats}>
-              <div className={styles.statItem}>
-                <div className={styles.statNumber}>500+</div>
-                <div className={styles.statLabel}>Oportunidades activas</div>
-              </div>
-              <div className={styles.statDivider}></div>
-              <div className={styles.statItem}>
-                <div className={styles.statNumber}>10K+</div>
-                <div className={styles.statLabel}>Usuarios activos</div>
-              </div>
-              <div className={styles.statDivider}></div>
-              <div className={styles.statItem}>
-                <div className={styles.statNumber}>98%</div>
-                <div className={styles.statLabel}>Satisfacción</div>
-              </div>
-            </div>
           </div>
 
           <div className={styles.heroLogoContainer}>
-            <Logo size="large" showText={false} imageSize={280} className={styles.heroLogo} />
+            <Logo size="large" showText={false} imageSize={420} className={styles.heroLogo} />
           </div>
         </div>
       </section>
@@ -70,7 +53,7 @@ export default function Home() {
           <span className={styles.sectionTag}>Ventajas</span>
           <h2 className={styles.sectionTitle}>¿Por qué elegirnos?</h2>
           <p className={styles.sectionSubtitle}>
-            No es una lotería tradicional. Son oportunidades reales con probabilidades que tú controlas.
+            No es una lotería. Son oportunidades reales con probabilidades que tú controlas.
           </p>
         </div>
         
@@ -91,7 +74,7 @@ export default function Home() {
             </div>
             <h3 className={styles.featureTitle}>Más probabilidades reales</h3>
             <p className={styles.featureText}>
-              Los tickets son limitados, no infinitos como en una lotería tradicional. Menos participantes, más chances de ganar.
+              Los tickets son limitados, no infinitos como en una lotería. Menos participantes, más chances de ganar.
             </p>
           </div>
           
@@ -127,11 +110,11 @@ export default function Home() {
             ¿Quieres que tu oportunidad se ejecute más rápido?
           </h3>
           <p className={styles.shareText}>
-            Comparte la oportunidad con tus amigos y conocidos. Mientras más personas participen, más rápido se completan los tickets y se ejecuta el sorteo. ¡Todos ganan más rápido!
+            Compártela con tus amigos y familia. Cada persona que participa acerca el momento en que se completan los tickets. Tú tienes el poder de acelerar lo que puede pasar.
           </p>
           <div className={styles.shareHighlight}>
             <FiZap className={styles.shareHighlightIcon} />
-            <span>Tickets limitados = Sorteo más rápido cuando se completan</span>
+            <span>Tickets limitados = Resultado más rápido cuando se completan</span>
           </div>
         </div>
       </section>
@@ -207,16 +190,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* WhatsApp Contact Button */}
-      <a
-        href="https://wa.me/51XXXXXXXXX?text=Hola%0A%0AEstoy%20visitando%20TIKETEA%20y%20quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20c%C3%B3mo%20funcionan%20las%20oportunidades%20y%20la%20compra%20de%20tickets.%0A%0A%C2%BFPodr%C3%ADan%20ayudarme,%20por%20favor?"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={styles.whatsappButton}
-        aria-label="Contactar por WhatsApp"
-      >
-        <FiMessageCircle className={styles.whatsappIcon} />
-      </a>
     </main>
   );
 }

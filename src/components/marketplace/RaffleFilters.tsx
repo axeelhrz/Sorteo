@@ -21,25 +21,42 @@ export default function RaffleFilters({
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [shopId, setShopId] = useState('');
+  const [ticketPrice, setTicketPrice] = useState('');
+  const [deliveryType, setDeliveryType] = useState<'all' | 'delivery' | 'pickup'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'closest' | 'price-asc' | 'price-desc'>('newest');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  const getTicketPriceRange = (value: string): { minValue?: number; maxValue?: number } => {
+    switch (value) {
+      case '0-5': return { minValue: 0, maxValue: 5 };
+      case '5-20': return { minValue: 5, maxValue: 20 };
+      case '20-50': return { minValue: 20, maxValue: 50 };
+      case '50+': return { minValue: 50 };
+      default: return {};
+    }
+  };
+
   const handleApplyFilters = useCallback(() => {
+    const ticketRange = getTicketPriceRange(ticketPrice);
     const filters: RaffleFiltersType = {
       search: search || undefined,
       category: category || undefined,
       shopId: shopId || undefined,
+      ...ticketRange,
+      deliveryType: deliveryType === 'all' ? undefined : deliveryType,
       sortBy,
       page: 1,
     };
 
     onFiltersChange(filters);
-  }, [search, category, shopId, sortBy, onFiltersChange]);
+  }, [search, category, shopId, ticketPrice, deliveryType, sortBy, onFiltersChange]);
 
   const handleReset = () => {
     setSearch('');
     setCategory('');
     setShopId('');
+    setTicketPrice('');
+    setDeliveryType('all');
     setSortBy('newest');
     setShowAdvanced(false);
     onFiltersChange({ sortBy: 'newest', page: 1 });
@@ -52,10 +69,13 @@ export default function RaffleFilters({
 
   const handleSortChange = (value: string) => {
     setSortBy(value as any);
+    const ticketRange = getTicketPriceRange(ticketPrice);
     onFiltersChange({
       search: search || undefined,
       category: category || undefined,
       shopId: shopId || undefined,
+      ...ticketRange,
+      deliveryType: deliveryType === 'all' ? undefined : deliveryType,
       sortBy: value as any,
       page: 1,
     });
@@ -81,7 +101,16 @@ export default function RaffleFilters({
                 type="button"
                 onClick={() => {
                   setSearch('');
-                  onFiltersChange({ sortBy, page: 1 });
+                  const ticketRange = getTicketPriceRange(ticketPrice);
+                  onFiltersChange({
+                    search: undefined,
+                    category: category || undefined,
+                    shopId: shopId || undefined,
+                    ...ticketRange,
+                    deliveryType: deliveryType === 'all' ? undefined : deliveryType,
+                    sortBy,
+                    page: 1,
+                  });
                 }}
                 className={styles.clearButton}
               >
@@ -142,11 +171,11 @@ export default function RaffleFilters({
             )}
 
             {/* Shop Filter */}
-        {shops.length > 0 && (
-          <div className={styles.filterItem}>
-            <label className={styles.filterLabel}>Organizador</label>
-            <select
-              value={shopId}
+            {shops.length > 0 && (
+              <div className={styles.filterItem}>
+                <label className={styles.filterLabel}>Organizador</label>
+                <select
+                  value={shopId}
                   onChange={(e) => setShopId(e.target.value)}
                   className={styles.filterSelect}
                   disabled={isLoading}
@@ -160,6 +189,38 @@ export default function RaffleFilters({
                 </select>
               </div>
             )}
+
+            {/* Ticket Price Filter */}
+            <div className={styles.filterItem}>
+              <label className={styles.filterLabel}>Ticket</label>
+              <select
+                value={ticketPrice}
+                onChange={(e) => setTicketPrice(e.target.value)}
+                className={styles.filterSelect}
+                disabled={isLoading}
+              >
+                <option value="">Todos los precios</option>
+                <option value="0-5">Hasta S/ 5</option>
+                <option value="5-20">S/ 5 - S/ 20</option>
+                <option value="20-50">S/ 20 - S/ 50</option>
+                <option value="50+">Más de S/ 50</option>
+              </select>
+            </div>
+
+            {/* Delivery Type Filter */}
+            <div className={styles.filterItem}>
+              <label className={styles.filterLabel}>Tipo de entrega</label>
+              <select
+                value={deliveryType}
+                onChange={(e) => setDeliveryType(e.target.value as 'all' | 'delivery' | 'pickup')}
+                className={styles.filterSelect}
+                disabled={isLoading}
+              >
+                <option value="all">Todos</option>
+                <option value="delivery">Con delivery</option>
+                <option value="pickup">Recojo en tienda</option>
+              </select>
+            </div>
           </div>
 
           {/* Action Buttons */}

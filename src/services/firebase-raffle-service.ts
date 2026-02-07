@@ -20,6 +20,7 @@ export interface RaffleFilters {
   status?: string;
   minValue?: number;
   maxValue?: number;
+  deliveryType?: 'all' | 'delivery' | 'pickup';
   search?: string;
   sortBy?: 'newest' | 'closest' | 'price-asc' | 'price-desc';
   page?: number;
@@ -89,6 +90,7 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
     soldTickets: data.soldTickets || 0,
     status: data.status || RaffleStatus.DRAFT,
     requiresDeposit: data.requiresDeposit || false,
+    thumbnail: data.thumbnail,
     winnerTicketId: data.winnerTicketId,
     winnerInfo: convertWinnerInfo(data.winnerInfo),
     specialConditions: data.specialConditions,
@@ -141,6 +143,12 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
           category: productData.category,
           mainImage: productData.mainImage,
           status: productData.status || 'inactive',
+          hasDelivery: productData.hasDelivery,
+          deliveryZones: productData.deliveryZones,
+          deliveryCost: productData.deliveryCost,
+          pickupAddress: productData.pickupAddress,
+          pickupDistrict: productData.pickupDistrict,
+          pickupInStore: productData.pickupInStore,
           createdAt: convertTimestamp(productData.createdAt),
           updatedAt: convertTimestamp(productData.updatedAt),
         } as Product;
@@ -241,6 +249,14 @@ export const firebaseRaffleService = {
 
       if (filters?.maxValue !== undefined) {
         raffles = raffles.filter((r) => r.productValue <= filters.maxValue!);
+      }
+
+      if (filters?.deliveryType && filters.deliveryType !== 'all') {
+        if (filters.deliveryType === 'delivery') {
+          raffles = raffles.filter((r) => r.product?.hasDelivery === true);
+        } else if (filters.deliveryType === 'pickup') {
+          raffles = raffles.filter((r) => r.product?.pickupInStore === true);
+        }
       }
 
       if (filters?.search) {
