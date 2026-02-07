@@ -134,21 +134,17 @@ const RaffleCard: React.FC<RaffleCardProps> = ({ raffle }) => {
             </div>
           </div>
 
-          {/* CTA Button */}
-          <button
+          {/* CTA Button - span para que Link funcione siempre */}
+          <span
             className={styles.ctaButton}
-            onClick={(e) => {
-              e.preventDefault();
-              // Navigation is handled by Link wrapper
-            }}
-            disabled={!isAvailable}
             style={{
-              opacity: isAvailable ? 1 : 0.6,
-              cursor: isAvailable ? 'pointer' : 'not-allowed',
+              opacity: isAvailable ? 1 : 0.7,
+              cursor: 'pointer',
+              display: 'inline-block',
             }}
           >
-            {isAvailable ? 'Ver detalles' : 'No disponible'}
-          </button>
+            {isAvailable ? 'Ver detalles' : 'Ver detalles'}
+          </span>
         </div>
       </div>
     </Link>
