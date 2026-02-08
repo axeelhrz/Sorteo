@@ -1,14 +1,15 @@
+/* === Container y layout === */
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 32px 24px 64px;
 }
 
-/* Navigation Buttons */
+/* === Navegación === */
 .navigationButtons {
   display: flex;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   flex-wrap: wrap;
 }
 
@@ -17,116 +18,124 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  background: #f5f5f5;
-  color: #333;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  padding: 12px 20px;
+  background: white;
+  color: #0f172a;
+  border: 2px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.06);
 }
 
 .backLink:hover,
 .homeLink:hover {
-  background: #efefef;
-  border-color: #2196F3;
-  color: #2196F3;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
 }
 
 .backIcon,
 .homeIcon {
-  font-size: 16px;
+  font-size: 18px;
 }
 
-/* Loading and Error States */
+/* === Loading y Error === */
 .loadingContainer,
 .errorContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px;
+  padding: 120px 24px;
   text-align: center;
-  min-height: 400px;
+  min-height: 50vh;
 }
 
 .spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #e0e0e0;
-  border-top-color: #2196F3;
+  width: 56px;
+  height: 56px;
+  border: 4px solid rgba(99, 102, 241, 0.15);
+  border-top-color: #6366f1;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 20px;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .errorIcon {
-  font-size: 64px;
-  margin-bottom: 16px;
-  color: #667eea;
+  font-size: 72px;
+  margin-bottom: 20px;
+  color: #8b5cf6;
+  opacity: 0.9;
 }
 
 .errorTitle {
   margin: 0 0 12px 0;
   font-size: 28px;
-  font-weight: 700;
-  color: #333;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
 }
 
 .errorDescription {
-  margin: 0 0 24px 0;
+  margin: 0 0 32px 0;
   font-size: 16px;
-  color: #666;
-  max-width: 400px;
+  color: #64748b;
+  max-width: 420px;
+  line-height: 1.6;
 }
 
 .backButton {
-  padding: 12px 32px;
-  background: #2196F3;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
 }
 
 .backButton:hover {
-  background: #1976D2;
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(99, 102, 241, 0.45);
 }
 
-/* Main Content */
+/* === Contenido principal === */
 .content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 60px;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 48px;
+  margin-bottom: 72px;
+  align-items: start;
 }
 
-/* Left Column */
+/* === Columna izquierda === */
 .leftColumn {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
 }
 
 .imageContainer {
   position: relative;
   width: 100%;
   padding-bottom: 100%;
-  background: #f5f5f5;
-  border-radius: 12px;
+  background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.06);
 }
 
 .image {
@@ -139,69 +148,74 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-  color: #999;
-  font-size: 16px;
+  background: linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #94a3b8;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .statusBadge {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  padding: 8px 16px;
-  border-radius: 20px;
+  top: 20px;
+  right: 20px;
+  padding: 10px 18px;
+  border-radius: 12px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
   color: white;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .statusBadge.status-active {
-  background: #4CAF50;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
 }
 
 .statusBadge.status-sold_out {
-  background: #FF9800;
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
 }
 
 .statusBadge.status-finished {
-  background: #9C27B0;
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
 }
 
 .statusBadge.status-paused {
-  background: #FF9800;
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
 }
 
-/* Shop Info */
+/* === Info del organizador === */
 .shopInfo {
   background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.06);
 }
 
 .shopTitle {
-  margin: 0 0 16px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #999;
+  margin: 0 0 18px 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .shopCard {
   display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 20px;
   align-items: flex-start;
 }
 
 .shopLogo {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
   object-fit: cover;
+  border: 2px solid rgba(99, 102, 241, 0.1);
 }
 
 .shopDetails {
@@ -209,595 +223,614 @@
 }
 
 .shopName {
-  margin: 0 0 4px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
 }
 
 .verifiedBadge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #4CAF50;
+  gap: 6px;
+  font-size: 13px;
+  color: #6366f1;
   font-weight: 600;
 }
 
 .verifiedIcon {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .shopDescription {
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
   font-size: 14px;
-  color: #666;
-  line-height: 1.5;
+  color: #64748b;
+  line-height: 1.65;
 }
 
 .socialMedia {
-  margin: 16px 0;
-  padding: 12px;
-  background: #f0f7ff;
-  border-radius: 8px;
+  margin: 20px 0;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%);
+  border-radius: 14px;
+  border: 1px solid rgba(99, 102, 241, 0.08);
 }
 
 .socialLabel {
-  margin: 0 0 8px 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #666;
+  margin: 0 0 12px 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .socialLinks {
   margin: 0;
   font-size: 13px;
-  color: #2196F3;
-  word-break: break-word;
+}
+
+.socialLink {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 600;
+  margin-right: 16px;
+  transition: color 0.2s;
+}
+
+.socialLink:hover {
+  color: #8b5cf6;
 }
 
 .viewShopButton {
   width: 100%;
-  padding: 12px 16px;
-  background: #f5f5f5;
-  color: #333;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+  color: #6366f1;
+  border: 2px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .viewShopButton:hover {
-  background: #efefef;
-  border-color: #2196F3;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
 }
 
-/* Right Column */
+/* === Columna derecha === */
 .rightColumn {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
 }
 
-/* Product Section */
+/* === Sección del producto === */
 .productSection {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.06);
 }
 
 .productName {
-  margin: 0 0 20px 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: #333;
-  line-height: 1.3;
+  margin: 0 0 24px 0;
+  font-size: 30px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
 }
 
-/* Product Description Box */
+/* === Descripción === */
 .descriptionBox {
-  background: #f9f9f9;
-  border-left: 4px solid #667eea;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%);
+  border-left: 4px solid #6366f1;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 24px;
 }
 
 .descriptionTitle {
   margin: 0 0 12px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #667eea;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6366f1;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .productDescription {
   margin: 0;
   font-size: 15px;
-  color: #555;
-  line-height: 1.7;
+  color: #475569;
+  line-height: 1.75;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
+/* === Caja de valor === */
 .valueBox {
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  background: linear-gradient(135deg, #f0f7ff 0%, #e3f2fd 100%);
-  border-left: 4px solid #2196F3;
-  border-radius: 12px;
-  margin-bottom: 20px;
+  padding: 24px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 18px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.35);
 }
 
 .valueLabel {
-  font-size: 12px;
-  color: #666;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.2px;
   margin-bottom: 8px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .valueAmount {
-  font-size: 32px;
+  font-size: 36px;
   font-weight: 800;
-  color: #2196F3;
+  color: white;
   margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
 .valueSubtext {
-  font-size: 13px;
-  color: #718096;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
-  padding-top: 8px;
-  border-top: 1px solid rgba(33, 150, 243, 0.2);
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-/* Delivery Info */
+/* === Entrega === */
 .deliveryInfo {
-  background: #f9f9f9;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 20px;
+  background: #f8fafc;
+  border-radius: 18px;
+  padding: 24px;
+  margin-top: 4px;
+  border: 1px solid rgba(99, 102, 241, 0.06);
 }
 
 .deliveryTitle {
-  margin: 0 0 16px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
+  margin: 0 0 18px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
 .deliveryOptions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .deliveryOption {
   display: flex;
-  gap: 12px;
-  padding: 12px;
+  gap: 16px;
+  padding: 16px;
   background: white;
-  border-radius: 8px;
-  border-left: 4px solid #2196F3;
+  border-radius: 14px;
+  border-left: 4px solid #6366f1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .deliveryIcon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
-  color: #2196F3;
+  color: #6366f1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .deliveryOptionTitle {
-  margin: 0 0 4px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .deliveryOptionText {
   margin: 0;
   font-size: 13px;
-  color: #666;
-  line-height: 1.5;
+  color: #64748b;
+  line-height: 1.55;
 }
 
-/* Rules Section */
-.rulesSection {
+/* === Progreso === */
+.progressSection {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.06);
 }
 
 .sectionTitle {
-  margin: 0 0 16px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-.rulesList {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.rule {
-  display: flex;
-  gap: 12px;
-}
-
-.ruleIcon {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  color: #2196F3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ruleTitle {
-  margin: 0 0 4px 0;
+  margin: 0 0 20px 0;
   font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
-
-.ruleText {
-  margin: 0;
-  font-size: 13px;
-  color: #666;
-  line-height: 1.5;
-}
-
-/* Progress Section */
-.progressSection {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
 .progressHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .progressLabel {
   font-size: 13px;
-  color: #666;
-  font-weight: 500;
+  color: #64748b;
+  font-weight: 600;
 }
 
 .progressCount {
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .progressBar {
   width: 100%;
-  height: 10px;
-  background: #e0e0e0;
-  border-radius: 5px;
+  height: 12px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #4CAF50 0%, #45a049 100%);
-  border-radius: 5px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 8px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .progressFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .remainingTickets {
-  color: #666;
+  color: #64748b;
+  font-weight: 600;
 }
 
 .progressPercent {
-  font-weight: 600;
-  color: #333;
+  font-weight: 800;
+  color: #6366f1;
+  font-size: 16px;
 }
 
 .estimatedDate {
-  margin-top: 16px;
-  padding: 12px;
-  background: #f0f7ff;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  margin-top: 18px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
+  border-radius: 14px;
+  border: 1px solid rgba(99, 102, 241, 0.1);
 }
 
 .estimatedLabel {
-  font-size: 12px;
-  color: #666;
+  font-size: 11px;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  font-weight: 700;
 }
 
 .estimatedValue {
-  font-size: 16px;
-  font-weight: 600;
-  color: #2196F3;
+  font-size: 17px;
+  font-weight: 700;
+  color: #6366f1;
+  margin-top: 4px;
 }
 
-/* Deposit Info */
+/* === Reglas === */
+.rulesSection {
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.06);
+}
+
+.rulesList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rule {
+  display: flex;
+  gap: 16px;
+}
+
+.ruleIcon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  color: #6366f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ruleTitle {
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ruleText {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* === Depósito === */
 .depositInfo {
   display: flex;
-  gap: 12px;
-  background: #f0f7ff;
-  border-left: 4px solid #2196F3;
-  border-radius: 8px;
-  padding: 16px;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
+  border-left: 4px solid #6366f1;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid rgba(99, 102, 241, 0.08);
 }
 
 .depositIcon {
   font-size: 24px;
   flex-shrink: 0;
-  color: #2196F3;
+  color: #6366f1;
 }
 
 .depositTitle {
-  margin: 0 0 4px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .depositText {
   margin: 0;
   font-size: 13px;
-  color: #666;
-  line-height: 1.5;
-}
-
-/* User Participation */
-.userParticipation {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.participationText {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  color: #666;
+  color: #64748b;
   line-height: 1.6;
 }
 
+/* === Participación del usuario === */
+.userParticipation {
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.06);
+}
+
+.participationText {
+  margin: 0 0 14px 0;
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.65;
+}
+
 .ticketsList {
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .ticketNumbers {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0;
+  gap: 10px;
+  margin: 14px 0;
 }
 
 .ticketNumber {
   display: inline-block;
-  padding: 6px 12px;
-  background: #e3f2fd;
-  color: #1976d2;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'Courier New', monospace;
-  border: 1px solid #90caf9;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  color: #6366f1;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 .participationDate {
-  margin: 12px 0 0 0;
+  margin: 14px 0 0 0;
   font-size: 12px;
-  color: #999;
+  color: #94a3b8;
   font-style: italic;
 }
 
-/* Login Prompt */
+/* === Login prompt === */
 .loginPrompt {
-  background: #f5f5f5;
-  border-radius: 12px;
-  padding: 24px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%);
+  border-radius: 20px;
+  padding: 28px;
   text-align: center;
+  border: 2px dashed rgba(99, 102, 241, 0.2);
 }
 
 .loginText {
-  margin: 0 0 16px 0;
-  font-size: 14px;
-  color: #666;
-  line-height: 1.6;
+  margin: 0 0 20px 0;
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.65;
 }
 
 .loginButtons {
   display: flex;
-  gap: 12px;
+  gap: 14px;
 }
 
 .loginButton,
 .registerButton {
   flex: 1;
-  padding: 12px 16px;
+  padding: 14px 20px;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .loginButton {
-  background: #2196F3;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
 }
 
 .loginButton:hover {
-  background: #1976D2;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(99, 102, 241, 0.45);
 }
 
 .registerButton {
   background: white;
-  color: #2196F3;
-  border: 2px solid #2196F3;
+  color: #6366f1;
+  border: 2px solid #6366f1;
 }
 
 .registerButton:hover {
-  background: #f0f7ff;
+  background: rgba(99, 102, 241, 0.06);
+  transform: translateY(-2px);
 }
 
-/* CTA Buttons */
-.buyButton {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: auto;
-}
-
-.buyButton:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-}
-
-.buyButton:active {
-  transform: scale(0.98);
-}
-
+/* === Mensajes de estado === */
 .soldOutMessage,
 .finishedMessage {
-  padding: 20px;
-  background: #fff3cd;
-  border-left: 4px solid #FF9800;
-  border-radius: 8px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(249, 115, 22, 0.08) 100%);
+  border-left: 4px solid #f59e0b;
+  border-radius: 14px;
   text-align: center;
+  border: 1px solid rgba(245, 158, 11, 0.15);
 }
 
 .soldOutMessage p,
 .finishedMessage p {
-  margin: 0 0 16px 0;
-  font-size: 14px;
-  color: #856404;
-  font-weight: 600;
+  margin: 0 0 18px 0;
+  font-size: 15px;
+  color: #92400e;
+  font-weight: 700;
 }
 
 .viewWinnerButton {
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
 }
 
 .viewWinnerButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(99, 102, 241, 0.45);
 }
 
-/* Winner Section */
+/* === Sección ganador === */
 .winnerSection {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 12px;
-  padding: 40px 24px;
-  margin: 60px 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.08) 100%);
+  border-radius: 20px;
+  padding: 48px 32px;
+  margin: 64px 0;
   text-align: center;
+  border: 1px solid rgba(99, 102, 241, 0.1);
 }
 
 .winnerTitle {
-  margin: 0 0 24px 0;
+  margin: 0 0 28px 0;
   font-size: 28px;
-  font-weight: 700;
-  color: #333;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
 }
 
 .winnerCard {
   background: white;
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.06);
 }
 
 .winnerInfo {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .winnerLabel {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  color: #666;
+  margin: 0 0 10px 0;
+  font-size: 12px;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  font-weight: 700;
 }
 
 .winnerNumber {
   margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: #9C27B0;
-  font-family: 'Courier New', monospace;
+  font-size: 36px;
+  font-weight: 800;
+  color: #6366f1;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
 }
 
 .winnerDetails {
-  border-top: 1px solid #e0e0e0;
-  padding-top: 24px;
+  border-top: 1px solid rgba(99, 102, 241, 0.1);
+  padding-top: 28px;
 }
 
 .winnerDetailText {
   margin: 0;
   font-size: 14px;
-  color: #666;
-  line-height: 1.6;
+  color: #64748b;
+  line-height: 1.65;
 }
 
-/* Related Section */
+/* === Sección relacionados === */
 .relatedSection {
   text-align: center;
-  padding: 40px 0;
-  border-top: 1px solid #e0e0e0;
-  margin-top: 60px;
+  padding: 48px 0;
+  border-top: 1px solid rgba(99, 102, 241, 0.08);
+  margin-top: 64px;
 }
 
 .relatedTitle {
-  margin: 0 0 16px 0;
+  margin: 0 0 18px 0;
   font-size: 24px;
-  font-weight: 700;
-  color: #333;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
 }
 
 .relatedText {
@@ -806,27 +839,27 @@
 }
 
 .relatedText a {
-  color: #2196F3;
+  color: #6366f1;
   text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  font-weight: 700;
+  transition: all 0.2s;
 }
 
 .relatedText a:hover {
-  color: #1976D2;
+  color: #8b5cf6;
 }
 
-/* Responsive */
+/* === Responsive === */
 @media (max-width: 1024px) {
   .content {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 32px;
   }
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 24px 16px;
+    padding: 24px 16px 48px;
   }
 
   .productName {
@@ -834,11 +867,15 @@
   }
 
   .valueAmount {
-    font-size: 24px;
+    font-size: 28px;
+  }
+
+  .valueBox {
+    padding: 20px;
   }
 
   .winnerNumber {
-    font-size: 24px;
+    font-size: 28px;
   }
 
   .loginButtons {

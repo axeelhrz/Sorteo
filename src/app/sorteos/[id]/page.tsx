@@ -37,7 +37,7 @@ export default function RaffleDetailPage() {
       } catch (err) {
         console.error('Error loading raffle:', err);
         if (!hasLoadedOnce) {
-          setError('No pudimos cargar el sorteo. Intenta nuevamente.');
+          setError('No pudimos cargar la oportunidad. Intenta nuevamente.');
         }
       } finally {
         if (!hasLoadedOnce) {
@@ -92,7 +92,7 @@ export default function RaffleDetailPage() {
       <main className={styles.container}>
         <div className={styles.loadingContainer}>
           <div className={styles.spinner} />
-          <p>Cargando sorteo...</p>
+          <p>Cargando oportunidad...</p>
         </div>
       </main>
     );
@@ -103,9 +103,9 @@ export default function RaffleDetailPage() {
       <main className={styles.container}>
         <div className={styles.errorContainer}>
           <FiSearch className={styles.errorIcon} />
-          <h1 className={styles.errorTitle}>Sorteo no encontrado</h1>
+          <h1 className={styles.errorTitle}>Oportunidad no encontrada</h1>
           <p className={styles.errorDescription}>
-            El sorteo que buscas no existe o no está disponible en este momento.
+            La oportunidad que buscas no existe o no está disponible en este momento.
           </p>
           <Link href="/sorteos">
             <button className={styles.backButton}>Volver al listado</button>
@@ -255,7 +255,7 @@ export default function RaffleDetailPage() {
             )}
             
             <Link href={`/organizador/${raffle.shop?.id}`}>
-              <button className={styles.viewShopButton}>Ver otros sorteos</button>
+              <button className={styles.viewShopButton}>Ver otras oportunidades</button>
             </Link>
           </div>
         </div>
@@ -276,11 +276,13 @@ export default function RaffleDetailPage() {
 
             {/* Value */}
             <div className={styles.valueBox}>
-              <span className={styles.valueLabel}>Valor de Ticket</span>
-              <span className={styles.valueAmount}>S/ {(Number(raffle.productValue) / raffle.totalTickets).toFixed(2)}</span>
-              <span className={styles.valueSubtext}>
-                Valor total del producto: S/ {Number(raffle.productValue).toFixed(2)}
-              </span>
+              <span className={styles.valueLabel}>Unidad de participación</span>
+              <span className={styles.valueAmount}>S/ {Number(raffle.productValue).toFixed(2)}</span>
+              {raffle.product?.value != null && (
+                <span className={styles.valueSubtext}>
+                  Valor del producto: S/ {Number(raffle.product.value).toFixed(2)}
+                </span>
+              )}
             </div>
 
             {/* Delivery and Pickup Info */}
@@ -337,7 +339,7 @@ export default function RaffleDetailPage() {
 
           {/* Progress Section */}
           <div className={styles.progressSection}>
-            <h3 className={styles.sectionTitle}>Progreso del sorteo</h3>
+            <h3 className={styles.sectionTitle}>Progreso de la oportunidad</h3>
             <div className={styles.progressHeader}>
               <span className={styles.progressLabel}>Tickets vendidos</span>
               <span className={styles.progressCount}>
@@ -360,7 +362,7 @@ export default function RaffleDetailPage() {
             </div>
             {estimatedDate && isActive && (
               <div className={styles.estimatedDate}>
-                <span className={styles.estimatedLabel}>Fecha estimada del sorteo:</span>
+                <span className={styles.estimatedLabel}>Fecha estimada del resultado:</span>
                 <span className={styles.estimatedValue}>
                   {estimatedDate.toLocaleDateString('es-PE', {
                     year: 'numeric',
@@ -374,7 +376,7 @@ export default function RaffleDetailPage() {
 
           {/* Raffle Rules */}
           <div className={styles.rulesSection}>
-            <h3 className={styles.sectionTitle}>Cómo funciona este sorteo</h3>
+            <h3 className={styles.sectionTitle}>Cómo funciona esta oportunidad</h3>
             <div className={styles.rulesList}>
               <div className={styles.rule}>
                 <span className={styles.ruleIcon}>
@@ -387,7 +389,7 @@ export default function RaffleDetailPage() {
                 <div>
                   <p className={styles.ruleTitle}>Tickets limitados</p>
                   <p className={styles.ruleText}>
-                    Los tickets disponibles para este sorteo son limitados. Compra los tuyos antes de que se agoten.
+                    Los tickets disponibles para esta oportunidad son limitados. Compra los tuyos antes de que se agoten.
                   </p>
                 </div>
               </div>
@@ -404,7 +406,7 @@ export default function RaffleDetailPage() {
                 <div>
                   <p className={styles.ruleTitle}>Sorteo automático</p>
                   <p className={styles.ruleText}>
-                    Cuando se venden todos los tickets, el sorteo se ejecuta automáticamente.
+                    Cuando se venden todos los tickets, el resultado se ejecuta automáticamente.
                   </p>
                 </div>
               </div>
@@ -468,8 +470,8 @@ export default function RaffleDetailPage() {
                   )}
                 </div>
               ) : (
-                <p className={styles.participationText}>
-                  Aún no participas en este sorteo. ¡Compra tickets para tener oportunidad de ganar!
+                  <p className={styles.participationText}>
+                  Aún no participas en esta oportunidad. ¡Compra tickets para tener oportunidad de ganar!
                 </p>
               )}
             </div>
@@ -508,19 +510,19 @@ export default function RaffleDetailPage() {
 
           {isPaused && (
             <div className={styles.soldOutMessage}>
-              <p>Este sorteo está pausado temporalmente.</p>
+              <p>Esta oportunidad está pausada temporalmente.</p>
             </div>
           )}
 
           {isSoldOut && (
             <div className={styles.soldOutMessage}>
-              <p>Tickets agotados. El sorteo se ejecutará pronto.</p>
+              <p>Tickets agotados. El resultado se ejecutará pronto.</p>
             </div>
           )}
 
           {isFinished && (
             <div className={styles.finishedMessage}>
-              <p>Este sorteo ha finalizado.</p>
+              <p>Esta oportunidad ha finalizado.</p>
               <Link href={`/sorteos/${raffleId}/winner`}>
                 <button className={styles.viewWinnerButton}>
                   Ver ticket ganador →
@@ -534,12 +536,12 @@ export default function RaffleDetailPage() {
       {/* Winner Section (if finished) */}
       {isFinished && raffle.winnerTicketId && (
         <div className={styles.winnerSection}>
-          <h2 className={styles.winnerTitle}>Sorteo finalizado</h2>
+          <h2 className={styles.winnerTitle}>Oportunidad finalizada</h2>
           <div className={styles.winnerCard}>
             <div className={styles.winnerInfo}>
               <p className={styles.winnerLabel}>El ganador ha sido seleccionado</p>
               <p className={styles.winnerDetailText}>
-                El sorteo ha finalizado y el ganador ha sido notificado. Visita la página del ganador para ver más detalles.
+                La oportunidad ha finalizado y el ganador ha sido notificado. Visita la página del ganador para ver más detalles.
               </p>
             </div>
             <Link href={`/sorteos/${raffleId}/winner`}>
@@ -556,10 +558,10 @@ export default function RaffleDetailPage() {
 
         {/* Related Raffles */}
         <div className={styles.relatedSection}>
-          <h2 className={styles.relatedTitle}>Otros sorteos de este organizador</h2>
+          <h2 className={styles.relatedTitle}>Otras oportunidades de este organizador</h2>
           <p className={styles.relatedText}>
             <Link href={`/organizador/${raffle.shop?.id}`}>
-            Ver todos los sorteos de {raffle.shop?.name} →
+            Ver todas las oportunidades de {raffle.shop?.name} →
           </Link>
         </p>
       </div>
