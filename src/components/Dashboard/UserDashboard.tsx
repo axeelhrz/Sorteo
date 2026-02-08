@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { UserRole } from '@/types/auth';
@@ -9,6 +10,7 @@ import { FiLogOut, FiPlay, FiTag, FiAward, FiShoppingBag, FiStar } from 'react-i
 import { ticketAssignmentService } from '@/services/ticket-assignment-service';
 import { firebaseUserParticipationService } from '@/services/firebase-user-participation-service';
 import { winnerVerificationService } from '@/services/winner-verification-service';
+import { publicRaffleService } from '@/services/public-raffle-service';
 import { DeliveryConfirmation } from '@/components/UserPanel/DeliveryConfirmation';
 import type { WinnerInfo } from '@/types/raffle';
 import styles from './UserDashboard.module.css';
@@ -20,7 +22,9 @@ interface Raffle {
     id: string;
     name: string;
     value: number;
+    mainImage?: string;
   };
+  thumbnail?: string;
   totalTickets: number;
   soldTickets: number;
   status: string;
@@ -65,14 +69,10 @@ export default function UserDashboard() {
       try {
         setLoading(true);
 
-        const { raffleService } = await import('@/services/raffle-service');
         const { productService } = await import('@/services/product-service');
 
-        const allRaffles = await raffleService.getAllRaffles();
-        const visibleRaffles = allRaffles.filter((r: any) =>
-          r.status !== 'draft' && r.status !== 'rejected' && r.status !== 'pending_approval'
-        );
-        setActiveRaffles(visibleRaffles.map((r: any) => ({
+        const activeResult = await publicRaffleService.getActiveRaffles({ limit: 100 });
+        setActiveRaffles(activeResult.data.map((r: any) => ({
           ...r,
           createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
         })));
@@ -350,7 +350,7 @@ export default function UserDashboard() {
                             </td>
                             <td>
                               <Link href={`/sorteos/${r.id}`} className={styles.viewLink}>
-                                Ver sorteo →
+                                Ver detalles →
                               </Link>
                             </td>
                           </tr>
@@ -451,6 +451,24 @@ export default function UserDashboard() {
 
                 return (
                   <div key={raffle.id} className={styles.raffleCard}>
+                    <Link href={`/sorteos/${raffle.id}`} className={styles.raffleImageLink}>
+                      <div className={styles.raffleImageContainer}>
+                        {(raffle.thumbnail || raffle.product?.mainImage) ? (
+                          <Image
+                            src={raffle.thumbnail || raffle.product?.mainImage || ''}
+                            alt={productName}
+                            fill
+                            className={styles.raffleImage}
+                            sizes="(max-width: 768px) 100vw, 320px"
+                          />
+                        ) : (
+                          <div className={styles.raffleImagePlaceholder}>
+                            Sin imagen
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                    <div className={styles.raffleCardContent}>
                     <div className={styles.raffleHeader}>
                       <h3 className={styles.raffleName}>{productName}</h3>
                       <span 
@@ -539,6 +557,10 @@ export default function UserDashboard() {
                         {raffle.status === 'paused' && 'Pausado'}
                       </div>
                     )}
+                    <Link href={`/sorteos/${raffle.id}`} className={styles.viewDetailsLink}>
+                      Ver detalles →
+                    </Link>
+                    </div>
                   </div>
                 );
               })}

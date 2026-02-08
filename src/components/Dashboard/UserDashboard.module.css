@@ -305,11 +305,50 @@
 .raffleCard {
   border: 1px solid rgba(99, 102, 241, 0.1);
   border-radius: 12px;
-  padding: 20px;
+  overflow: hidden;
+  padding: 0;
   background: white;
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+}
+
+.raffleImageLink {
+  display: block;
+  flex-shrink: 0;
+}
+
+.raffleImageContainer {
+  position: relative;
+  width: 100%;
+  padding-bottom: 66.67%;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  overflow: hidden;
+}
+
+.raffleImage {
+  object-fit: cover;
+}
+
+.raffleImagePlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.raffleCardContent {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .raffleCard:hover {
@@ -323,6 +362,22 @@
   justify-content: space-between;
   align-items: start;
   margin-bottom: 15px;
+}
+
+.viewDetailsLink {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(99, 102, 241, 0.1);
+  font-size: 14px;
+  font-weight: 600;
+  color: #6366f1;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.viewDetailsLink:hover {
+  color: #8b5cf6;
 }
 
 .raffleName {
