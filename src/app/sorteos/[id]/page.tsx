@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { FiSearch, FiLock, FiCheckCircle, FiArrowLeft, FiHome } from 'react-icons/fi';
+import { FiSearch, FiLock, FiArrowLeft, FiHome } from 'react-icons/fi';
 import { publicRaffleService } from '@/services/public-raffle-service';
 import { useAuth } from '@/hooks/useAuth';
 import { Raffle, RaffleStatus } from '@/types/raffle';
@@ -186,78 +186,6 @@ export default function RaffleDetailPage() {
               {raffle.status === RaffleStatus.FINISHED && 'Finalizado'}
             </div>
           </div>
-
-        {/* Shop Info */}
-        <div className={styles.shopInfo}>
-          <h3 className={styles.shopTitle}>Organizador</h3>
-          <div className={styles.shopCard}>
-              {raffle.shop?.logo && (
-                <Image
-                  src={raffle.shop.logo}
-                  alt={raffle.shop.name}
-                  width={48}
-                  height={48}
-                  className={styles.shopLogo}
-                />
-              )}
-              <div className={styles.shopDetails}>
-                <h4 className={styles.shopName}>{raffle.shop?.name}</h4>
-                {raffle.shop?.status === 'verified' && (
-              <span className={styles.verifiedBadge}>
-                <FiCheckCircle className={styles.verifiedIcon} />
-                Organizador verificado
-              </span>
-                )}
-              </div>
-            </div>
-            {raffle.shop?.description && (
-              <p className={styles.shopDescription}>{raffle.shop.description}</p>
-            )}
-            
-            {/* Social Media */}
-            {raffle.shop?.socialMedia && Object.keys(raffle.shop.socialMedia).length > 0 && (
-              <div className={styles.socialMedia}>
-                <p className={styles.socialLabel}>Síguenos en redes sociales:</p>
-                <div className={styles.socialLinks}>
-                  {raffle.shop.socialMedia.facebook && (
-                    <a href={raffle.shop.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                      Facebook
-                    </a>
-                  )}
-                  {raffle.shop.socialMedia.instagram && (
-                    <a href={raffle.shop.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                      Instagram
-                    </a>
-                  )}
-                  {raffle.shop.socialMedia.twitter && (
-                    <a href={raffle.shop.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                      Twitter
-                    </a>
-                  )}
-                  {raffle.shop.socialMedia.tiktok && (
-                    <a href={raffle.shop.socialMedia.tiktok} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                      TikTok
-                    </a>
-                  )}
-                  {raffle.shop.socialMedia.whatsapp && (
-                    <a href={`https://wa.me/${raffle.shop.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                      WhatsApp
-                    </a>
-                  )}
-                  {raffle.shop.socialMedia.website && (
-                    <a href={raffle.shop.socialMedia.website} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                      Sitio Web
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
-            
-            <Link href={`/organizador/${raffle.shop?.id}`}>
-              <button className={styles.viewShopButton}>Ver otras oportunidades</button>
-            </Link>
-          </div>
-        </div>
 
         {/* Right Column - Details and CTA */}
         <div className={styles.rightColumn}>
@@ -551,16 +479,6 @@ export default function RaffleDetailPage() {
           </div>
         </div>
       )}
-
-      {/* Related Raffles */}
-        <div className={styles.relatedSection}>
-          <h2 className={styles.relatedTitle}>Otras oportunidades de este organizador</h2>
-          <p className={styles.relatedText}>
-            <Link href={`/organizador/${raffle.shop?.id}`}>
-            Ver todas las oportunidades de {raffle.shop?.name} →
-          </Link>
-        </p>
-      </div>
     </main>
   );
 }
