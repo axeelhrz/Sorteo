@@ -10,7 +10,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { Raffle, RaffleStatus } from '@/types/raffle';
 import { BuyTicketsBlock } from '@/components/marketplace/BuyTicketsBlock';
 import { apiClient } from '@/lib/api-client';
-import HowItWorks from '@/components/marketplace/HowItWorks';
 import styles from './detail.module.css';
 
 export default function RaffleDetailPage() {
@@ -553,10 +552,7 @@ export default function RaffleDetailPage() {
         </div>
       )}
 
-      {/* How It Works */}
-      <HowItWorks />
-
-        {/* Related Raffles */}
+      {/* Related Raffles */}
         <div className={styles.relatedSection}>
           <h2 className={styles.relatedTitle}>Otras oportunidades de este organizador</h2>
           <p className={styles.relatedText}>
