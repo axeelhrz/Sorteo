@@ -1,5 +1,18 @@
 # Firebase: permisos (Firestore) y CORS (Storage)
 
+## 0. Oportunidades públicas (marketplace) sin login
+
+El listado de oportunidades (`/sorteos`) y el detalle (`/sorteos/[id]`) deben ser visibles **sin iniciar sesión**. Para evitar depender de reglas de Firestore que permitan lectura anónima, la app usa **API routes** con **Firebase Admin SDK**:
+
+- `GET /api/raffles/active` – lista de oportunidades activas
+- `GET /api/raffles/[id]` – detalle de una oportunidad
+- `GET /api/raffles/categories` – categorías
+- `GET /api/raffles/shops` – organizadores con oportunidades activas
+
+El Admin SDK tiene acceso total a Firestore y no está sujeto a las reglas de seguridad del cliente. Las oportunidades se cargan correctamente aunque el usuario no esté logueado.
+
+---
+
 ## 1. Error: "Missing or insufficient permissions" al cargar organizadores/shops
 
 **Causa:** El panel de admin (`/dashboard/admin` → Organizadores) lee la colección `shops` desde el navegador. Si las reglas de Firestore no permiten esa lectura, aparece este error.

@@ -53,7 +53,7 @@ export default function SorteosPage() {
       setTotalRaffles(result.total);
     } catch (err: any) {
       console.error('Error loading raffles:', err);
-      setError('No pudimos cargar los sorteos. Intenta nuevamente.');
+      setError('No pudimos cargar las oportunidades. Intenta nuevamente.');
       setRaffles([]);
     } finally {
       setIsLoading(false);
