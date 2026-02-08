@@ -186,6 +186,7 @@ export default function RaffleDetailPage() {
               {raffle.status === RaffleStatus.FINISHED && 'Finalizado'}
             </div>
           </div>
+        </div>
 
         {/* Right Column - Details and CTA */}
         <div className={styles.rightColumn}>
