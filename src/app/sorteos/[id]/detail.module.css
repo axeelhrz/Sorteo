@@ -393,6 +393,31 @@
   border-top: 1px solid rgba(255, 255, 255, 0.25);
 }
 
+.deliveryCostRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid rgba(99, 102, 241, 0.08);
+}
+
+.deliveryCostLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.deliveryCostValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
 /* === Entrega === */
 .deliveryInfo {
   background: #f8fafc;

@@ -165,10 +165,10 @@ export default function RaffleDetailPage() {
         <div className={styles.leftColumn}>
           {/* Product Image */}
           <div className={styles.imageContainer}>
-            {raffle.product?.mainImage ? (
+            {(raffle.thumbnail || raffle.product?.mainImage) ? (
               <Image
-                src={raffle.product.mainImage}
-                alt={raffle.product.name}
+                src={raffle.thumbnail || raffle.product!.mainImage!}
+                alt={raffle.product?.name || 'Producto'}
                 fill
                 className={styles.image}
                 priority
@@ -211,6 +211,18 @@ export default function RaffleDetailPage() {
                   Valor del producto: S/ {Number(raffle.product.value).toFixed(2)}
                 </span>
               )}
+            </div>
+
+            {/* Delivery cost */}
+            <div className={styles.deliveryCostRow}>
+              <span className={styles.deliveryCostLabel}>Delivery</span>
+              <span className={styles.deliveryCostValue}>
+                {raffle.product?.pickupInStore
+                  ? 'N/A'
+                  : raffle.product?.deliveryCost != null && raffle.product.deliveryCost > 0
+                    ? `S/ ${Number(raffle.product.deliveryCost).toFixed(2)}`
+                    : 'N/A'}
+              </span>
             </div>
 
             {/* Delivery and Pickup Info */}

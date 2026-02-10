@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { FiX, FiAlertTriangle, FiCheck } from 'react-icons/fi';
 import { Raffle, WinnerInfo } from '@/types/raffle';
 import { WinnerValidation } from '@/components/ShopPanel/WinnerValidation';
@@ -88,6 +89,23 @@ export default function RaffleModals({
             </div>
 
             <div className={styles.modalBodyNew}>
+              {/* Imagen del producto */}
+              <div style={{ marginBottom: '24px', borderRadius: '12px', overflow: 'hidden', position: 'relative', width: '100%', maxHeight: '240px', backgroundColor: '#f1f5f9' }}>
+                {(viewModal.raffle.thumbnail || viewModal.raffle.product?.mainImage) ? (
+                  <Image
+                    src={viewModal.raffle.thumbnail || viewModal.raffle.product!.mainImage!}
+                    alt={viewModal.raffle.product?.name || 'Producto'}
+                    width={400}
+                    height={240}
+                    style={{ width: '100%', height: 'auto', objectFit: 'cover', maxHeight: '240px' }}
+                  />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '180px', color: '#94a3b8', fontSize: '14px' }}>
+                    Sin imagen disponible
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                 {/* Información del Producto */}
                 <div>
@@ -150,6 +168,20 @@ export default function RaffleModals({
                   </h3>
                   <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#10b981' }}>
                     S/. {viewModal.raffle.productValue.toFixed(2)}
+                  </p>
+                </div>
+
+                {/* Delivery */}
+                <div>
+                  <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: '12px' }}>
+                    Delivery
+                  </h3>
+                  <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>
+                    {viewModal.raffle.product?.pickupInStore
+                      ? 'N/A'
+                      : viewModal.raffle.product?.deliveryCost != null && viewModal.raffle.product.deliveryCost > 0
+                        ? `S/. ${Number(viewModal.raffle.product.deliveryCost).toFixed(2)}`
+                        : 'N/A'}
                   </p>
                 </div>
 
