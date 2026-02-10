@@ -25,17 +25,19 @@ const PendingRafflesPage = dynamic(() => import('@/views/admin/raffles/pending/p
 const ActiveRafflesPage = dynamic(() => import('@/views/admin/raffles/active/page'), { ssr: false });
 const FinishedRafflesPage = dynamic(() => import('@/views/admin/raffles/finished/page'), { ssr: false });
 const AdminPaymentsPage = dynamic(() => import('@/views/admin/payments/page'), { ssr: false });
+const AdminPaymentsToOrganizersPage = dynamic(() => import('@/views/admin/payments-to-organizers/page'), { ssr: false });
 const AdminUsersPage = dynamic(() => import('@/views/admin/users/page'), { ssr: false });
 const AdminShopsPage = dynamic(() => import('@/views/admin/shops/page'), { ssr: false });
 
-type AdminTab = 'resumen' | 'sorteos-pendientes' | 'sorteos-activos' | 'sorteos-finalizados' | 'pagos' | 'usuarios' | 'organizadores';
+type AdminTab = 'resumen' | 'sorteos-pendientes' | 'sorteos-activos' | 'sorteos-finalizados' | 'tickets' | 'pagos' | 'usuarios' | 'organizadores';
 
 const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'resumen', label: 'Resumen', icon: <FiBarChart2 /> },
   { id: 'sorteos-pendientes', label: 'Sorteos Pendientes', icon: <FiClock /> },
   { id: 'sorteos-activos', label: 'Sorteos Activos', icon: <FiPlay /> },
   { id: 'sorteos-finalizados', label: 'Sorteos Finalizados', icon: <FiCheckCircle /> },
-  { id: 'pagos', label: 'Tickets', icon: <FiCreditCard /> },
+  { id: 'tickets', label: 'Tickets', icon: <FiCreditCard /> },
+  { id: 'pagos', label: 'Pagos', icon: <FiDollarSign /> },
   { id: 'usuarios', label: 'Usuarios', icon: <FiUsers /> },
   { id: 'organizadores', label: 'Organizadores', icon: <FiShoppingBag /> },
 ];
@@ -282,7 +284,8 @@ export default function AdminDashboard() {
           {activeTab === 'sorteos-pendientes' && <PendingRafflesPage />}
           {activeTab === 'sorteos-activos' && <ActiveRafflesPage />}
           {activeTab === 'sorteos-finalizados' && <FinishedRafflesPage />}
-          {activeTab === 'pagos' && <AdminPaymentsPage />}
+          {activeTab === 'tickets' && <AdminPaymentsPage />}
+          {activeTab === 'pagos' && <AdminPaymentsToOrganizersPage />}
           {activeTab === 'usuarios' && <AdminUsersPage />}
           {activeTab === 'organizadores' && <AdminShopsPage />}
         </div>
