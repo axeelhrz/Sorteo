@@ -268,20 +268,30 @@ export default function AdminDashboard() {
                     <div className={styles.statChange}><span>{stats.payments.pending} pendientes · {stats.payments.completed} completados</span></div>
                   </div>
                   <div className={styles.statCard} style={{ gridColumn: '1 / -1' }}>
-                    <div className={styles.statHeader}>
-                      <div>
-                        <div className={styles.statLabel}>Ingresos totales</div>
-                        <div className={styles.statValue} style={{ fontSize: '36px' }}>
-                          S/. {stats.payments.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <div className={styles.statHeader} style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '20px 32px', flex: 1 }}>
+                        <div>
+                          <div className={styles.statLabel}>Ingresos totales</div>
+                          <div className={styles.statValue} style={{ fontSize: '36px' }}>
+                            S/. {stats.payments.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </div>
+                        </div>
+                        <div>
+                          <div className={styles.statLabel}>Pago Organizadores</div>
+                          <div className={styles.statValue} style={{ fontSize: '36px' }}>
+                            S/. {(stats.payments.paymentToOrganizers ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </div>
+                        </div>
+                        <div>
+                          <div className={styles.statLabel}>Ingreso de la Plataforma</div>
+                          <div className={styles.statValue} style={{ fontSize: '36px' }}>
+                            S/. {(stats.payments.platformIncome ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </div>
                         </div>
                       </div>
                       <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', width: 56, height: 56, fontSize: 28 }}>
                         <FiDollarSign />
                       </div>
-                    </div>
-                    <div className={styles.statChange} style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
-                      <span><strong>Pago Organizadores:</strong> S/. {(stats.payments.paymentToOrganizers ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                      <span><strong>Ingreso de la Plataforma:</strong> S/. {(stats.payments.platformIncome ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   </div>
                 </div>
