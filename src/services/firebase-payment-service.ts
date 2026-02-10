@@ -9,6 +9,8 @@ import {
   query,
   where,
   getDocs,
+  orderBy,
+  limit as firestoreLimit,
   Timestamp
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -173,6 +175,38 @@ export const firebasePaymentService = {
       return await this.getPaymentById(paymentId);
     } catch (error) {
       console.error('Error confirming payment with voucher:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get all payments (for admin history)
+   */
+  async getAllPayments(maxLimit = 500): Promise<Payment[]> {
+    try {
+      const paymentsRef = collection(db, 'payments');
+      const q = query(
+        paymentsRef,
+        orderBy('createdAt', 'desc'),
+        firestoreLimit(maxLimit)
+      );
+      const querySnapshot = await getDocs(q);
+
+      return querySnapshot.docs.map((docSnap) => {
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          ...data,
+          createdAt: convertTimestamp(data.createdAt),
+          updatedAt: convertTimestamp(data.updatedAt),
+          voucherUploadedAt: convertTimestamp(data.voucherUploadedAt),
+          completedAt: convertTimestamp(data.completedAt),
+          failedAt: convertTimestamp(data.failedAt),
+          ocrProcessedAt: convertTimestamp(data.ocrProcessedAt),
+        } as Payment;
+      });
+    } catch (error) {
+      console.error('Error fetching all payments:', error);
       throw error;
     }
   },

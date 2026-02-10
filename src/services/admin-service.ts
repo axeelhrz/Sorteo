@@ -205,6 +205,30 @@ export const adminService = {
   },
 
   /**
+   * Get raffle data with shopId (for history filters)
+   */
+  async getRaffleDataWithShop(raffleId: string): Promise<{ name: string; shopId?: string }> {
+    try {
+      const raffleDoc = await getDoc(doc(db, 'raffles', raffleId));
+      if (raffleDoc.exists()) {
+        const raffleData = raffleDoc.data();
+        let name = 'Sorteo';
+        if (raffleData.productId) {
+          const productDoc = await getDoc(doc(db, 'products', raffleData.productId));
+          if (productDoc.exists()) {
+            name = productDoc.data().name || 'Sorteo';
+          }
+        }
+        return { name, shopId: raffleData.shopId };
+      }
+      return { name: 'Sorteo' };
+    } catch (error) {
+      console.error('Error getting raffle data:', error);
+      return { name: 'Sorteo' };
+    }
+  },
+
+  /**
    * Get all pending validation payments
    */
   async getPendingPayments(): Promise<Payment[]> {
@@ -212,6 +236,154 @@ export const adminService = {
       return await firebasePaymentService.getPendingValidationPayments();
     } catch (error) {
       console.error('Error getting pending payments:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get unified payment history: compras (user ticket purchases) + pagos a organizadores
+   * Supports filters: tipo, shopId, userId, oportunidad (text search)
+   */
+  async getPaymentHistory(filters?: {
+    tipo?: 'compra' | 'pago_organizador';
+    shopId?: string;
+    userId?: string;
+    oportunidad?: string;
+  }): Promise<{
+    items: Array<{
+      id: string;
+      type: 'compra' | 'pago_organizador';
+      date: Date | string;
+      amount: number;
+      status?: string;
+      userName?: string;
+      userEmail?: string;
+      shopName?: string;
+      opportunityName?: string;
+      raffleId?: string;
+      ticketQuantity?: number;
+      paymentEvidenceUrl?: string;
+    }>;
+    shops: Array<{ id: string; name: string }>;
+    users: Array<{ id: string; name: string; email: string }>;
+  }> {
+    try {
+      const [paymentsRaw, { data: finishedRaffles }] = await Promise.all([
+        firebasePaymentService.getAllPayments(300),
+        this.getFinishedRaffles(300, 0),
+      ]);
+
+      const organizerPayments = finishedRaffles.filter((r: any) => r.paymentToOrganizerAt != null);
+      const toDate = (v: any) => (v?.toDate ? v.toDate() : v instanceof Date ? v : v ? new Date(v) : undefined);
+
+      const compras = await Promise.all(
+        paymentsRaw.map(async (p) => {
+          const [userData, raffleData] = await Promise.all([
+            this.getUserData(p.userId),
+            this.getRaffleDataWithShop(p.raffleId),
+          ]);
+          const date = toDate(p.completedAt || p.createdAt) || new Date(0);
+          return {
+            id: p.id,
+            type: 'compra' as const,
+            date,
+            amount: p.amount || 0,
+            status: p.status,
+            userName: userData.name,
+            userEmail: userData.email,
+            shopId: raffleData.shopId,
+            opportunityName: raffleData.name,
+            raffleId: p.raffleId,
+            ticketQuantity: p.ticketQuantity,
+            userId: p.userId,
+          };
+        })
+      );
+
+      const pagosOrg = organizerPayments.map((r: any) => {
+        const date = toDate(r.paymentToOrganizerAt) || new Date(0);
+        const amount = (r.soldTickets || 0) * (r.productValue || 0);
+        return {
+          id: `org-${r.id}`,
+          type: 'pago_organizador' as const,
+          date,
+          amount,
+          shopName: r.shop?.name || 'N/A',
+          shopId: r.shopId,
+          opportunityName: r.product?.name || 'N/A',
+          raffleId: r.id,
+          paymentEvidenceUrl: r.paymentEvidenceUrl,
+        };
+      });
+
+      let items = [...compras, ...pagosOrg].sort((a, b) => {
+        const da = a.date instanceof Date ? a.date.getTime() : new Date(a.date).getTime();
+        const db_ = b.date instanceof Date ? b.date.getTime() : new Date(b.date).getTime();
+        return db_ - da;
+      });
+
+      if (filters?.tipo) {
+        items = items.filter((i) => i.type === filters.tipo);
+      }
+      if (filters?.shopId) {
+        items = items.filter((i) => (i as any).shopId === filters.shopId);
+      }
+      if (filters?.userId) {
+        items = items.filter((i) => (i as any).userId === filters.userId);
+      }
+      if (filters?.oportunidad && filters.oportunidad.trim()) {
+        const q = filters.oportunidad.trim().toLowerCase();
+        items = items.filter(
+          (i) => (i.opportunityName || '').toLowerCase().includes(q)
+        );
+      }
+
+      const shopIds = new Set<string>();
+      const userIds = new Set<string>();
+      compras.forEach((c) => {
+        if ((c as any).shopId) shopIds.add((c as any).shopId);
+        if ((c as any).userId) userIds.add((c as any).userId);
+      });
+      organizerPayments.forEach((r: any) => {
+        if (r.shopId) shopIds.add(r.shopId);
+      });
+
+      const shopsList: Array<{ id: string; name: string }> = [];
+      for (const sid of shopIds) {
+        const shopDoc = await getDoc(doc(db, 'shops', sid));
+        if (shopDoc.exists()) {
+          shopsList.push({ id: shopDoc.id, name: shopDoc.data().name || 'N/A' });
+        }
+      }
+      shopsList.sort((a, b) => a.name.localeCompare(b.name));
+
+      const usersList: Array<{ id: string; name: string; email: string }> = [];
+      for (const uid of userIds) {
+        const userData = await this.getUserData(uid);
+        usersList.push({ id: uid, name: userData.name, email: userData.email });
+      }
+      usersList.sort((a, b) => a.name.localeCompare(b.name));
+
+      return {
+        items: items.map((i: any) => ({
+          id: i.id,
+          type: i.type,
+          date: i.date instanceof Date ? i.date.toISOString() : (typeof i.date === 'string' ? i.date : ''),
+          amount: i.amount,
+          status: i.status,
+          userName: i.userName,
+          userEmail: i.userEmail,
+          shopName: i.shopName,
+          opportunityName: i.opportunityName,
+          raffleId: i.raffleId,
+          ticketQuantity: i.ticketQuantity,
+          paymentEvidenceUrl: i.paymentEvidenceUrl,
+        })),
+        shops: shopsList,
+        users: usersList,
+      };
+    } catch (error) {
+      console.error('Error getting payment history:', error);
       throw error;
     }
   },

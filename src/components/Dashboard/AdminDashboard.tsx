@@ -15,6 +15,7 @@ import {
   FiCreditCard,
   FiDollarSign,
   FiBarChart2,
+  FiList,
 } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
 import dynamic from 'next/dynamic';
@@ -26,10 +27,11 @@ const ActiveRafflesPage = dynamic(() => import('@/views/admin/raffles/active/pag
 const FinishedRafflesPage = dynamic(() => import('@/views/admin/raffles/finished/page'), { ssr: false });
 const AdminPaymentsPage = dynamic(() => import('@/views/admin/payments/page'), { ssr: false });
 const AdminPaymentsToOrganizersPage = dynamic(() => import('@/views/admin/payments-to-organizers/page'), { ssr: false });
+const AdminHistoryPage = dynamic(() => import('@/views/admin/history/page'), { ssr: false });
 const AdminUsersPage = dynamic(() => import('@/views/admin/users/page'), { ssr: false });
 const AdminShopsPage = dynamic(() => import('@/views/admin/shops/page'), { ssr: false });
 
-type AdminTab = 'resumen' | 'sorteos-pendientes' | 'sorteos-activos' | 'sorteos-finalizados' | 'tickets' | 'pagos' | 'usuarios' | 'organizadores';
+type AdminTab = 'resumen' | 'sorteos-pendientes' | 'sorteos-activos' | 'sorteos-finalizados' | 'tickets' | 'pagos' | 'historial' | 'usuarios' | 'organizadores';
 
 const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'resumen', label: 'Resumen', icon: <FiBarChart2 /> },
@@ -38,6 +40,7 @@ const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'sorteos-finalizados', label: 'Sorteos Finalizados', icon: <FiCheckCircle /> },
   { id: 'tickets', label: 'Tickets', icon: <FiCreditCard /> },
   { id: 'pagos', label: 'Pagos', icon: <FiDollarSign /> },
+  { id: 'historial', label: 'Historial', icon: <FiList /> },
   { id: 'usuarios', label: 'Usuarios', icon: <FiUsers /> },
   { id: 'organizadores', label: 'Organizadores', icon: <FiShoppingBag /> },
 ];
@@ -286,6 +289,7 @@ export default function AdminDashboard() {
           {activeTab === 'sorteos-finalizados' && <FinishedRafflesPage />}
           {activeTab === 'tickets' && <AdminPaymentsPage />}
           {activeTab === 'pagos' && <AdminPaymentsToOrganizersPage />}
+          {activeTab === 'historial' && <AdminHistoryPage />}
           {activeTab === 'usuarios' && <AdminUsersPage />}
           {activeTab === 'organizadores' && <AdminShopsPage />}
         </div>
