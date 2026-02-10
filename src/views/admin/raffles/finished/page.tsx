@@ -6,7 +6,9 @@ import { adminService } from '@/services/admin-service';
 import styles from '@/views/admin/admin.module.css';
 
 interface WinnerInfo {
+  userId?: string;
   userName?: string;
+  userEmail?: string;
   ticketNumber?: number;
   verificationCode?: string;
   claimedAt?: string | Date;
@@ -68,11 +70,40 @@ export default function FinishedRaffles() {
     }
   };
 
-  const getWinnerInfo = (raffle: Raffle) => {
+  const getWinnerTicket = (raffle: Raffle) => {
     if (raffle.winnerInfo?.ticketNumber != null) return `Ticket #${raffle.winnerInfo.ticketNumber}`;
-    if (!raffle.winnerTicketId) return 'No hay ganador';
+    if (!raffle.winnerTicketId) return '—';
     const winnerTicket = raffle.tickets?.find((t: any) => t.id === raffle.winnerTicketId);
-    return winnerTicket ? `Ticket #${winnerTicket.number}` : 'Ganador no encontrado';
+    return winnerTicket ? `Ticket #${winnerTicket.number}` : '—';
+  };
+
+  const getWinnerUser = (raffle: Raffle) => {
+    if (raffle.winnerInfo?.userName) return raffle.winnerInfo.userName;
+    if (raffle.winnerInfo?.userEmail) return raffle.winnerInfo.userEmail;
+    return '—';
+  };
+
+  /** Estados: Ejecutado (en proceso), Pago Pendiente (evidencia no subida), Finalizado (cierre completo) */
+  const getClosureStatus = (raffle: Raffle): 'ejecutado' | 'pago_pendiente' | 'finalizado' => {
+    if (raffle.paymentToOrganizerAt) return 'finalizado';
+    const wi = raffle.winnerInfo;
+    const deliveryDone = wi?.deliveryConfirmedAt || wi?.deliveryEvidence?.photoUrl;
+    if (deliveryDone) return 'pago_pendiente';
+    return 'ejecutado';
+  };
+
+  const getClosureStatusLabel = (raffle: Raffle) => {
+    const s = getClosureStatus(raffle);
+    if (s === 'finalizado') return 'Finalizado';
+    if (s === 'pago_pendiente') return 'Pago Pendiente';
+    return 'Ejecutado';
+  };
+
+  const getClosureStatusBadgeClass = (raffle: Raffle) => {
+    const s = getClosureStatus(raffle);
+    if (s === 'finalizado') return styles.statusFinalizado;
+    if (s === 'pago_pendiente') return styles.statusPagoPendiente;
+    return styles.statusEjecutado;
   };
 
   const formatDate = (v: string | Date | undefined | { toDate?: () => Date } | null) => {
@@ -161,7 +192,8 @@ export default function FinishedRaffles() {
                   <th className={styles.finishedTh}>Producto</th>
                   <th className={styles.finishedTh}>Valor</th>
                   <th className={styles.finishedTh}>Tickets</th>
-                  <th className={styles.finishedTh}>Ganador</th>
+                  <th className={styles.finishedTh}>Ticket ganador</th>
+                  <th className={styles.finishedTh}>Usuario ganador</th>
                   <th className={styles.finishedTh}>Fecha fin</th>
                   <th className={styles.finishedTh}>Estado</th>
                   <th className={styles.finishedThActions}>Acciones</th>
@@ -180,7 +212,13 @@ export default function FinishedRaffles() {
                         {raffle.soldTickets} / {raffle.totalTickets}
                       </span>
                     </td>
-                    <td className={styles.finishedTdWinner}>{getWinnerInfo(raffle)}</td>
+                    <td className={styles.finishedTdWinner}>{getWinnerTicket(raffle)}</td>
+                    <td className={styles.finishedTdWinner}>
+                      {getWinnerUser(raffle)}
+                      {raffle.winnerInfo?.userEmail && raffle.winnerInfo?.userName && (
+                        <span style={{ display: 'block', fontSize: 11, color: '#64748b', marginTop: 2 }}>{raffle.winnerInfo.userEmail}</span>
+                      )}
+                    </td>
                     <td className={styles.finishedTdDate}>
                       {new Date(raffle.raffleExecutedAt).toLocaleDateString('es-PE', {
                         day: '2-digit',
@@ -189,8 +227,8 @@ export default function FinishedRaffles() {
                       })}
                     </td>
                     <td>
-                      <span className={`${styles.statusBadge} ${styles[raffle.status]}`}>
-                        {raffle.status === 'finished' ? 'Finalizado' : 'Agotado'}
+                      <span className={`${styles.statusBadge} ${getClosureStatusBadgeClass(raffle)}`}>
+                        {getClosureStatusLabel(raffle)}
                       </span>
                     </td>
                     <td className={styles.finishedTdActions}>
@@ -268,10 +306,24 @@ export default function FinishedRaffles() {
                   </p>
                 </div>
                 <div className={styles.detailGridItem}>
-                  <label>Ganador</label>
+                  <label>Ticket ganador</label>
+                  <p className={styles.value}>{getWinnerTicket(selectedRaffle)}</p>
+                </div>
+                <div className={styles.detailGridItem}>
+                  <label>Usuario ganador</label>
                   <p className={styles.value}>
-                    {getWinnerInfo(selectedRaffle)}
-                    {selectedRaffle.winnerInfo?.userName && ` (${selectedRaffle.winnerInfo.userName})`}
+                    {selectedRaffle.winnerInfo?.userName || selectedRaffle.winnerInfo?.userEmail || '—'}
+                    {selectedRaffle.winnerInfo?.userEmail && selectedRaffle.winnerInfo?.userName && (
+                      <span style={{ display: 'block', fontSize: 13, color: '#64748b', marginTop: 4 }}>{selectedRaffle.winnerInfo.userEmail}</span>
+                    )}
+                  </p>
+                </div>
+                <div className={styles.detailGridItem}>
+                  <label>Estado</label>
+                  <p className={styles.value}>
+                    <span className={`${styles.statusBadge} ${getClosureStatusBadgeClass(selectedRaffle)}`}>
+                      {getClosureStatusLabel(selectedRaffle)}
+                    </span>
                   </p>
                 </div>
                 <div className={styles.detailGridItem} style={{ gridColumn: '1 / -1' }}>

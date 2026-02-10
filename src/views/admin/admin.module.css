@@ -689,6 +689,22 @@
   color: #721c24;
 }
 
+/* Estados de cierre (Sorteos Finalizados) */
+.statusBadge.statusEjecutado {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.statusBadge.statusPagoPendiente {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.statusBadge.statusFinalizado {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
 /* User role badges (Gestión de Usuarios) */
 .userRoleAdmin {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
