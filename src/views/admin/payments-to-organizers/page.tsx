@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FiDollarSign, FiExternalLink, FiCheck } from 'react-icons/fi';
+import { FiDollarSign, FiExternalLink } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
 import Link from 'next/link';
 
