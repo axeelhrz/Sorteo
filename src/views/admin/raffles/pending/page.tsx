@@ -403,7 +403,7 @@ export default function PendingRafflesPage() {
 
             {/* Definir aprobación: valores iniciales = organizador, editables por admin */}
             <div style={{ padding: '0 24px 24px' }}>
-              <p style={{ ...modalStyles.sectionTitle, marginBottom: '14px' }}>Aprobación (valores del organizador; puedes modificarlos)</p>
+              <p style={{ ...modalStyles.sectionTitle, marginBottom: '14px' }}>Aprobación</p>
               <div style={{ display: 'grid', gap: '16px' }}>
                 <div>
                   <label style={modalStyles.label}>Unidad de participación (S/.)</label>
@@ -429,9 +429,6 @@ export default function PendingRafflesPage() {
                     onChange={(e) => setRatio(parseFloat(e.target.value) || 0)}
                     style={modalStyles.input}
                   />
-                  <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
-                    (valor producto + delivery) × ratio / unidad de participación ≈ número de tickets
-                  </small>
                 </div>
                 <div>
                   <label style={modalStyles.label}>Número de tickets</label>
@@ -443,7 +440,7 @@ export default function PendingRafflesPage() {
                     style={modalStyles.input}
                   />
                   <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
-                    Se recalcula al cambiar costo o ratio; puedes editarlo manualmente.
+                    (valor producto + delivery) × ratio / unidad de participación ≈ número de tickets
                   </small>
                 </div>
               </div>
