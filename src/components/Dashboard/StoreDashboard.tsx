@@ -455,6 +455,7 @@ export default function StoreDashboard() {
                       <th>Oportunidad</th>
                       <th>Tickets</th>
                       <th>Valor del Producto</th>
+                      <th>Envío</th>
                       <th>Estado</th>
                       <th>Creado</th>
                       <th>Acciones</th>
@@ -489,6 +490,13 @@ export default function StoreDashboard() {
                         <td>
                           <span className={styles.price}>
                             S/. {raffle.productValue.toFixed(2)}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={styles.deliveryCost}>
+                            {raffle.product?.deliveryCost != null && raffle.product?.deliveryCost > 0
+                              ? `S/. ${Number(raffle.product.deliveryCost).toFixed(2)}`
+                              : 'N/A'}
                           </span>
                         </td>
                         <td>
@@ -527,14 +535,16 @@ export default function StoreDashboard() {
                               <FiEdit2 />
                               <span className={styles.actionBtnLabel}>Activar</span>
                             </button>
-                            <button 
-                              className={styles.actionBtn} 
-                              title="Eliminar"
-                              onClick={() => handleOpenDeleteModal(raffle.id, raffle.product?.name || 'Oportunidad')}
-                            >
-                              <FiTrash2 />
-                              <span className={styles.actionBtnLabel}>Eliminar</span>
-                            </button>
+                            {raffle.status === 'pending_approval' && (
+                              <button 
+                                className={styles.actionBtn} 
+                                title="Eliminar"
+                                onClick={() => handleOpenDeleteModal(raffle.id, raffle.product?.name || 'Oportunidad')}
+                              >
+                                <FiTrash2 />
+                                <span className={styles.actionBtnLabel}>Eliminar</span>
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
