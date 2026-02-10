@@ -679,6 +679,8 @@ export const adminService = {
       failed: number;
       refunded: number;
       totalRevenue: number;
+      paymentToOrganizers: number;
+      platformIncome: number;
     };
   }> {
     try {
@@ -753,6 +755,18 @@ export const adminService = {
         }
       });
 
+      // Calcular pagos a organizadores (sorteos finalizados con pago registrado)
+      let paymentToOrganizers = 0;
+      rafflesSnapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        if (data.status === 'finished' && data.paymentToOrganizerAt) {
+          const sold = data.soldTickets || 0;
+          const price = data.productValue || 0;
+          paymentToOrganizers += sold * price;
+        }
+      });
+      const platformIncome = Math.max(0, totalRevenue - paymentToOrganizers);
+
       return {
         users: { total: totalUsers },
         shops: { 
@@ -776,6 +790,8 @@ export const adminService = {
           failed: failedPayments,
           refunded: refundedPayments,
           totalRevenue,
+          paymentToOrganizers,
+          platformIncome,
         },
       };
     } catch (error) {

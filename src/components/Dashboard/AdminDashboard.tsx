@@ -63,6 +63,8 @@ interface DashboardStats {
     failed: number;
     refunded: number;
     totalRevenue: number;
+    paymentToOrganizers: number;
+    platformIncome: number;
   };
 }
 
@@ -277,7 +279,10 @@ export default function AdminDashboard() {
                         <FiDollarSign />
                       </div>
                     </div>
-                    <div className={styles.statChange}><span>Ingresos de la plataforma</span></div>
+                    <div className={styles.statChange} style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
+                      <span><strong>Pago Organizadores:</strong> S/. {(stats.payments.paymentToOrganizers ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span><strong>Ingreso de la Plataforma:</strong> S/. {(stats.payments.platformIncome ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
                   </div>
                 </div>
               )}
