@@ -11,6 +11,7 @@ interface PaymentWithDetails extends Payment {
   userName?: string;
   userEmail?: string;
   raffleName?: string;
+  costPerTicket?: number;
 }
 
 export default function AdminPaymentsPage() {
@@ -48,6 +49,7 @@ export default function AdminPaymentsPage() {
             userName: userData.name,
             userEmail: userData.email,
             raffleName: raffleData.name,
+            costPerTicket: raffleData.costPerTicket,
           } as PaymentWithDetails;
         })
       );
@@ -542,21 +544,26 @@ export default function AdminPaymentsPage() {
               <h2 style={{ margin: 0, color: '#0f172a', fontSize: '22px', fontWeight: '700' }}>Validar Pago</h2>
               <button
                 onClick={() => setSelectedPayment(null)}
+                type="button"
+                title="Cerrar"
+                aria-label="Cerrar"
                 style={{
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  fontSize: '24px',
+                  backgroundColor: '#f1f5f9',
+                  border: '1px solid #e2e8f0',
+                  fontSize: '20px',
+                  lineHeight: 1,
                   cursor: 'pointer',
-                  color: '#64748b',
-                  padding: '0',
-                  width: '32px',
-                  height: '32px',
+                  color: '#334155',
+                  padding: '6px',
+                  width: '36px',
+                  height: '36px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  borderRadius: '8px',
                 }}
               >
-                <FiX />
+                ×
               </button>
             </div>
 
@@ -580,6 +587,12 @@ export default function AdminPaymentsPage() {
                   <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Tickets</p>
                   <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>{selectedPayment.ticketQuantity}</p>
                 </div>
+                {selectedPayment.costPerTicket != null && (
+                  <div>
+                    <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Unidad de Participación</p>
+                    <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>S/. {Number(selectedPayment.costPerTicket).toFixed(2)}</p>
+                  </div>
+                )}
                 <div>
                   <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Monto esperado</p>
                   <p style={{ margin: '0', color: '#10b981', fontSize: '16px', fontWeight: '700' }}>S/. {Number(selectedPayment.amount).toFixed(2)}</p>
@@ -682,65 +695,69 @@ export default function AdminPaymentsPage() {
               <button
                 onClick={() => setShowRejectModal(true)}
                 disabled={validating}
+                type="button"
                 style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#ef4444',
-                  color: 'white',
-                  border: 'none',
+                  padding: '12px 24px',
+                  backgroundColor: '#b91c1c',
+                  color: '#ffffff',
+                  border: '2px solid #991b1b',
                   borderRadius: '8px',
                   cursor: validating ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
+                  fontSize: '15px',
+                  fontWeight: '700',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '8px',
                   transition: 'all 0.2s ease',
-                  opacity: validating ? 0.7 : 1,
+                  opacity: validating ? 0.6 : 1,
+                  boxShadow: '0 2px 4px rgba(185, 28, 28, 0.3)',
                 }}
                 onMouseEnter={(e) => {
                   if (!validating) {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = '#dc2626';
-                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#991b1b';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(185, 28, 28, 0.4)';
                   }
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = '#ef4444';
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#b91c1c';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 4px rgba(185, 28, 28, 0.3)';
                 }}
               >
-                <FiX style={{ fontSize: '14px' }} />
+                <FiX style={{ fontSize: '16px' }} />
                 Rechazar
               </button>
               <button
                 onClick={handleApprovePayment}
                 disabled={validating}
+                type="button"
                 style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  border: 'none',
+                  padding: '12px 24px',
+                  backgroundColor: '#047857',
+                  color: '#ffffff',
+                  border: '2px solid #065f46',
                   borderRadius: '8px',
                   cursor: validating ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
+                  fontSize: '15px',
+                  fontWeight: '700',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '8px',
                   transition: 'all 0.2s ease',
-                  opacity: validating ? 0.7 : 1,
+                  opacity: validating ? 0.6 : 1,
+                  boxShadow: '0 2px 4px rgba(4, 120, 87, 0.3)',
                 }}
                 onMouseEnter={(e) => {
                   if (!validating) {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = '#059669';
-                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#065f46';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(4, 120, 87, 0.4)';
                   }
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = '#10b981';
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#047857';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 4px rgba(4, 120, 87, 0.3)';
                 }}
               >
-                <FiCheck style={{ fontSize: '14px' }} />
+                <FiCheck style={{ fontSize: '16px' }} />
                 {validating ? 'Procesando...' : 'Aprobar'}
               </button>
             </div>

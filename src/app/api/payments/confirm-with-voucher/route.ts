@@ -60,15 +60,50 @@ export async function POST(request: NextRequest) {
     });
     const voucherUrl = signedUrl;
 
+    const paymentData = paymentSnap.data() || {};
+    const finalAmount = parseFloat(amount || paymentData.amount || '0') || 0;
+    const finalTicketQuantity = parseInt(ticketQuantity || paymentData.ticketQuantity || '1', 10) || 1;
+
     await paymentRef.update({
       status: 'pending_validation',
       paymentMethod,
       voucherUrl,
       voucherUploadedAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
-      amount: parseFloat(amount || '0') || 0,
-      ticketQuantity: parseInt(ticketQuantity || '1', 10) || 1,
+      amount: finalAmount,
+      ticketQuantity: finalTicketQuantity,
     });
+
+    // Enviar correo de participación registrada al usuario
+    const userId = paymentData.userId as string | undefined;
+    if (userId) {
+      try {
+        const userSnap = await adminFirestore.collection('users').doc(userId).get();
+        const userData = userSnap.exists ? userSnap.data() : null;
+        const userEmail = userData?.email;
+        const userName = userData?.name || userData?.displayName || 'Usuario';
+
+        if (userEmail) {
+          const baseUrl = request.nextUrl?.origin || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+          const emailRes = await fetch(`${baseUrl}/api/emails/send-payment-validation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: userEmail,
+              name: userName,
+              ticketQuantity: finalTicketQuantity,
+              amount: finalAmount,
+              paymentMethod: paymentMethod === 'yape' ? 'Yape' : paymentMethod === 'plin' ? 'Plin' : paymentMethod,
+            }),
+          });
+          if (!emailRes.ok) {
+            console.warn('No se pudo enviar el correo de validación:', await emailRes.text());
+          }
+        }
+      } catch (emailErr) {
+        console.warn('Error enviando correo de participación:', emailErr);
+      }
+    }
 
     return NextResponse.json({
       id: paymentId,

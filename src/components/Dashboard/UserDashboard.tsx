@@ -63,6 +63,8 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [ticketQuantity, setTicketQuantity] = useState<{ [raffleId: string]: number }>({});
+  const [expandedTicketsRaffleId, setExpandedTicketsRaffleId] = useState<string | null>(null);
+  const [expandedWonRaffleId, setExpandedWonRaffleId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -210,7 +212,7 @@ export default function UserDashboard() {
           <div className={styles.headerLeft}>
             <span className={styles.headerTag}>Panel de Usuario</span>
             <h1 className={styles.title}>Mi Dashboard</h1>
-            <p className={styles.subtitle}>Participa en sorteos y gestiona tus tickets</p>
+            <p className={styles.subtitle}>Participa en oportunidades y gestiona tus tickets</p>
           </div>
           
           <div className={styles.headerRight}>
@@ -241,7 +243,7 @@ export default function UserDashboard() {
           <div className={styles.statCard}>
             <div className={styles.statHeader}>
               <div>
-                <div className={styles.statLabel}>Sorteos Disponibles</div>
+                <div className={styles.statLabel}>Oportunidades Disponibles</div>
                 <div className={styles.statValue}>{activeRaffles.length}</div>
               </div>
               <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
@@ -249,7 +251,7 @@ export default function UserDashboard() {
               </div>
             </div>
             <div className={styles.statChange}>
-              <span>Sorteos activos para participar</span>
+              <span>Oportunidades activas para participar</span>
             </div>
           </div>
 
@@ -271,7 +273,7 @@ export default function UserDashboard() {
           <div className={styles.statCard}>
             <div className={styles.statHeader}>
               <div>
-                <div className={styles.statLabel}>Sorteos Participados</div>
+                <div className={styles.statLabel}>Mis Oportunidades</div>
                 <div className={styles.statValue}>
                   {new Set(myTickets.map((t) => t.raffleId)).size}
                 </div>
@@ -281,12 +283,12 @@ export default function UserDashboard() {
               </div>
             </div>
             <div className={styles.statChange}>
-              <span>Diferentes sorteos</span>
+              <span>Diferentes oportunidades</span>
             </div>
           </div>
         </div>
 
-        {/* Tabs: Sorteos participados / Sorteos ganados */}
+        {/* Tabs: Mis Oportunidades / Oportunidades ganadas */}
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
@@ -296,7 +298,7 @@ export default function UserDashboard() {
                 onClick={() => setTabMyRaffles('participados')}
               >
                 <FiTag style={{ marginRight: '6px' }} />
-                Sorteos participados
+                Mis Oportunidades
               </button>
               <button
                 type="button"
@@ -304,7 +306,7 @@ export default function UserDashboard() {
                 onClick={() => setTabMyRaffles('ganados')}
               >
                 <FiStar style={{ marginRight: '6px' }} />
-                Sorteos ganados
+                Oportunidades ganadas
               </button>
             </div>
           </div>
@@ -314,16 +316,16 @@ export default function UserDashboard() {
               {participations.length === 0 ? (
                 <div className={styles.emptyState}>
                   <FiTag className={styles.emptyIcon} />
-                  <h3>No has participado en sorteos</h3>
-                  <p>Compra tickets en los sorteos disponibles para aparecer aquí.</p>
-                  <Link href="#raffles" className={styles.buyBtn}>Ver sorteos disponibles</Link>
+                  <h3>No has participado en oportunidades</h3>
+                  <p>Compra tickets en las oportunidades disponibles para aparecer aquí.</p>
+                  <Link href="#raffles" className={styles.buyBtn}>Ver oportunidades disponibles</Link>
                 </div>
               ) : (
                 <div className={styles.tableWrapper}>
                   <table className={styles.table}>
                     <thead>
                       <tr>
-                        <th>Sorteo</th>
+                        <th>Oportunidad</th>
                         <th>Tickets</th>
                         <th>Estado</th>
                         <th>Acción</th>
@@ -331,29 +333,64 @@ export default function UserDashboard() {
                     </thead>
                     <tbody>
                       {participations.map((r) => {
-                        const ticketCount = myTickets.filter((t) => t.raffleId === r.id).length;
+                        const ticketsForRaffle = myTickets.filter((t) => t.raffleId === r.id);
+                        const ticketCount = ticketsForRaffle.length;
                         const productName = r.product?.name || products.find((p) => p.id === r.productId)?.name || 'Sorteo';
-                        const statusLabels: { [key: string]: string } = {
-                          active: 'Activo',
-                          sold_out: 'Agotado',
-                          finished: 'Finalizado',
-                          cancelled: 'Cancelado',
+                        const hasWon = wonRaffles.some((wr) => wr.id === r.id);
+                        const displayStatus = hasWon ? 'Ganado' : (r.status === 'active' || r.status === 'paused' || r.status === 'sold_out' ? 'Activo' : 'Finalizado');
+                        const statusColors: { [key: string]: string } = {
+                          Activo: '#2196F3',
+                          Finalizado: '#64748b',
+                          Ganado: '#10b981',
                         };
+                        const isExpanded = expandedTicketsRaffleId === r.id;
                         return (
-                          <tr key={r.id}>
-                            <td>{productName}</td>
-                            <td>{ticketCount}</td>
-                            <td>
-                              <span className={styles.ticketBadge} style={{ backgroundColor: getStatusColor(r.status) }}>
-                                {statusLabels[r.status] || r.status}
-                              </span>
-                            </td>
-                            <td>
-                              <Link href={`/sorteos/${r.id}`} className={styles.viewLink}>
-                                Ver detalles →
-                              </Link>
-                            </td>
-                          </tr>
+                          <React.Fragment key={r.id}>
+                            <tr>
+                              <td>{productName}</td>
+                              <td>
+                                <span style={{ marginRight: '8px' }}>{ticketCount}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedTicketsRaffleId(isExpanded ? null : r.id)}
+                                  className={styles.viewLink}
+                                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontWeight: 600 }}
+                                >
+                                  Ver
+                                </button>
+                              </td>
+                              <td>
+                                <span className={styles.ticketBadge} style={{ backgroundColor: statusColors[displayStatus] || '#64748b' }}>
+                                  {displayStatus}
+                                </span>
+                              </td>
+                              <td>
+                                <Link href={`/sorteos/${r.id}`} className={styles.viewLink}>
+                                  Ver detalles →
+                                </Link>
+                              </td>
+                            </tr>
+                            {isExpanded && (
+                              <tr>
+                                <td colSpan={4} style={{ padding: '0 16px 16px', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                                  <div style={{ padding: '12px 16px', fontSize: '14px' }}>
+                                    <strong style={{ color: '#475569', marginBottom: '8px', display: 'block' }}>Tus tickets:</strong>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                      {ticketsForRaffle.length > 0 ? (
+                                        ticketsForRaffle.map((t) => (
+                                          <span key={t.id} style={{ padding: '4px 10px', backgroundColor: '#e2e8f0', borderRadius: '6px', fontWeight: 600 }}>
+                                            #{t.number}
+                                          </span>
+                                        ))
+                                      ) : (
+                                        <span style={{ color: '#64748b' }}>Sin tickets</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
                         );
                       })}
                     </tbody>
@@ -368,48 +405,77 @@ export default function UserDashboard() {
               {wonRaffles.length === 0 ? (
                 <div className={styles.emptyState}>
                   <FiStar className={styles.emptyIcon} />
-                  <h3>No has ganado sorteos aún</h3>
+                  <h3>No has ganado oportunidades aún</h3>
                   <p>¡Sigue participando! Tus tickets pueden ser los ganadores.</p>
-                  <Link href="#raffles" className={styles.buyBtn}>Ver sorteos disponibles</Link>
+                  <Link href="#raffles" className={styles.buyBtn}>Ver oportunidades disponibles</Link>
                 </div>
               ) : (
-                <div className={styles.rafflesGrid} style={{ gridTemplateColumns: '1fr' }}>
-                  {wonRaffles.map((r) => {
-                    const productName = r.product?.name || products.find((p) => p.id === r.productId)?.name || 'Premio';
-                    const winnerInfo = winnersInfo.get(r.id);
-                    return (
-                      <div key={r.id} className={styles.raffleCard} style={{ maxWidth: '100%' }}>
-                        <div className={styles.raffleHeader}>
-                          <h3 className={styles.raffleName}>🏆 {productName}</h3>
-                          <span className={styles.statusBadge} style={{ backgroundColor: '#10b981' }}>
-                            Ganado
-                          </span>
-                        </div>
-                        <p className={styles.rafflePrice}>
-                          Ticket ganador: #{winnerInfo?.ticketNumber ?? '-'}
-                        </p>
-                        {winnerInfo && user && (
-                          <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-                            <DeliveryConfirmation
-                              raffleId={r.id}
-                              winnerInfo={winnerInfo}
-                              userId={user.id}
-                              onConfirmSuccess={() => {
-                                winnerVerificationService.getWinnerInfo(r.id).then((info) => {
-                                  if (info) {
-                                    setWinnersInfo((prev) => new Map(prev).set(r.id, info));
-                                  }
-                                });
-                              }}
-                            />
-                          </div>
-                        )}
-                        <Link href={`/sorteos/${r.id}/winner`} className={styles.viewLink} style={{ display: 'inline-block', marginTop: '12px' }}>
-                          Ver detalles del premio →
-                        </Link>
-                      </div>
-                    );
-                  })}
+                <div className={styles.tableWrapper}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>Oportunidad</th>
+                        <th>Ticket ganador</th>
+                        <th>Estado</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {wonRaffles.map((r) => {
+                        const productName = r.product?.name || products.find((p) => p.id === r.productId)?.name || 'Premio';
+                        const winnerInfo = winnersInfo.get(r.id);
+                        const isExpanded = expandedWonRaffleId === r.id;
+                        return (
+                          <React.Fragment key={r.id}>
+                            <tr
+                              onClick={() => setExpandedWonRaffleId(isExpanded ? null : r.id)}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              <td>🏆 {productName}</td>
+                              <td>#{winnerInfo?.ticketNumber ?? '-'}</td>
+                              <td>
+                                <span className={styles.ticketBadge} style={{ backgroundColor: '#10b981' }}>
+                                  Ganado
+                                </span>
+                              </td>
+                              <td style={{ textAlign: 'right' }}>
+                                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                                  {isExpanded ? '▲' : '▼'}
+                                </span>
+                              </td>
+                            </tr>
+                            {isExpanded && (
+                              <tr>
+                                <td colSpan={4} style={{ padding: 0, backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                                  <div style={{ padding: '20px 24px' }} onClick={(e) => e.stopPropagation()}>
+                                    {winnerInfo && user && (
+                                      <div style={{ marginBottom: '16px' }}>
+                                        <DeliveryConfirmation
+                                          raffleId={r.id}
+                                          winnerInfo={winnerInfo}
+                                          userId={user.id}
+                                          onConfirmSuccess={() => {
+                                            winnerVerificationService.getWinnerInfo(r.id).then((info) => {
+                                              if (info) {
+                                                setWinnersInfo((prev) => new Map(prev).set(r.id, info));
+                                              }
+                                            });
+                                          }}
+                                        />
+                                      </div>
+                                    )}
+                                    <Link href={`/sorteos/${r.id}/winner`} className={styles.viewLink}>
+                                      Ver detalles del premio →
+                                    </Link>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </>
@@ -420,16 +486,16 @@ export default function UserDashboard() {
         <div id="raffles" className={styles.section}>
           <div className={styles.sectionHeader}>
             <div>
-              <h2 className={styles.sectionTitle}>Sorteos Disponibles</h2>
-              <p className={styles.sectionSubtitle}>Explora y participa en los sorteos activos</p>
+              <h2 className={styles.sectionTitle}>Oportunidades Disponibles</h2>
+              <p className={styles.sectionSubtitle}>Explora y participa en las oportunidades activas</p>
             </div>
           </div>
 
           {activeRaffles.length === 0 ? (
             <div className={styles.emptyState}>
               <FiShoppingBag className={styles.emptyIcon} />
-              <h3>No hay sorteos disponibles</h3>
-              <p>En este momento no hay sorteos activos. Vuelve pronto para participar en nuevos sorteos.</p>
+              <h3>No hay oportunidades disponibles</h3>
+              <p>En este momento no hay oportunidades activas. Vuelve pronto para participar en nuevas oportunidades.</p>
             </div>
           ) : (
             <div className={styles.rafflesGrid}>
@@ -589,7 +655,7 @@ export default function UserDashboard() {
                 <thead>
                   <tr>
                     <th>Ticket</th>
-                    <th>Sorteo</th>
+                    <th>Oportunidad</th>
                     <th>Estado</th>
                     <th>Fecha</th>
                   </tr>

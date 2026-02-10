@@ -180,22 +180,21 @@ export const adminService = {
   /**
    * Get raffle data from Firestore
    */
-  async getRaffleData(raffleId: string): Promise<{ name: string }> {
+  async getRaffleData(raffleId: string): Promise<{ name: string; costPerTicket?: number }> {
     try {
       const raffleDoc = await getDoc(doc(db, 'raffles', raffleId));
       if (raffleDoc.exists()) {
         const raffleData = raffleDoc.data();
-        
-        // Get product name
+        let name = 'Sorteo';
         if (raffleData.productId) {
           const productDoc = await getDoc(doc(db, 'products', raffleData.productId));
           if (productDoc.exists()) {
             const productData = productDoc.data();
-            return { name: productData.name || 'Sorteo' };
+            name = productData.name || 'Sorteo';
           }
         }
-        
-        return { name: 'Sorteo' };
+        const costPerTicket = raffleData.productValue ?? raffleData.costPerTicket;
+        return { name, costPerTicket };
       }
       return { name: 'Sorteo' };
     } catch (error) {

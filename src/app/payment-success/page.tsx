@@ -78,15 +78,15 @@ function PaymentSuccessContent() {
         {/* Icono de éxito */}
         <div className={styles.successIcon}>✓</div>
 
-        <h1 className={styles.title}>¡Compra completada!</h1>
+        <h1 className={styles.title}>Participación en proceso de revisión</h1>
 
         <p className={styles.subtitle}>
-          Tu pago ha sido procesado exitosamente
+          Tu participación se ha registrado y está siendo validada
         </p>
 
-        {/* Resumen de compra */}
+        {/* Resumen de participación */}
         <div className={styles.summarySection}>
-          <h2>Resumen de tu compra</h2>
+          <h2>Resumen de tu participación</h2>
 
           {raffle && (
             <div className={styles.summaryItem}>
@@ -103,14 +103,14 @@ function PaymentSuccessContent() {
           </div>
 
           <div className={styles.summaryItem}>
-            <span>Monto pagado:</span>
+            <span>Monto:</span>
             <span className={styles.value}>
               S/. {Number(payment.amount).toFixed(2)}
             </span>
           </div>
 
           <div className={styles.summaryItem}>
-            <span>Fecha de compra:</span>
+            <span>Fecha:</span>
             <span className={styles.value}>
               {new Date(payment.createdAt).toLocaleDateString('es-PE')}
             </span>
@@ -125,8 +125,8 @@ function PaymentSuccessContent() {
         {/* Información adicional */}
         <div className={styles.infoBox}>
           <p>
-            Se ha enviado un email de confirmación a tu correo electrónico con
-            los detalles de tu compra y tus números de tickets.
+            Hemos enviado un correo a tu email con la información de tu participación.
+            Una vez validada por nuestro equipo, recibirás tus números de tickets.
           </p>
         </div>
 

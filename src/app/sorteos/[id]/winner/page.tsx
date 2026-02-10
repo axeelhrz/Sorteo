@@ -30,7 +30,7 @@ export default function WinnerPage() {
         const data = await publicRaffleService.getRaffleById(raffleId);
         setRaffle(data);
 
-        // Si el sorteo está finalizado y tiene ganador, cargar información del ticket ganador
+        // Si la oportunidad está finalizada y tiene ganador, cargar información del ticket ganador
         if (data.status === RaffleStatus.FINISHED && data.winnerTicketId) {
           try {
             // Intentar obtener el ticket ganador
@@ -53,7 +53,7 @@ export default function WinnerPage() {
         }
       } catch (err) {
         console.error('Error loading raffle:', err);
-        setError('No pudimos cargar el sorteo. Intenta nuevamente.');
+        setError('No pudimos cargar la oportunidad. Intenta nuevamente.');
       } finally {
         setIsLoading(false);
       }
@@ -104,9 +104,9 @@ export default function WinnerPage() {
       <main className={styles.container}>
         <div className={styles.errorContainer}>
           <FiSearch className={styles.errorIcon} />
-          <h1 className={styles.errorTitle}>Sorteo no encontrado</h1>
+          <h1 className={styles.errorTitle}>Oportunidad no encontrada</h1>
           <p className={styles.errorDescription}>
-            El sorteo que buscas no existe o no está disponible en este momento.
+            La oportunidad que buscas no existe o no está disponible en este momento.
           </p>
           <Link href="/sorteos">
             <button className={styles.backButton}>Volver al listado</button>
@@ -121,12 +121,12 @@ export default function WinnerPage() {
       <main className={styles.container}>
         <div className={styles.errorContainer}>
           <FiClock className={styles.errorIcon} />
-          <h1 className={styles.errorTitle}>Sorteo aún no finalizado</h1>
+          <h1 className={styles.errorTitle}>Oportunidad aún no finalizada</h1>
           <p className={styles.errorDescription}>
-            Este sorteo aún no ha finalizado. Vuelve cuando el sorteo esté completo.
+            Esta oportunidad aún no ha finalizado. Vuelve cuando la oportunidad esté completa.
           </p>
           <Link href={`/sorteos/${raffleId}`}>
-            <button className={styles.backButton}>Ver sorteo</button>
+            <button className={styles.backButton}>Ver oportunidad</button>
           </Link>
         </div>
       </main>
@@ -140,10 +140,10 @@ export default function WinnerPage() {
           <FiHelpCircle className={styles.errorIcon} />
           <h1 className={styles.errorTitle}>Ganador no disponible</h1>
           <p className={styles.errorDescription}>
-            El ganador de este sorteo aún no ha sido determinado.
+            El ganador de esta oportunidad aún no ha sido determinado.
           </p>
           <Link href={`/sorteos/${raffleId}`}>
-            <button className={styles.backButton}>Volver al sorteo</button>
+            <button className={styles.backButton}>Volver a la oportunidad</button>
           </Link>
         </div>
       </main>
@@ -154,7 +154,7 @@ export default function WinnerPage() {
     <main className={styles.container}>
       {/* Back Button */}
       <Link href={`/sorteos/${raffleId}`} className={styles.backLink}>
-        ← Volver al sorteo
+        ← Volver a la oportunidad
       </Link>
 
       {/* Winner Hero Section */}
@@ -167,7 +167,7 @@ export default function WinnerPage() {
               </div>
               <h1 className={styles.heroTitle}>¡Felicidades! Eres el ganador</h1>
               <p className={styles.heroSubtitle}>
-                Has ganado el sorteo de <strong>{raffle.product?.name}</strong>
+                Has ganado la oportunidad de <strong>{raffle.product?.name}</strong>
               </p>
             </>
           ) : (
@@ -175,9 +175,9 @@ export default function WinnerPage() {
               <div className={styles.winnerIcon}>
                 <FiCheckCircle />
               </div>
-              <h1 className={styles.heroTitle}>Sorteo finalizado</h1>
+              <h1 className={styles.heroTitle}>Oportunidad finalizada</h1>
               <p className={styles.heroSubtitle}>
-                El ganador del sorteo de <strong>{raffle.product?.name}</strong> ha sido seleccionado
+                El ganador de la oportunidad de <strong>{raffle.product?.name}</strong> ha sido seleccionado
               </p>
             </>
           )}
@@ -274,21 +274,21 @@ export default function WinnerPage() {
 
             <div className={styles.winnerTicketDisplay}>
               <div className={styles.ticketNumberContainer}>
-                <span className={styles.ticketLabel}>Número de ticket</span>
+                <span className={styles.ticketLabel}>Ticket ganador</span>
                 <span className={styles.ticketNumber}>
-                  #{winnerTicket?.number || 'N/A'}
+                  #{winnerTicket?.number ?? raffle.winnerInfo?.ticketNumber ?? 'N/A'}
                 </span>
               </div>
 
-              {winnerTicket?.user && (
-                <div className={styles.winnerUserInfo}>
-                  <p className={styles.winnerUserLabel}>Ganador</p>
-                  <p className={styles.winnerUserName}>{winnerTicket.user.name}</p>
-                  {isWinner && (
-                    <p className={styles.winnerUserEmail}>{winnerTicket.user.email}</p>
-                  )}
-                </div>
-              )}
+              <div className={styles.winnerUserInfo}>
+                <p className={styles.winnerUserLabel}>Nombre de usuario</p>
+                <p className={styles.winnerUserName}>
+                  {winnerTicket?.user?.name ?? raffle.winnerInfo?.userName ?? '—'}
+                </p>
+                {(isWinner && (winnerTicket?.user?.email || raffle.winnerInfo?.userEmail)) && (
+                  <p className={styles.winnerUserEmail}>{winnerTicket?.user?.email ?? raffle.winnerInfo?.userEmail}</p>
+                )}
+              </div>
 
               {raffle.raffleExecutedAt && (
                 <div className={styles.executionInfo}>
@@ -306,7 +306,7 @@ export default function WinnerPage() {
             {isWinner && (
               <div className={styles.winnerMessage}>
             <p className={styles.winnerMessageText}>
-              <strong>¡Felicidades!</strong> Has sido seleccionado como ganador de este sorteo.
+              <strong>¡Felicidades!</strong> Has sido seleccionado como ganador de esta oportunidad.
               El organizador se pondrá en contacto contigo para coordinar la entrega del premio.
             </p>
             {raffle.shop?.publicEmail && (
@@ -323,7 +323,7 @@ export default function WinnerPage() {
 
           {/* Raffle Stats */}
           <div className={styles.statsCard}>
-            <h3 className={styles.statsTitle}>Estadísticas del sorteo</h3>
+            <h3 className={styles.statsTitle}>Estadísticas de la oportunidad</h3>
             <div className={styles.statsGrid}>
               <div className={styles.statItem}>
                 <span className={styles.statLabel}>Total de tickets</span>
@@ -332,12 +332,6 @@ export default function WinnerPage() {
               <div className={styles.statItem}>
                 <span className={styles.statLabel}>Tickets vendidos</span>
                 <span className={styles.statValue}>{raffle.soldTickets}</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>Valor total</span>
-                <span className={styles.statValue}>
-                  S/ {(Number(raffle.productValue) * raffle.soldTickets).toFixed(2)}
-                </span>
               </div>
             </div>
           </div>
@@ -371,10 +365,10 @@ export default function WinnerPage() {
 
       {/* CTA Section */}
       <div className={styles.ctaSection}>
-        <h2 className={styles.ctaTitle}>¿Quieres participar en más sorteos?</h2>
-        <p className={styles.ctaText}>Descubre otros sorteos disponibles y gana increíbles premios</p>
+        <h2 className={styles.ctaTitle}>¿Quieres participar en más oportunidades?</h2>
+        <p className={styles.ctaText}>Descubre otras oportunidades disponibles y gana increíbles premios</p>
         <Link href="/sorteos">
-          <button className={styles.ctaButton}>Ver todos los sorteos</button>
+          <button className={styles.ctaButton}>Ver Oportunidades</button>
         </Link>
       </div>
     </main>

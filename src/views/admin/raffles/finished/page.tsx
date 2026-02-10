@@ -193,7 +193,7 @@ export default function FinishedRaffles() {
                   <th className={styles.finishedTh}>Valor</th>
                   <th className={styles.finishedTh}>Tickets</th>
                   <th className={styles.finishedTh}>Ticket ganador</th>
-                  <th className={styles.finishedTh}>Usuario ganador</th>
+                  <th className={styles.finishedTh}>Nombre de usuario</th>
                   <th className={styles.finishedTh}>Fecha fin</th>
                   <th className={styles.finishedTh}>Estado</th>
                   <th className={styles.finishedThActions}>Acciones</th>
@@ -310,7 +310,7 @@ export default function FinishedRaffles() {
                   <p className={styles.value}>{getWinnerTicket(selectedRaffle)}</p>
                 </div>
                 <div className={styles.detailGridItem}>
-                  <label>Usuario ganador</label>
+                  <label>Nombre de usuario</label>
                   <p className={styles.value}>
                     {selectedRaffle.winnerInfo?.userName || selectedRaffle.winnerInfo?.userEmail || '—'}
                     {selectedRaffle.winnerInfo?.userEmail && selectedRaffle.winnerInfo?.userName && (
