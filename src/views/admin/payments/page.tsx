@@ -146,7 +146,7 @@ export default function AdminPaymentsPage() {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-        <p style={{ color: '#64748b', fontSize: '16px' }}>Cargando pagos pendientes...</p>
+        <p style={{ color: '#64748b', fontSize: '16px' }}>Cargando compras pendientes...</p>
       </div>
     );
   }
@@ -157,18 +157,18 @@ export default function AdminPaymentsPage() {
     <div>
       <div style={{ marginBottom: '24px' }}>
         <h2 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '24px', fontWeight: '700' }}>
-          Validación de Pagos
+          Aprobar compras de tickets
         </h2>
         <p style={{ margin: '0', color: '#64748b', fontSize: '14px' }}>
-          Total: {total} pagos pendientes de validación
+          Total: {total} compras pendientes de aprobación
         </p>
       </div>
 
       {payments.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e8ecf1' }}>
           <FiCheck style={{ fontSize: '48px', color: '#10b981', marginBottom: '16px' }} />
-          <h3 style={{ color: '#1e293b', fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>No hay pagos pendientes</h3>
-          <p style={{ color: '#64748b', fontSize: '14px', margin: '0' }}>Todos los pagos han sido validados</p>
+          <h3 style={{ color: '#1e293b', fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>No hay compras pendientes</h3>
+          <p style={{ color: '#64748b', fontSize: '14px', margin: '0' }}>Todas las compras de tickets han sido aprobadas</p>
         </div>
       ) : (
         <>

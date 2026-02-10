@@ -35,7 +35,7 @@ const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'sorteos-pendientes', label: 'Sorteos Pendientes', icon: <FiClock /> },
   { id: 'sorteos-activos', label: 'Sorteos Activos', icon: <FiPlay /> },
   { id: 'sorteos-finalizados', label: 'Sorteos Finalizados', icon: <FiCheckCircle /> },
-  { id: 'pagos', label: 'Pagos', icon: <FiCreditCard /> },
+  { id: 'pagos', label: 'Tickets', icon: <FiCreditCard /> },
   { id: 'usuarios', label: 'Usuarios', icon: <FiUsers /> },
   { id: 'organizadores', label: 'Organizadores', icon: <FiShoppingBag /> },
 ];
