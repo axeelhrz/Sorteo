@@ -120,4 +120,11 @@ export const publicRaffleService = {
     if (!res.ok) return [];
     return res.json();
   },
+
+  async getTicketPrices(): Promise<number[]> {
+    const base = getBaseUrl();
+    const res = await fetch(`${base}/api/raffles/ticket-prices`);
+    if (!res.ok) return [];
+    return res.json();
+  },
 };

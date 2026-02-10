@@ -9,6 +9,7 @@ interface RaffleFiltersProps {
   onFiltersChange: (filters: RaffleFiltersType) => void;
   categories?: string[];
   shops?: Array<{ id: string; name: string }>;
+  ticketPrices?: number[];
   isLoading?: boolean;
 }
 
@@ -16,6 +17,7 @@ export default function RaffleFilters({
   onFiltersChange,
   categories = [],
   shops = [],
+  ticketPrices = [],
   isLoading = false,
 }: RaffleFiltersProps) {
   const [search, setSearch] = useState('');
@@ -26,23 +28,20 @@ export default function RaffleFilters({
   const [sortBy, setSortBy] = useState<'newest' | 'closest' | 'price-asc' | 'price-desc'>('newest');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const getTicketPriceRange = (value: string): { minValue?: number; maxValue?: number } => {
-    switch (value) {
-      case '0-5': return { minValue: 0, maxValue: 5 };
-      case '5-20': return { minValue: 5, maxValue: 20 };
-      case '20-50': return { minValue: 20, maxValue: 50 };
-      case '50+': return { minValue: 50 };
-      default: return {};
-    }
+  const getTicketPriceFilter = (value: string): { minValue?: number; maxValue?: number } => {
+    if (!value) return {};
+    const price = parseFloat(value);
+    if (isNaN(price) || price <= 0) return {};
+    return { minValue: price, maxValue: price };
   };
 
   const handleApplyFilters = useCallback(() => {
-    const ticketRange = getTicketPriceRange(ticketPrice);
+    const ticketFilter = getTicketPriceFilter(ticketPrice);
     const filters: RaffleFiltersType = {
       search: search || undefined,
       category: category || undefined,
       shopId: shopId || undefined,
-      ...ticketRange,
+      ...ticketFilter,
       deliveryType: deliveryType === 'all' ? undefined : deliveryType,
       sortBy,
       page: 1,
@@ -69,12 +68,12 @@ export default function RaffleFilters({
 
   const handleSortChange = (value: string) => {
     setSortBy(value as any);
-    const ticketRange = getTicketPriceRange(ticketPrice);
+    const ticketFilter = getTicketPriceFilter(ticketPrice);
     onFiltersChange({
       search: search || undefined,
       category: category || undefined,
       shopId: shopId || undefined,
-      ...ticketRange,
+      ...ticketFilter,
       deliveryType: deliveryType === 'all' ? undefined : deliveryType,
       sortBy: value as any,
       page: 1,
@@ -101,12 +100,12 @@ export default function RaffleFilters({
                 type="button"
                 onClick={() => {
                   setSearch('');
-                  const ticketRange = getTicketPriceRange(ticketPrice);
+                  const ticketFilter = getTicketPriceFilter(ticketPrice);
                   onFiltersChange({
                     search: undefined,
                     category: category || undefined,
                     shopId: shopId || undefined,
-                    ...ticketRange,
+                    ...ticketFilter,
                     deliveryType: deliveryType === 'all' ? undefined : deliveryType,
                     sortBy,
                     page: 1,
@@ -200,10 +199,11 @@ export default function RaffleFilters({
                 disabled={isLoading}
               >
                 <option value="">Todos los precios</option>
-                <option value="0-5">Hasta S/ 5</option>
-                <option value="5-20">S/ 5 - S/ 20</option>
-                <option value="20-50">S/ 20 - S/ 50</option>
-                <option value="50+">Más de S/ 50</option>
+                {ticketPrices.map((price) => (
+                  <option key={price} value={String(price)}>
+                    S/ {price.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </option>
+                ))}
               </select>
             </div>
 

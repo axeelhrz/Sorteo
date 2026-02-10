@@ -23,7 +23,7 @@ export default function Home() {
             </h1>
             
             <p className={styles.heroSubtitle}>
-              Accede a oportunidades reales para obtener productos de alto valor con tickets de costo muy bajo.
+              Descubre productos de alto valor con tickets de bajo costo. Controla tu ventaja y acelera tu oportunidad cuando quieras.
             </p>
             
             <p className={styles.heroDescription}>

@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { FaWhatsapp } from 'react-icons/fa';
+import { FaWhatsapp, FaInstagram } from 'react-icons/fa';
 import { FiMail, FiPhone, FiMapPin, FiLock, FiCheckCircle, FiAward, FiShield } from 'react-icons/fi';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types/auth';
 import styles from './Footer.module.css';
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '984908819';
-const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@tiketea.com';
+const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'tiketea.online@gmail.com';
 const WHATSAPP_URL = `https://wa.me/51${WHATSAPP_NUMBER.replace(/\D/g, '')}?text=Hola%20👋%0A%0AEstoy%20visitando%20TIKETEA%20y%20quiero%20más%20información%20sobre%20cómo%20funcionan%20las%20oportunidades%20y%20la%20compra%20de%20tickets.%0A%0A¿Podrían%20ayudarme,%20por%20favor?`;
 
 export default function Footer() {
@@ -116,6 +116,15 @@ export default function Footer() {
               </div>
             </div>
             <div className={styles.socialLinks}>
+              <a
+                href="https://www.instagram.com/tiketeaonline/"
+                title="Instagram"
+                className={styles.socialLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaInstagram />
+              </a>
               <a
                 href={WHATSAPP_URL}
                 title="WhatsApp"

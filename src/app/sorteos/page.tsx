@@ -16,6 +16,7 @@ export default function SorteosPage() {
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [shops, setShops] = useState<Array<{ id: string; name: string }>>([]);
+  const [ticketPrices, setTicketPrices] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRaffles, setTotalRaffles] = useState(0);
@@ -28,12 +29,14 @@ export default function SorteosPage() {
   useEffect(() => {
     const loadMetadata = async () => {
       try {
-        const [categoriesData, shopsData] = await Promise.all([
+        const [categoriesData, shopsData, pricesData] = await Promise.all([
           publicRaffleService.getCategories(),
           publicRaffleService.getShopsWithActiveRaffles(),
+          publicRaffleService.getTicketPrices(),
         ]);
         setCategories(categoriesData);
         setShops(shopsData);
+        setTicketPrices(pricesData);
       } catch (err) {
         console.error('Error loading metadata:', err);
       }
@@ -106,6 +109,7 @@ export default function SorteosPage() {
         onFiltersChange={handleFiltersChange}
         categories={categories}
         shops={shops}
+        ticketPrices={ticketPrices}
         isLoading={isLoading}
       />
 
