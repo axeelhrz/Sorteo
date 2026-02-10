@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -68,23 +68,29 @@ export default function RaffleDetailPage() {
     return () => clearInterval(interval);
   }, [raffleId, raffle?.status]);
 
-  useEffect(() => {
-    const loadUserTickets = async () => {
-      if (!user || !raffleId) return;
-
-      try {
-        setLoadingTickets(true);
-        const response = await apiClient.get(`/api/raffle-tickets?raffleId=${raffleId}`);
-        setUserTickets(response.data || []);
-      } catch (err) {
-        console.error('Error loading user tickets:', err);
-      } finally {
-        setLoadingTickets(false);
-      }
-    };
-
-    loadUserTickets();
+  const refreshUserTickets = useCallback(async () => {
+    if (!user || !raffleId) return;
+    try {
+      setLoadingTickets(true);
+      const response = await apiClient.get(`/api/raffle-tickets?raffleId=${raffleId}`);
+      setUserTickets(response.data || []);
+    } catch (err) {
+      console.error('Error loading user tickets:', err);
+    } finally {
+      setLoadingTickets(false);
+    }
   }, [user, raffleId]);
+
+  useEffect(() => {
+    refreshUserTickets();
+  }, [refreshUserTickets]);
+
+  useEffect(() => {
+    if (!user || !raffleId) return;
+    const onFocus = () => refreshUserTickets();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [user, raffleId, refreshUserTickets]);
 
   if (isLoading) {
     return (
@@ -121,30 +127,6 @@ export default function RaffleDetailPage() {
   const isFinished = raffle.status === RaffleStatus.FINISHED;
   const isPaused = raffle.status === RaffleStatus.PAUSED;
 
-  // Calcular fecha estimada del sorteo (basada en velocidad de venta)
-  const calculateEstimatedDate = () => {
-    if (remainingTickets <= 0) return null;
-    if (raffle.soldTickets === 0) return null;
-
-    // Calcular velocidad de venta (tickets por día)
-    const daysSinceCreation = Math.max(
-      1,
-      (new Date().getTime() - new Date(raffle.createdAt).getTime()) / (1000 * 60 * 60 * 24),
-    );
-    const ticketsPerDay = raffle.soldTickets / daysSinceCreation;
-
-    if (ticketsPerDay <= 0) return null;
-
-    // Calcular días restantes
-    const daysRemaining = remainingTickets / ticketsPerDay;
-    const estimatedDate = new Date();
-    estimatedDate.setDate(estimatedDate.getDate() + Math.ceil(daysRemaining));
-
-    return estimatedDate;
-  };
-
-  const estimatedDate = calculateEstimatedDate();
-
   return (
     <main className={styles.container}>
       {/* Navigation Buttons */}
@@ -161,7 +143,7 @@ export default function RaffleDetailPage() {
 
       {/* Main Content */}
       <div className={styles.content}>
-        {/* Left Column - Image and Info */}
+        {/* Left Column - Image and Description below */}
         <div className={styles.leftColumn}>
           {/* Product Image */}
           <div className={styles.imageContainer}>
@@ -186,35 +168,36 @@ export default function RaffleDetailPage() {
               {raffle.status === RaffleStatus.FINISHED && 'Finalizado'}
             </div>
           </div>
+
+          {/* Description below photo */}
+          {raffle.product?.description && (
+            <div className={styles.descriptionBox}>
+              <h3 className={styles.descriptionTitle}>Descripción del producto</h3>
+              <p className={styles.productDescription}>{raffle.product.description}</p>
+            </div>
+          )}
         </div>
 
-        {/* Right Column - Details and CTA */}
+        {/* Right Column - Title, Unit, Delivery, Participa, Progress, Tus participaciones */}
         <div className={styles.rightColumn}>
-          {/* Product Info */}
-          <div className={styles.productSection}>
-            <h1 className={styles.productName}>{raffle.product?.name}</h1>
-            
-            {/* Product Description */}
-            {raffle.product?.description && (
-              <div className={styles.descriptionBox}>
-                <h3 className={styles.descriptionTitle}>Descripción del producto</h3>
-                <p className={styles.productDescription}>{raffle.product.description}</p>
-              </div>
+          {/* Title */}
+          <h1 className={styles.productName}>{raffle.product?.name}</h1>
+
+          {/* Unit of participation */}
+          <div className={styles.valueBox}>
+            <span className={styles.valueLabel}>Unidad de participación</span>
+            <span className={styles.valueAmount}>S/ {Number(raffle.productValue).toFixed(2)}</span>
+            {raffle.product?.value != null && (
+              <span className={styles.valueSubtext}>
+                Valor del producto: S/ {Number(raffle.product.value).toFixed(2)}
+              </span>
             )}
+          </div>
 
-            {/* Value */}
-            <div className={styles.valueBox}>
-              <span className={styles.valueLabel}>Unidad de participación</span>
-              <span className={styles.valueAmount}>S/ {Number(raffle.productValue).toFixed(2)}</span>
-              {raffle.product?.value != null && (
-                <span className={styles.valueSubtext}>
-                  Valor del producto: S/ {Number(raffle.product.value).toFixed(2)}
-                </span>
-              )}
-            </div>
-
-            {/* Delivery cost */}
-            <div className={styles.deliveryCostRow}>
+          {/* Entrega del premio */}
+          <div className={styles.deliveryInfo}>
+            <h4 className={styles.deliveryTitle}>Entrega del premio</h4>
+            <div className={styles.deliveryCostRow} style={{ marginTop: 12, marginBottom: 0 }}>
               <span className={styles.deliveryCostLabel}>Delivery</span>
               <span className={styles.deliveryCostValue}>
                 {raffle.product?.pickupInStore
@@ -224,225 +207,55 @@ export default function RaffleDetailPage() {
                     : 'N/A'}
               </span>
             </div>
-
-            {/* Delivery and Pickup Info */}
-            <div className={styles.deliveryInfo}>
-              <h4 className={styles.deliveryTitle}>Entrega del premio</h4>
-              <div className={styles.deliveryOptions}>
-                {raffle.product?.hasDelivery ? (
-                  <div className={styles.deliveryOption}>
-                    <span className={styles.deliveryIcon}>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="1" y="3" width="15" height="13"></rect>
-                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                      </svg>
-                    </span>
-                    <div>
-                      <p className={styles.deliveryOptionTitle}>Envío a domicilio</p>
-                      {raffle.product?.deliveryZones && (
-                        <p className={styles.deliveryOptionText}>
-                          Zonas de cobertura: {raffle.product.deliveryZones}
-                        </p>
-                      )}
-                    </div>
+            <div className={styles.deliveryOptions}>
+              {raffle.product?.hasDelivery ? (
+                <div className={styles.deliveryOption}>
+                  <span className={styles.deliveryIcon}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="1" y="3" width="15" height="13"></rect>
+                      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                      <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                      <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                    </svg>
+                  </span>
+                  <div>
+                    <p className={styles.deliveryOptionTitle}>Envío a domicilio</p>
+                    {raffle.product?.deliveryZones && (
+                      <p className={styles.deliveryOptionText}>Zonas: {raffle.product.deliveryZones}</p>
+                    )}
                   </div>
-                ) : null}
-                
-                {raffle.product?.pickupInStore ? (
-                  <div className={styles.deliveryOption}>
-                    <span className={styles.deliveryIcon}>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10"></path>
-                        <path d="M3 10h14v10c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V10z"></path>
-                        <path d="M8 14h4"></path>
-                      </svg>
-                    </span>
-                    <div>
-                <p className={styles.deliveryOptionTitle}>Recojo en local</p>
-                <p className={styles.deliveryOptionText}>
-                  Disponible para recojo en las instalaciones del organizador
-                </p>
-                    </div>
+                </div>
+              ) : null}
+              {raffle.product?.pickupInStore ? (
+                <div className={styles.deliveryOption}>
+                  <span className={styles.deliveryIcon}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10"></path>
+                      <path d="M3 10h14v10c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V10z"></path>
+                      <path d="M8 14h4"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <p className={styles.deliveryOptionTitle}>Recojo en local</p>
+                    <p className={styles.deliveryOptionText}>Disponible para recojo en el organizador</p>
                   </div>
-                ) : null}
-
-            {!raffle.product?.hasDelivery && !raffle.product?.pickupInStore && (
-              <p className={styles.deliveryOptionText}>
-                Consulta con el organizador sobre las opciones de entrega disponibles.
-              </p>
-            )}
-              </div>
-            </div>
-          </div>
-
-          {/* Progress Section */}
-          <div className={styles.progressSection}>
-            <h3 className={styles.sectionTitle}>Progreso de la oportunidad</h3>
-            <div className={styles.progressHeader}>
-              <span className={styles.progressLabel}>Tickets vendidos</span>
-              <span className={styles.progressCount}>
-                {raffle.soldTickets} de {raffle.totalTickets}
-              </span>
-            </div>
-            <div className={styles.progressBar}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-              />
-            </div>
-            <div className={styles.progressFooter}>
-              <span className={styles.remainingTickets}>
-                {remainingTickets > 0
-                  ? `${remainingTickets} tickets disponibles`
-                  : 'Todos los tickets vendidos'}
-              </span>
-              <span className={styles.progressPercent}>{Math.round(progressPercentage)}%</span>
-            </div>
-            {estimatedDate && isActive && (
-              <div className={styles.estimatedDate}>
-                <span className={styles.estimatedLabel}>Fecha estimada del resultado:</span>
-                <span className={styles.estimatedValue}>
-                  {estimatedDate.toLocaleDateString('es-PE', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Raffle Rules */}
-          <div className={styles.rulesSection}>
-            <h3 className={styles.sectionTitle}>Cómo funciona esta oportunidad</h3>
-            <div className={styles.rulesList}>
-              <div className={styles.rule}>
-                <span className={styles.ruleIcon}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="9" y1="9" x2="15" y2="9"></line>
-                    <line x1="9" y1="15" x2="15" y2="15"></line>
-                  </svg>
-                </span>
-                <div>
-                  <p className={styles.ruleTitle}>Tickets limitados</p>
-                  <p className={styles.ruleText}>
-                    Los tickets disponibles para esta oportunidad son limitados. Compra los tuyos antes de que se agoten.
-                  </p>
                 </div>
-              </div>
-              <div className={styles.rule}>
-                <span className={styles.ruleIcon}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="1"></circle>
-                    <path d="M12 1v6m0 6v6"></path>
-                    <path d="M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24"></path>
-                    <path d="M1 12h6m6 0h6"></path>
-                    <path d="M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path>
-                  </svg>
-                </span>
-                <div>
-                  <p className={styles.ruleTitle}>Sorteo automático</p>
-                  <p className={styles.ruleText}>
-                    Cuando se venden todos los tickets, el resultado se ejecuta automáticamente.
-                  </p>
-                </div>
-              </div>
-              <div className={styles.rule}>
-                <span className={styles.ruleIcon}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M6 9l6-7 6 7"></path>
-                    <path d="M6 9h12v10c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V9z"></path>
-                  </svg>
-                </span>
-                <div>
-                  <p className={styles.ruleTitle}>Ganador aleatorio</p>
-                  <p className={styles.ruleText}>
-                    El ganador se elige de forma completamente aleatoria entre todos los tickets vendidos.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Deposit Info */}
-          {raffle.requiresDeposit && (
-            <div className={styles.depositInfo}>
-              <FiLock className={styles.depositIcon} />
-              <div>
-            <p className={styles.depositTitle}>Depósito de garantía</p>
-            <p className={styles.depositText}>
-              Este organizador tiene un depósito de garantía para asegurar la entrega del premio.
-            </p>
-              </div>
-            </div>
-          )}
-
-          {/* User Participation */}
-          {user ? (
-            <div className={styles.userParticipation}>
-              <h3 className={styles.sectionTitle}>Tus participaciones</h3>
-              {loadingTickets ? (
-                <p className={styles.participationText}>Cargando tus tickets...</p>
-              ) : userTickets.length > 0 ? (
-                <div className={styles.ticketsList}>
-                  <p className={styles.participationText}>
-                    Tienes <strong>{userTickets.length}</strong> ticket{userTickets.length > 1 ? 's' : ''} en este sorteo:
-                  </p>
-                  <div className={styles.ticketNumbers}>
-                    {userTickets.map((ticket: any) => (
-                      <span key={ticket.id} className={styles.ticketNumber}>
-                        #{ticket.number}
-                      </span>
-                    ))}
-                  </div>
-                  {userTickets[0]?.createdAt && (
-                    <p className={styles.participationDate}>
-                      Comprado{userTickets.length > 1 ? 's' : ''} el{' '}
-                      {new Date(userTickets[0].createdAt).toLocaleDateString('es-PE', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                  <p className={styles.participationText}>
-                  Aún no participas en esta oportunidad. ¡Compra tickets para tener oportunidad de ganar!
-                </p>
+              ) : null}
+              {!raffle.product?.hasDelivery && !raffle.product?.pickupInStore && (
+                <p className={styles.deliveryOptionText}>Consulta con el organizador sobre las opciones de entrega.</p>
               )}
             </div>
-          ) : (
-            <div className={styles.loginPrompt}>
-              <p className={styles.loginText}>
-                Inicia sesión o regístrate para comprar tickets y ver tus participaciones.
-              </p>
-              <div className={styles.loginButtons}>
-                <Link href="/login">
-                  <button className={styles.loginButton}>Iniciar sesión</button>
-                </Link>
-                <Link href="/register">
-                  <button className={styles.registerButton}>Registrarse</button>
-                </Link>
-              </div>
-            </div>
-          )}
+          </div>
 
-          {/* Buy Tickets Block */}
+          {/* Buy Tickets Block - Participa */}
           {isActive && !isPaused && (
             <BuyTicketsBlock
               raffle={raffle}
               onPaymentCreated={() => {
-                // Recargar tickets del usuario después de la compra
                 if (user) {
-                  setTimeout(() => {
-                    apiClient.get(`/api/raffle-tickets?raffleId=${raffleId}`).then((response) => {
-                      setUserTickets(response.data || []);
-                    });
-                  }, 2000);
+                  publicRaffleService.getRaffleById(raffleId).then(setRaffle);
+                  setTimeout(refreshUserTickets, 1500);
+                  setTimeout(refreshUserTickets, 4000);
                 }
               }}
             />
@@ -464,10 +277,95 @@ export default function RaffleDetailPage() {
             <div className={styles.finishedMessage}>
               <p>Esta oportunidad ha finalizado.</p>
               <Link href={`/sorteos/${raffleId}/winner`}>
-                <button className={styles.viewWinnerButton}>
-                  Ver ticket ganador →
-                </button>
+                <button className={styles.viewWinnerButton}>Ver ticket ganador →</button>
               </Link>
+            </div>
+          )}
+
+          {/* Progress Section */}
+          <div className={styles.progressSection}>
+            <h3 className={styles.sectionTitle}>Progreso de la oportunidad</h3>
+            <div className={styles.progressBarRow}>
+              <div className={styles.progressBar}>
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                />
+              </div>
+              <span className={styles.progressPercent}>{Math.round(progressPercentage)}%</span>
+            </div>
+            <div className={styles.progressFooter}>
+              <span className={styles.progressLabel}>Tickets Participando</span>
+              <span className={styles.progressCount}>
+                {raffle.soldTickets} de {raffle.totalTickets}
+              </span>
+            </div>
+            <div className={styles.progressFooter}>
+              <span className={styles.remainingTickets}>
+                {remainingTickets > 0 ? `${remainingTickets} tickets disponibles` : 'Todos los tickets vendidos'}
+              </span>
+            </div>
+          </div>
+
+          {/* Deposit Info */}
+          {raffle.requiresDeposit && (
+            <div className={styles.depositInfo}>
+              <FiLock className={styles.depositIcon} />
+              <div>
+                <p className={styles.depositTitle}>Depósito de garantía</p>
+                <p className={styles.depositText}>
+                  Este organizador tiene un depósito de garantía para asegurar la entrega del premio.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Tus participaciones */}
+          {user ? (
+            <div className={styles.userParticipation}>
+              <h3 className={styles.sectionTitle}>Tus participaciones</h3>
+              {loadingTickets ? (
+                <p className={styles.participationText}>Cargando tus tickets...</p>
+              ) : userTickets.length > 0 ? (
+                <div className={styles.ticketsList}>
+                  <p className={styles.participationText}>
+                    Tienes <strong>{userTickets.length}</strong> ticket{userTickets.length > 1 ? 's' : ''} en este sorteo:
+                  </p>
+                  <div className={styles.ticketNumbers}>
+                    {userTickets.map((ticket: any) => (
+                      <span key={ticket.id} className={styles.ticketNumber}>#{ticket.number}</span>
+                    ))}
+                  </div>
+                  {userTickets[0]?.createdAt && (
+                    <p className={styles.participationDate}>
+                      Comprado{userTickets.length > 1 ? 's' : ''} el{' '}
+                      {new Date(userTickets[0].createdAt).toLocaleDateString('es-PE', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className={styles.participationText}>
+                  Aún no participas en esta oportunidad. ¡Participa para tener oportunidad de ganar!
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className={styles.loginPrompt}>
+              <p className={styles.loginText}>
+                Inicia sesión o regístrate para participar y ver tus participaciones.
+              </p>
+              <div className={styles.loginButtons}>
+                <Link href="/login">
+                  <button className={styles.loginButton}>Iniciar sesión</button>
+                </Link>
+                <Link href="/register">
+                  <button className={styles.registerButton}>Registrarse</button>
+                </Link>
+              </div>
             </div>
           )}
         </div>

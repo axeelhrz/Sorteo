@@ -131,7 +131,7 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
 
   return (
     <div className={styles.blockContainer}>
-      <h2 className={styles.title}>Compra tus tickets</h2>
+      <h2 className={styles.title}>Participa</h2>
 
       {/* Información de disponibilidad */}
       <div className={styles.infoSection}>
@@ -140,7 +140,7 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
           <span className={styles.value}>{availableTickets}</span>
         </div>
         <div className={styles.infoItem}>
-          <span className={styles.label}>Precio por ticket:</span>
+          <span className={styles.label}>Unidad de participación:</span>
           <span className={styles.value}>S/. {pricePerTicket.toFixed(2)}</span>
         </div>
       </div>
@@ -148,7 +148,7 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
       {/* Selector de cantidad */}
       <div className={styles.quantitySection}>
         <label htmlFor="quantity" className={styles.label}>
-          Cantidad de tickets:
+          Cantidad:
         </label>
         <div className={styles.quantityControls}>
           <input
@@ -159,6 +159,7 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
             value={quantity}
             onChange={handleQuantityChange}
             className={styles.quantityInput}
+            aria-label="Cantidad de tickets"
           />
           <div className={styles.quickButtons}>
             <button
@@ -205,7 +206,7 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
         onClick={handleBuyTickets}
         disabled={!isQuantityValid || loading}
       >
-        {loading ? 'Procesando...' : 'Continuar con la compra'}
+        {loading ? 'Procesando...' : 'Continuar'}
       </button>
 
       {/* Validación visual */}

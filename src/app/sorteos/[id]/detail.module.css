@@ -501,6 +501,18 @@
   margin-bottom: 14px;
 }
 
+.progressBarRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.progressBarRow .progressBar {
+  flex: 1;
+  margin-bottom: 0;
+}
+
 .progressLabel {
   font-size: 13px;
   color: #64748b;
