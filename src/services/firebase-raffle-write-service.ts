@@ -273,15 +273,19 @@ export const firebaseRaffleWriteService = {
   },
 
   /**
-   * Cancela un sorteo
+   * Cancela un sorteo. Deja de mostrarse en panel admin y catálogo público.
    */
-  async cancelRaffle(id: string): Promise<Raffle> {
+  async cancelRaffle(id: string, reason?: string): Promise<Raffle> {
     try {
       const raffleRef = doc(db, 'raffles', id);
-      await updateDoc(raffleRef, {
+      const updateData: Record<string, any> = {
         status: RaffleStatus.CANCELLED,
         updatedAt: serverTimestamp(),
-      });
+      };
+      if (reason && reason.trim()) {
+        updateData.cancelReason = reason.trim();
+      }
+      await updateDoc(raffleRef, updateData);
 
       const updatedDoc = await getDoc(raffleRef);
       if (!updatedDoc.exists()) {

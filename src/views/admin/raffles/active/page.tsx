@@ -26,7 +26,9 @@ export default function ActiveRaffles() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showExecuteModal, setShowExecuteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCancelSuccessModal, setShowCancelSuccessModal] = useState(false);
   const [selectedRaffleId, setSelectedRaffleId] = useState<string | null>(null);
+  const [selectedRaffle, setSelectedRaffle] = useState<Raffle | null>(null);
   const [cancelReason, setCancelReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -63,10 +65,11 @@ export default function ActiveRaffles() {
     try {
       setActionLoading(true);
       await adminService.cancelRaffle(selectedRaffleId, cancelReason);
-      alert('Sorteo cancelado exitosamente');
       setShowCancelModal(false);
       setCancelReason('');
       setSelectedRaffleId(null);
+      setSelectedRaffle(null);
+      setShowCancelSuccessModal(true);
       fetchRaffles();
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'Error al cancelar sorteo');
@@ -218,6 +221,8 @@ export default function ActiveRaffles() {
                             className={`${styles.btn} ${styles.btnDanger}`}
                             onClick={() => {
                               setSelectedRaffleId(raffle.id);
+                              setSelectedRaffle(raffle);
+                              setCancelReason('');
                               setShowCancelModal(true);
                             }}
                             title="Cancelar sorteo"
@@ -256,19 +261,24 @@ export default function ActiveRaffles() {
         </div>
       )}
 
-      {/* Cancel Modal */}
+      {/* Cancel Modal - Confirmación */}
       {showCancelModal && (
-        <div className={`${styles.modal} ${styles.open}`}>
-          <div className={styles.modalContent} style={{ borderRadius: 16, maxWidth: 440 }}>
+        <div className={`${styles.modal} ${styles.open}`} onClick={() => { if (!actionLoading) { setShowCancelModal(false); setCancelReason(''); setSelectedRaffleId(null); setSelectedRaffle(null); } }}>
+          <div className={styles.modalContent} style={{ borderRadius: 16, maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2 style={{ margin: 0, fontSize: 20 }}>Cancelar sorteo</h2>
+              <h2 style={{ margin: 0, fontSize: 20 }}>Confirmar cancelación</h2>
             </div>
             <div className={styles.modalBody}>
+              {selectedRaffle && (
+                <p style={{ marginBottom: 12, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>
+                  ¿Cancelar «{selectedRaffle.product?.name}»?
+                </p>
+              )}
               <p style={{ color: '#64748b', marginBottom: 16, fontSize: 14, lineHeight: 1.6 }}>
-                Esta acción no se puede deshacer. Indica el motivo de la cancelación.
+                El sorteo se eliminará del panel y del catálogo público. Esta acción no se puede deshacer.
               </p>
               <div className={styles.formGroup}>
-                <label>Motivo</label>
+                <label>Motivo (obligatorio)</label>
                 <textarea
                   value={cancelReason}
                   onChange={(e) => setCancelReason(e.target.value)}
@@ -281,7 +291,7 @@ export default function ActiveRaffles() {
             <div className={styles.modalFooter}>
               <button
                 className={`${styles.btn} ${styles.btnSecondary}`}
-                onClick={() => { setShowCancelModal(false); setCancelReason(''); setSelectedRaffleId(null); }}
+                onClick={() => { setShowCancelModal(false); setCancelReason(''); setSelectedRaffleId(null); setSelectedRaffle(null); }}
                 disabled={actionLoading}
               >
                 Volver
@@ -292,6 +302,29 @@ export default function ActiveRaffles() {
                 disabled={actionLoading || !cancelReason.trim()}
               >
                 {actionLoading ? 'Procesando...' : 'Confirmar cancelación'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal - Sorteo cancelado */}
+      {showCancelSuccessModal && (
+        <div className={`${styles.modal} ${styles.open}`}>
+          <div className={styles.modalContent} style={{ borderRadius: 16, maxWidth: 380, textAlign: 'center' }}>
+            <div className={styles.modalBody} style={{ padding: '32px 24px 24px' }}>
+              <FiCheckCircle style={{ fontSize: 56, color: '#059669', marginBottom: 16 }} />
+              <h2 style={{ margin: '0 0 8px 0', fontSize: 20, color: '#0f172a' }}>Sorteo cancelado</h2>
+              <p style={{ margin: 0, color: '#64748b', fontSize: 15 }}>
+                El sorteo ha sido eliminado del panel y del catálogo.
+              </p>
+            </div>
+            <div className={styles.modalFooter} style={{ justifyContent: 'center' }}>
+              <button
+                className={`${styles.btn} ${styles.btnSuccess}`}
+                onClick={() => setShowCancelSuccessModal(false)}
+              >
+                Aceptar
               </button>
             </div>
           </div>

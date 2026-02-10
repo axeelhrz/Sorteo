@@ -865,14 +865,12 @@ export const adminService = {
   },
 
   /**
-   * Cancel raffle (admin only)
-   * TODO: Implement proper Firestore update for raffle cancellation
+   * Cancel raffle (admin only).
+   * El sorteo deja de mostrarse en Sorteos Activos y en el catálogo público.
    */
-  async cancelRaffle(_raffleId: string, _reason: string): Promise<void> {
+  async cancelRaffle(raffleId: string, reason: string): Promise<void> {
     try {
-      // This is a placeholder implementation
-      // In a real application, you would update the raffle status to cancelled in Firestore
-      console.warn('cancelRaffle is not fully implemented yet');
+      await firebaseRaffleWriteService.cancelRaffle(raffleId, reason);
     } catch (error) {
       console.error('Error cancelling raffle:', error);
       throw error;
