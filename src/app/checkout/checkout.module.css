@@ -275,6 +275,12 @@
   transition: all 0.3s ease;
 }
 
+.methodLogoPlin {
+  border: none;
+  box-shadow: none;
+  background: #fff;
+}
+
 .methodButton:hover .methodLogo {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
@@ -381,6 +387,22 @@
   box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
 }
 
+.qrWrapperPlin {
+  border: none;
+  box-shadow: none;
+  background: #fff;
+  padding: 20px;
+}
+
+.qrWrapperPlin::before {
+  display: none;
+}
+
+.qrWrapperPlin:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .qrCode {
   display: block;
   width: auto;
@@ -391,7 +413,11 @@
   image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
-  border-radius: 8px;
+  border-radius: 0;
+}
+
+.qrWrapperPlin .qrCode {
+  border-radius: 0;
 }
 
 /* Manual Section */
@@ -457,19 +483,19 @@
 }
 
 .copyBtn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   color: white;
-  border: none;
-  border-radius: 8px;
+  border: 2px solid #4338ca;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 18px;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.4);
   position: relative;
   overflow: hidden;
 }
@@ -646,11 +672,11 @@
 .removeBtn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   color: white;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
+  border: 2px solid #4338ca;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -736,12 +762,12 @@
 
 .confirmBtn {
   width: 100%;
-  padding: 16px 32px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  padding: 18px 32px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   color: white;
-  border: none;
+  border: 2px solid #4338ca;
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -749,7 +775,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.45);
   position: relative;
   overflow: hidden;
 }
@@ -771,7 +797,8 @@
 
 .confirmBtn:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 8px 28px rgba(99, 102, 241, 0.45);
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  box-shadow: 0 8px 32px rgba(79, 70, 229, 0.55);
 }
 
 .confirmBtn:active:not(:disabled) {
@@ -788,13 +815,13 @@
 
 .cancelBtn {
   width: 100%;
-  padding: 14px 32px;
-  background: white;
-  color: #64748b;
-  border: 2px solid rgba(99, 102, 241, 0.15);
+  padding: 16px 32px;
+  background: #fff;
+  color: #475569;
+  border: 2px solid #94a3b8;
   border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -804,11 +831,11 @@
 }
 
 .cancelBtn:hover:not(:disabled) {
-  border-color: #ef4444;
-  color: #ef4444;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(220, 38, 38, 0.05) 100%);
+  border-color: #dc2626;
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.08);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.2);
 }
 
 .cancelBtn:disabled {

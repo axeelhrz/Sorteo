@@ -28,7 +28,7 @@ function CheckoutContent() {
 
   useEffect(() => {
     if (!paymentId) {
-      setError('ID de pago no encontrado');
+      setError('ID de participación no encontrado');
       setLoading(false);
       return;
     }
@@ -38,7 +38,7 @@ function CheckoutContent() {
         const paymentData = await firebasePaymentService.getPaymentById(paymentId);
         setPayment(paymentData);
       } catch (err: any) {
-        setError('Error al cargar el pago');
+        setError('Error al cargar la participación');
         console.error(err);
       } finally {
         setLoading(false);
@@ -87,12 +87,12 @@ function CheckoutContent() {
 
   const handleConfirmPayment = async () => {
     if (!payment || !selectedMethod) {
-      setError('Selecciona un método de pago');
+      setError('Selecciona un método de participación');
       return;
     }
 
     if (!voucherFile) {
-      setError('Debes subir el comprobante de pago');
+      setError('Debes subir el comprobante de participación');
       return;
     }
 
@@ -127,7 +127,7 @@ function CheckoutContent() {
       router.push(`/payment-success?paymentId=${payment.id}&pending=true`);
     } catch (err: unknown) {
       console.error('Error confirming payment:', err);
-      setError(err instanceof Error ? err.message : 'Error al confirmar el pago');
+      setError(err instanceof Error ? err.message : 'Error al confirmar la participación');
       setConfirmingPayment(false);
     }
   };
@@ -138,13 +138,13 @@ function CheckoutContent() {
     try {
       await firebasePaymentService.failPayment(
         payment.id,
-        'Pago rechazado por el usuario'
+        'Participación rechazada por el usuario'
       );
 
       router.push(`/payment-failed?paymentId=${payment.id}`);
     } catch (err) {
       console.error('Error failing payment:', err);
-      setError('Error al procesar el rechazo del pago');
+      setError('Error al procesar el rechazo de la participación');
     }
   };
 
@@ -153,7 +153,7 @@ function CheckoutContent() {
       <div className={styles.pageWrapper}>
         <div className={styles.loadingState}>
           <div className={styles.spinner}></div>
-          <p>Cargando información del pago...</p>
+          <p>Cargando información de la participación...</p>
         </div>
       </div>
     );
@@ -164,8 +164,8 @@ function CheckoutContent() {
       <div className={styles.pageWrapper}>
         <div className={styles.errorState}>
           <div className={styles.errorIcon}>⚠️</div>
-          <h1>Error al cargar el pago</h1>
-          <p>{error || 'No se pudo cargar la información del pago'}</p>
+          <h1>Error al cargar la participación</h1>
+          <p>{error || 'No se pudo cargar la información de la participación'}</p>
           <button onClick={() => router.back()} className={styles.backButton}>
             Volver atrás
           </button>
@@ -179,15 +179,15 @@ function CheckoutContent() {
       <div className={styles.checkoutContainer}>
         {/* Header */}
         <div className={styles.header}>
-          <h1 className={styles.mainTitle}>Finalizar Compra</h1>
+          <h1 className={styles.mainTitle}>Finalizar Participación</h1>
           <p className={styles.mainSubtitle}>
-            Completa tu pago de forma rápida y segura
+            Completa tu participación de forma rápida y segura
           </p>
         </div>
 
         {/* Purchase Summary */}
         <div className={styles.summaryCard}>
-          <h2 className={styles.cardTitle}>Resumen de compra</h2>
+          <h2 className={styles.cardTitle}>Resumen de participación</h2>
           <div className={styles.summaryContent}>
             <div className={styles.summaryRow}>
               <span className={styles.summaryLabel}>Tickets</span>
@@ -203,7 +203,7 @@ function CheckoutContent() {
 
         {/* Payment Methods */}
         <div className={styles.paymentMethodsCard}>
-          <h2 className={styles.cardTitle}>Método de pago</h2>
+          <h2 className={styles.cardTitle}>Método de participación</h2>
           <p className={styles.cardSubtitle}>Selecciona tu billetera digital</p>
           
           <div className={styles.methodsContainer}>
@@ -226,7 +226,7 @@ function CheckoutContent() {
               className={`${styles.methodButton} ${selectedMethod === 'plin' ? styles.methodActive : ''}`}
               onClick={() => setSelectedMethod('plin')}
             >
-              <div className={styles.methodLogo}>
+              <div className={`${styles.methodLogo} ${styles.methodLogoPlin}`}>
                 <Image src="/assets/plin-logo.png" alt="PLIN" width={48} height={48} />
               </div>
               <span className={styles.methodName}>PLIN</span>
@@ -243,7 +243,7 @@ function CheckoutContent() {
         {selectedMethod && (
           <>
             <div className={styles.instructionsCard}>
-              <h2 className={styles.cardTitle}>Realiza tu pago</h2>
+              <h2 className={styles.cardTitle}>Realiza tu participación</h2>
               
               <div className={styles.instructionsLayout}>
                 {/* QR Code Section */}
@@ -255,7 +255,7 @@ function CheckoutContent() {
                     </p>
                   </div>
                   
-                  <div className={styles.qrWrapper}>
+                  <div className={`${styles.qrWrapper} ${selectedMethod === 'plin' ? styles.qrWrapperPlin : ''}`}>
                     {selectedMethod === 'yape' && (
                       <img 
                         src="/assets/yape.png" 
@@ -308,7 +308,7 @@ function CheckoutContent() {
 
             {/* Voucher Upload */}
             <div className={styles.voucherCard}>
-              <h2 className={styles.cardTitle}>Comprobante de pago</h2>
+              <h2 className={styles.cardTitle}>Comprobante de participación</h2>
               <p className={styles.cardSubtitle}>
                 Sube una captura de pantalla de tu comprobante
               </p>
@@ -384,7 +384,7 @@ function CheckoutContent() {
                 ) : (
                   <>
                     <FiCheckCircle />
-                    Confirmar pago
+                    Confirmar participación
                   </>
                 )}
               </button>
@@ -395,7 +395,7 @@ function CheckoutContent() {
                 disabled={confirmingPayment}
               >
                 <FiX />
-                Cancelar compra
+                Cancelar participación
               </button>
             </div>
 
