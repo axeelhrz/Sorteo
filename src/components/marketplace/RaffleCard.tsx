@@ -71,12 +71,6 @@ const RaffleCard: React.FC<RaffleCardProps> = ({ raffle }) => {
             {getBadgeText()}
           </div>
 
-          {/* Thumbnail Badge - Show if special conditions exist */}
-          {raffle.specialConditions && (
-            <div className={styles.thumbnailBadge}>
-              Condiciones especiales
-            </div>
-          )}
         </div>
 
         {/* Content */}
@@ -101,9 +95,6 @@ const RaffleCard: React.FC<RaffleCardProps> = ({ raffle }) => {
             <div className={styles.valueAmount}>
               S/. {raffle.productValue.toFixed(2)}
             </div>
-            <span className={styles.ticketInfo}>
-              Tickets desde S/. {raffle.productValue.toFixed(2)}
-            </span>
           </div>
 
           {/* Progress Section */}

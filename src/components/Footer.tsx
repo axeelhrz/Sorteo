@@ -64,7 +64,7 @@ export default function Footer() {
             <h3 className={styles.columnTitle}>Para Organizadores</h3>
             <ul className={styles.linkList}>
               <li>
-                <Link href="/register">Registrar Organizador</Link>
+                <Link href="/register">Registrate como Organizador</Link>
               </li>
               <li>
                 <Link href="/dashboard">Panel de Control</Link>

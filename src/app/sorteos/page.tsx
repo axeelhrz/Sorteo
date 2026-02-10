@@ -249,7 +249,7 @@ export default function SorteosPage() {
           <h2 className={styles.ctaTitle}>¿Eres un organizador?</h2>
           <p className={styles.ctaText}>Crea oportunidades y llega a miles de clientes potenciales</p>
           <Link href="/register" className={styles.ctaButton}>
-            Registra tu organizador
+            Registrate como Organizador
           </Link>
         </div>
       </section>

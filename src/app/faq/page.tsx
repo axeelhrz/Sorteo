@@ -177,7 +177,7 @@ const faqItems: FAQItem[] = [
     id: '26',
     category: 'Para Organizadores',
     question: '¿Cómo registro mi organizador?',
-    answer: 'Haz clic en "Registra tu organizador" en la página principal, completa el formulario con información de tu organizador, sube documentos de verificación y espera la aprobación manual.'
+    answer: 'Haz clic en "Registrate como Organizador" en la página principal, completa el formulario con información de tu organizador, sube documentos de verificación y espera la aprobación manual.'
   },
   {
     id: '27',
