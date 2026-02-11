@@ -53,6 +53,12 @@ async function fetchRaffleDataWithShop(raffleId: string) {
   return { name, shopId: data.shopId };
 }
 
+type AdminRaffleRecord = Record<string, any> & {
+  id: string;
+  shopId?: string | null;
+  productId?: string | null;
+};
+
 export const adminSecureService = {
   async getDashboardStats() {
     const [usersSnap, shopsSnap, rafflesSnap, ticketsSnap, paymentsSnap] = await Promise.all([
@@ -323,11 +329,13 @@ export const adminSecureService = {
 
   async getFinishedRaffles(limit: number, offset: number, shopId?: string) {
     const snapshot = await adminDb.collection('raffles').where('status', '==', 'finished').get();
-    let raffles = snapshot.docs.map((doc) => {
-      const data = doc.data();
+    let raffles: AdminRaffleRecord[] = snapshot.docs.map((doc) => {
+      const data = doc.data() as Record<string, any>;
       return {
         id: doc.id,
         ...data,
+        shopId: data.shopId ?? null,
+        productId: data.productId ?? null,
         createdAt: toDate(data.createdAt),
         updatedAt: toDate(data.updatedAt),
         activatedAt: toDate(data.activatedAt),
