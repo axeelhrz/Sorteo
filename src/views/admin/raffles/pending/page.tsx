@@ -73,7 +73,7 @@ export default function PendingRafflesPage() {
     try {
       setLoading(true);
       const result = await adminService.getPendingRaffles(ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
-      setRaffles(result.data);
+      setRaffles(result.data as Raffle[]);
       setTotal(result.total);
       setError(null);
     } catch (err: any) {
