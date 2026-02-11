@@ -4,9 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FiMail, FiLock, FiLogIn, FiShield } from 'react-icons/fi';
-import { firebaseAuthService } from '@/services/firebase-auth-service';
-import { useAuthStore } from '@/store/auth-store';
-import { UserRole } from '@/types/auth';
+import { useAdminSessionStore } from '@/store/admin-session-store';
 import Logo from '@/components/Logo';
 import styles from '@/components/LoginForm.module.css';
 
@@ -14,7 +12,7 @@ const ADMIN_EMAIL = 'tiketea.online@gmail.com';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const { setUser, setToken } = useAuthStore();
+  const { login } = useAdminSessionStore();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -39,17 +37,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      const { user, token } = await firebaseAuthService.login(formData);
-
-      if (user.role !== UserRole.ADMIN) {
-        setError('Esta cuenta no tiene permisos de administrador. Contacta al equipo técnico.');
-        await firebaseAuthService.logout();
-        setLoading(false);
-        return;
-      }
-
-      setToken(token);
-      setUser(user);
+      await login(formData.email, formData.password);
       router.push('/dashboard/admin');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Credenciales inválidas');

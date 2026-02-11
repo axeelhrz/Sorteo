@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { FiCheck, FiCheckCircle, FiX, FiEye, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
 import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
-import { useAuth } from '@/hooks/useAuth';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 interface PaymentWithDetails extends Payment {
   userName?: string;
@@ -15,7 +15,7 @@ interface PaymentWithDetails extends Payment {
 }
 
 export default function AdminPaymentsPage() {
-  const { user } = useAuth();
+  const { user } = useAdminAuth();
   const [payments, setPayments] = useState<PaymentWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState<PaymentWithDetails | null>(null);

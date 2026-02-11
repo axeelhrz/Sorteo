@@ -2,25 +2,28 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth-store';
-import { UserRole } from '@/types/auth';
+import { useAdminSessionStore } from '@/store/admin-session-store';
 import AdminDashboard from '@/components/Dashboard/AdminDashboard';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { adminUser, isLoading, isChecked, checkSession } = useAdminSessionStore();
 
   useEffect(() => {
-    if (!isAuthenticated || !user) {
-      router.replace('/login/admin');
-      return;
-    }
-    if (user.role !== UserRole.ADMIN) {
-      router.replace('/login/admin');
-    }
-  }, [isAuthenticated, user, router]);
+    let mounted = true;
+    checkSession().then((ok) => {
+      if (mounted && !ok) router.replace('/login/admin');
+    });
+    return () => { mounted = false; };
+  }, [checkSession, router]);
 
-  if (!isAuthenticated || !user || user.role !== UserRole.ADMIN) {
+  useEffect(() => {
+    if (isChecked && !isLoading && !adminUser) {
+      router.replace('/login/admin');
+    }
+  }, [isChecked, isLoading, adminUser, router]);
+
+  if (!isChecked || isLoading || !adminUser) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
         <p>Redirigiendo...</p>

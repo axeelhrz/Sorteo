@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth-store';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import {
   FiLogOut,
   FiUsers,
@@ -70,7 +70,7 @@ interface DashboardStats {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user, logout } = useAdminAuth();
   const [activeTab, setActiveTab] = useState<AdminTab>('resumen');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
