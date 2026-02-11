@@ -63,11 +63,11 @@ export default function ShopsManagement() {
   const fetchShops = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getAllShops(
+      const data = (await adminService.getAllShops(
         limit,
         page * limit,
         statusFilter ? { status: statusFilter } : undefined,
-      );
+      )) as { data: Shop[]; total: number };
       setShops(data.data);
       setTotal(data.total);
       setError(null);
