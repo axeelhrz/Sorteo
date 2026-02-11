@@ -17,7 +17,7 @@ import {
   FiBarChart2,
   FiList,
 } from 'react-icons/fi';
-import { adminService } from '@/services/admin-service';
+import { adminService, type AdminDashboardStats } from '@/services/admin-service';
 import dynamic from 'next/dynamic';
 import styles from './AdminDashboard.module.css';
 
@@ -45,34 +45,11 @@ const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'organizadores', label: 'Organizadores', icon: <FiShoppingBag /> },
 ];
 
-interface DashboardStats {
-  users: { total: number };
-  shops: { total: number; pending: number; verified: number; blocked: number };
-  raffles: {
-    pending: number;
-    active: number;
-    finished: number;
-    cancelled: number;
-    rejected: number;
-  };
-  tickets: { totalSold: number };
-  payments: {
-    total: number;
-    completed: number;
-    pending: number;
-    failed: number;
-    refunded: number;
-    totalRevenue: number;
-    paymentToOrganizers: number;
-    platformIncome: number;
-  };
-}
-
 export default function AdminDashboard() {
   const router = useRouter();
   const { user, logout } = useAdminAuth();
   const [activeTab, setActiveTab] = useState<AdminTab>('resumen');
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

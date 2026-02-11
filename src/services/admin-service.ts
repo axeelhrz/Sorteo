@@ -8,6 +8,29 @@ export interface PaymentWithDetails extends Payment {
   raffleName?: string;
 }
 
+export interface AdminDashboardStats {
+  users: { total: number };
+  shops: { total: number; pending: number; verified: number; blocked: number };
+  raffles: {
+    pending: number;
+    active: number;
+    finished: number;
+    cancelled: number;
+    rejected: number;
+  };
+  tickets: { totalSold: number };
+  payments: {
+    total: number;
+    completed: number;
+    pending: number;
+    failed: number;
+    refunded: number;
+    totalRevenue: number;
+    paymentToOrganizers: number;
+    platformIncome: number;
+  };
+}
+
 async function callAdminSecure<T>(action: string, payload?: any): Promise<T> {
   const response = await fetch('/api/admin/secure', {
     method: 'POST',
@@ -52,8 +75,8 @@ export const adminService = {
     await emailService.sendPaymentApprovedEmail(result.emailPayload);
   },
 
-  async getDashboardStats() {
-    return callAdminSecure('getDashboardStats');
+  async getDashboardStats(): Promise<AdminDashboardStats> {
+    return callAdminSecure<AdminDashboardStats>('getDashboardStats');
   },
 
   async getPendingRaffles(limit: number, offset: number, shopId?: string) {
