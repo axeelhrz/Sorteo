@@ -59,7 +59,7 @@ export default function FinishedRaffles() {
         page * limit,
         shopFilter || undefined,
       );
-      setRaffles(data.data);
+      setRaffles(data.data as Raffle[]);
       setTotal(data.total);
       setError(null);
     } catch (err: any) {
