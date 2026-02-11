@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FiDollarSign, FiExternalLink } from 'react-icons/fi';
-import { adminService } from '@/services/admin-service';
+import { adminService, type RafflesListResponse } from '@/services/admin-service';
 import Link from 'next/link';
 
 interface Raffle {
@@ -29,7 +29,8 @@ export default function AdminPaymentsToOrganizersPage() {
     try {
       setLoading(true);
       setError(null);
-      const { data } = await adminService.getFinishedRaffles(500, 0);
+      const result = await adminService.getFinishedRaffles(500, 0) as RafflesListResponse;
+      const { data } = result;
       const withPayment = data.filter(
         (r: any) => r.paymentToOrganizerAt != null
       );

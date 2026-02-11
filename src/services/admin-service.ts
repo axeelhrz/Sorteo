@@ -31,6 +31,11 @@ export interface AdminDashboardStats {
   };
 }
 
+export interface RafflesListResponse<T = unknown> {
+  data: T[];
+  total: number;
+}
+
 export interface PaymentHistoryResponse {
   items: Array<{
     id: string;
@@ -100,8 +105,8 @@ export const adminService = {
     return callAdminSecure<AdminDashboardStats>('getDashboardStats');
   },
 
-  async getPendingRaffles(limit: number, offset: number, shopId?: string) {
-    return callAdminSecure('getPendingRaffles', { limit, offset, shopId });
+  async getPendingRaffles(limit: number, offset: number, shopId?: string): Promise<RafflesListResponse> {
+    return callAdminSecure<RafflesListResponse>('getPendingRaffles', { limit, offset, shopId });
   },
 
   async approveRaffle(raffleId: string, params: ApproveRaffleParams) {
@@ -116,8 +121,8 @@ export const adminService = {
     await callAdminSecure('rejectRaffle', { raffleId, reason });
   },
 
-  async getActiveRaffles(limit: number, offset: number, shopId?: string) {
-    return callAdminSecure('getActiveRaffles', { limit, offset, shopId });
+  async getActiveRaffles(limit: number, offset: number, shopId?: string): Promise<RafflesListResponse> {
+    return callAdminSecure<RafflesListResponse>('getActiveRaffles', { limit, offset, shopId });
   },
 
   async cancelRaffle(raffleId: string, reason: string) {
@@ -136,8 +141,8 @@ export const adminService = {
     }
   },
 
-  async getFinishedRaffles(limit: number, offset: number, shopId?: string) {
-    return callAdminSecure('getFinishedRaffles', { limit, offset, shopId });
+  async getFinishedRaffles(limit: number, offset: number, shopId?: string): Promise<RafflesListResponse> {
+    return callAdminSecure<RafflesListResponse>('getFinishedRaffles', { limit, offset, shopId });
   },
 
   async registerPaymentToOrganizer(raffleId: string, evidenceFile: File) {
