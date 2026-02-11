@@ -31,11 +31,11 @@ export default function UsersManagement() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getAllUsers(
+      const data = (await adminService.getAllUsers(
         limit,
         page * limit,
         { role: 'user' },
-      );
+      )) as { data: User[]; total: number };
       setUsers(data.data);
       setTotal(data.total);
       setError(null);
