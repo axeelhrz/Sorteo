@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-export const dynamic = 'force-dynamic';
 import {
   createAdminSessionToken,
   verifyAdminSessionToken,
@@ -8,9 +6,13 @@ import {
   setAdminSessionCookie,
   clearAdminSessionCookie,
 } from '@/lib/admin-session';
+import { verifyAdminCredentials } from '@/server/admin-credentials';
 
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'tiketea.online@gmail.com').toLowerCase().trim();
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'tiketea_admin123';
+export const dynamic = 'force-dynamic';
+
+const FALLBACK_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'tiketea.online@gmail.com').toLowerCase().trim();
+const FALLBACK_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'tiketea_admin123';
+const FALLBACK_ADMIN_NAME = process.env.ADMIN_NAME || 'Administrador';
 
 /**
  * POST /api/admin/session
@@ -22,12 +24,29 @@ export async function POST(request: NextRequest) {
     const email = (body.email || '').toLowerCase().trim();
     const password = body.password || '';
 
-    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+    let adminUser = await verifyAdminCredentials(email, password);
+    if (!adminUser && email === FALLBACK_ADMIN_EMAIL && password === FALLBACK_ADMIN_PASSWORD) {
+      adminUser = {
+        id: 'env-admin',
+        name: FALLBACK_ADMIN_NAME,
+        email: FALLBACK_ADMIN_EMAIL,
+        passwordHash: '',
+      };
+    }
+
+    if (!adminUser) {
       return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
     }
 
-    const token = createAdminSessionToken(email);
-    const response = NextResponse.json({ success: true });
+    const token = createAdminSessionToken({
+      email: adminUser.email,
+      name: adminUser.name,
+      userId: adminUser.id,
+    });
+    const response = NextResponse.json({
+      success: true,
+      user: { id: adminUser.id, email: adminUser.email, name: adminUser.name },
+    });
     response.headers.set('Set-Cookie', setAdminSessionCookie(token));
     return response;
   } catch (error) {
@@ -54,7 +73,7 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json({
       ok: true,
-      user: { email: payload.email, role: payload.role },
+      user: { id: payload.userId, email: payload.email, name: payload.name },
     });
   } catch (error) {
     console.error('Admin session verify error:', error);

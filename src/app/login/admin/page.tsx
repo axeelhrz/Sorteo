@@ -8,8 +8,6 @@ import { useAdminSessionStore } from '@/store/admin-session-store';
 import Logo from '@/components/Logo';
 import styles from '@/components/LoginForm.module.css';
 
-const ADMIN_EMAIL = 'tiketea.online@gmail.com';
-
 export default function AdminLoginPage() {
   const router = useRouter();
   const { login } = useAdminSessionStore();
@@ -31,12 +29,6 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      if (formData.email.toLowerCase().trim() !== ADMIN_EMAIL) {
-        setError('Acceso restringido. Solo el administrador puede ingresar aquí.');
-        setLoading(false);
-        return;
-      }
-
       await login(formData.email, formData.password);
       router.push('/dashboard/admin');
     } catch (err: unknown) {

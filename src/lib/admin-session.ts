@@ -14,13 +14,17 @@ function sign(payload: string): string {
 
 export interface AdminSessionPayload {
   email: string;
+  name: string;
   role: 'admin';
+  userId: string;
   exp: number;
 }
 
-export function createAdminSessionToken(email: string): string {
+export function createAdminSessionToken(params: { email: string; name: string; userId: string }): string {
   const payload: AdminSessionPayload = {
-    email,
+    email: params.email,
+    name: params.name,
+    userId: params.userId,
     role: 'admin',
     exp: Math.floor(Date.now() / 1000) + MAX_AGE_SECONDS,
   };

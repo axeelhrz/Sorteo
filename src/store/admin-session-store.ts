@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { User } from '@/types/auth';
-import { UserRole } from '@/types/auth';
+import { User, UserRole } from '@/types/auth';
 
 interface AdminSessionState {
   adminUser: User | null;
@@ -12,14 +11,6 @@ interface AdminSessionState {
   logout: () => Promise<void>;
   checkSession: () => Promise<boolean>;
 }
-
-const ADMIN_USER: User = {
-  id: 'admin',
-  uid: 'admin',
-  name: 'Administrador',
-  email: 'tiketea.online@gmail.com',
-  role: UserRole.ADMIN,
-};
 
 export const useAdminSessionStore = create<AdminSessionState>((set, get) => ({
   adminUser: null,
@@ -36,12 +27,18 @@ export const useAdminSessionStore = create<AdminSessionState>((set, get) => ({
         body: JSON.stringify({ email, password }),
         credentials: 'include',
       });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
         throw new Error(data.error || 'Credenciales inválidas');
       }
       set({
-        adminUser: { ...ADMIN_USER, email: email.toLowerCase().trim() },
+        adminUser: {
+          id: data.user.id,
+          uid: data.user.id,
+          email: data.user.email,
+          name: data.user.name,
+          role: UserRole.ADMIN,
+        },
         isLoading: false,
         isChecked: true,
       });
@@ -67,7 +64,13 @@ export const useAdminSessionStore = create<AdminSessionState>((set, get) => ({
         const data = await res.json();
         if (data.ok && data.user) {
           set({
-            adminUser: { ...ADMIN_USER, email: data.user.email },
+            adminUser: {
+              id: data.user.id,
+              uid: data.user.id,
+              email: data.user.email,
+              name: data.user.name,
+              role: UserRole.ADMIN,
+            },
             isLoading: false,
             isChecked: true,
           });
