@@ -2,42 +2,92 @@
 
 Todos los correos transaccionales se envían con **EmailJS** (REST API desde el servidor).
 
-## Variables de entorno
+## Flujos que envían correos al usuario
+
+1. **Participación registrada** – Cuando el usuario sube el comprobante de pago
+   - Mensaje: "Tu participación se ha registrado y está siendo validada"
+
+2. **Ganador – Notificación con código** – Cuando se ejecuta la oportunidad y el usuario resulta ganador
+   - Incluye: número de ticket ganador, código de verificación, datos del premio y del organizador
+
+---
+
+## Variables de entorno obligatorias
 
 | Variable | Obligatorio | Descripción |
 |----------|-------------|-------------|
-| `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | Sí | Public Key de tu cuenta EmailJS (Dashboard → Account → API Keys). |
-| `EMAILJS_PRIVATE_KEY` | Sí (servidor) | Private Key de tu cuenta EmailJS (Dashboard → Account → API Keys). Necesaria para que las API routes puedan enviar correo; sin ella EmailJS devuelve 403 "API calls are disabled for non-browser applications". |
-| `EMAILJS_SERVICE_ID` | No | Service ID del servicio de email en EmailJS (por defecto: `service_sovfqju`). |
-| `EMAILJS_TEMPLATE_WINNER_NOTIFICATION` | No | Plantilla para notificación al ganador (por defecto: `template_winner_notification`). |
-| `EMAILJS_TEMPLATE_ORGANIZER_RAFFLE_FINISHED` | No | Plantilla para “oportunidad finalizada” al organizador (por defecto: `template_mgmgrng`). |
-| `EMAILJS_TEMPLATE_ORGANIZER_PAYMENT_DONE` | No | Plantilla para “pago realizado” al organizador (por defecto: `template_mgmgrng`). |
+| `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | **Sí** | Public Key de tu cuenta EmailJS (Dashboard → Account → API Keys). |
+| `EMAILJS_PRIVATE_KEY` | **Sí** (servidor) | Private Key de tu cuenta EmailJS. Sin ella, EmailJS devuelve 403 para llamadas desde el servidor. |
+| `EMAILJS_SERVICE_ID` | No | Service ID del servicio de email (por defecto: `service_sovfqju`). |
+| `NEXT_PUBLIC_APP_URL` | Sí (producción) | URL base de la app (ej. `https://www.tiketeaonline.com`). Necesaria para enlaces en los correos. |
 
-## Uso en el código
+## Variables para plantillas (recomendadas)
 
-- **Servidor (API routes):** se usa `@/lib/emailjs-server` → `sendEmail({ templateId, templateParams })`, que llama a la REST API de EmailJS.
-- Las rutas que envían correo son, entre otras:
-  - `/api/emails/send-winner-notification` – notificación al ganador.
-  - `/api/emails/send-organizer-raffle-finished` – oportunidad finalizada al organizador.
-  - `/api/emails/send-organizer-payment-done` – pago realizado al organizador.
+| Variable | Uso | Fallback |
+|----------|-----|----------|
+| `EMAILJS_TEMPLATE_PAYMENT_VALIDATION` | Participación registrada (usuario sube comprobante) | `template_mgmgrng` |
+| `EMAILJS_TEMPLATE_WINNER_NOTIFICATION` | Notificación al ganador con código | `template_mgmgrng` |
+| `EMAILJS_TEMPLATE_ORGANIZER_RAFFLE_FINISHED` | Oportunidad finalizada al organizador | `template_mgmgrng` |
+| `EMAILJS_TEMPLATE_ORGANIZER_PAYMENT_DONE` | Pago realizado al organizador | `template_mgmgrng` |
 
-## Plantillas en EmailJS (obligatorio)
+---
 
-Si ves **"The template ID not found"** (400), es porque el ID que usas no existe en tu cuenta de EmailJS. Los IDs de `.env` deben ser **exactamente** los de plantillas que tú creas en EmailJS.
+## Pasos para habilitar los correos
 
-1. Entra en **[EmailJS → Templates](https://dashboard.emailjs.com/admin/templates)**.
-2. **Crea una plantilla** (o usa una existente) y copia su **Template ID** (ej. `template_xxxxx`).
-3. En tu `.env.local` define la variable con ese ID, por ejemplo:
-   - Notificación al ganador: `EMAILJS_TEMPLATE_WINNER_NOTIFICATION=template_xxxxx` (el ID que te muestra EmailJS para esa plantilla).
+### 1. Cuenta EmailJS
 
-En el dashboard debes tener también:
+1. Crea una cuenta en [EmailJS](https://www.emailjs.com/)
+2. Conecta un servicio de email (Gmail, Outlook, etc.) en **Email Services**
 
-1. **Servicio de email** (Gmail, Outlook, etc.) conectado.
-2. **Plantillas** con las variables que usa cada tipo de correo. Para la notificación al ganador, la plantilla puede usar por ejemplo: `{{to_email}}`, `{{to_name}}`, `{{raffle_title}}`, `{{product_name}}`, `{{ticket_number}}`, `{{verification_code}}`, `{{shop_name}}`, `{{win_date}}`, `{{raffle_url}}`.
+### 2. Activar envío desde servidor
 
-## Habilitar envío desde el servidor
+1. En **Account → Security**, activa **"Allow API requests from non-browser applications"**
+2. En **Account → API Keys**, copia:
+   - **Public Key** → `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`
+   - **Private Key** → `EMAILJS_PRIVATE_KEY` (solo en servidor, nunca en el frontend)
 
-EmailJS bloquea por defecto las llamadas que no vienen del navegador (error 403). Para que funcione desde las API routes:
+### 3. Plantillas en EmailJS
 
-1. **Account → Security** → activa **"Allow API requests from non-browser applications"** (o equivalente para permitir Node.js/servidor).
-2. Añade en `.env.local` la **Private Key**: `EMAILJS_PRIVATE_KEY=tu_clave_privada` (la obtienes en Account → API Keys; no la expongas en el frontend).
+Ve a **[Templates](https://dashboard.emailjs.com/admin/templates)** y crea:
+
+#### Plantilla: Participación registrada
+- **ID** (cópialo exacto) → `EMAILJS_TEMPLATE_PAYMENT_VALIDATION`
+- Variables sugeridas: `{{to_email}}`, `{{to_name}}`, `{{message}}`, `{{subject}}`
+
+#### Plantilla: Notificación al ganador
+- **ID** → `EMAILJS_TEMPLATE_WINNER_NOTIFICATION`
+- Variables: `{{to_email}}`, `{{to_name}}`, `{{message}}`, `{{product_name}}`, `{{ticket_number}}`, `{{verification_code}}`, `{{raffle_url}}`, `{{shop_name}}`, `{{win_date}}`
+
+Si usas la plantilla genérica `template_mgmgrng`, debe incluir al menos `{{message}}`, `{{to_email}}` y `{{to_name}}`.
+
+### 4. Configurar `.env.local` (o variables en Vercel)
+
+```env
+# EmailJS (obligatorio para correos)
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=tu_public_key
+EMAILJS_PRIVATE_KEY=tu_private_key
+EMAILJS_SERVICE_ID=service_sovfqju
+
+# Plantillas (opcional; si no se definen, se usa template_mgmgrng)
+EMAILJS_TEMPLATE_PAYMENT_VALIDATION=template_xxxxx
+EMAILJS_TEMPLATE_WINNER_NOTIFICATION=template_yyyyy
+
+# URL de la app (para enlaces en correos)
+NEXT_PUBLIC_APP_URL=https://www.tiketeaonline.com
+```
+
+### 5. Verificación
+
+- **Participación registrada**: sube un comprobante en checkout y revisa que llegue el correo.
+- **Ganador**: ejecuta una oportunidad desde el panel admin y comprueba que el ganador reciba el correo con el código.
+
+---
+
+## Solución de problemas
+
+| Error | Causa | Solución |
+|-------|-------|----------|
+| 403 Forbidden | Llamadas desde servidor bloqueadas | Activar "Allow API requests from non-browser applications" en EmailJS |
+| "EMAILJS_PRIVATE_KEY no está configurado" | Falta la clave privada | Añadir `EMAILJS_PRIVATE_KEY` en `.env.local` |
+| "The template ID not found" (400) | ID de plantilla incorrecto o inexistente | Crear la plantilla en EmailJS y copiar el ID exacto |
+| No llegan correos | Plantilla sin `to_email` correcto | Verificar que la plantilla use `{{to_email}}` como destinatario |

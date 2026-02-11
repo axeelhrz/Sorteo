@@ -18,11 +18,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.25) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(139, 92, 246, 0.18) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 50% at 0% 100%, rgba(129, 140, 248, 0.15) 0%, transparent 50%),
-    linear-gradient(180deg, #FAFBFF 0%, #F0F4FF 40%, #E8ECFF 100%);
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.35) 45%, transparent 65%),
+    url('/assets/Fondo-test.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   overflow: hidden;
   padding: var(--space-20) var(--space-6);
 }
@@ -30,27 +31,17 @@
 .hero::before {
   content: '';
   position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 65%);
-  border-radius: 50%;
-  animation: float 6s ease-in-out infinite;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse 80% 60% at 20% 50%, rgba(0, 0, 0, 0.3) 0%, transparent 60%);
+  pointer-events: none;
   z-index: 0;
 }
 
 .hero::after {
-  content: '';
-  position: absolute;
-  bottom: -30%;
-  left: -5%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, transparent 65%);
-  border-radius: 50%;
-  animation: float 8s ease-in-out infinite reverse;
-  z-index: 0;
+  display: none;
 }
 
 .heroWrapper {
@@ -75,14 +66,14 @@
   display: inline-block;
   width: fit-content;
   padding: var(--space-2) var(--space-4);
-  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+  background: rgba(255, 255, 255, 0.95);
   color: var(--primary-700);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
   border-radius: var(--radius-full);
-  border: 1px solid var(--primary-200);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
 .heroTitle {
@@ -91,26 +82,25 @@
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.02em;
-  color: var(--text-primary);
-  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ffffff;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
   animation: slideInUp 0.8s ease-out 0.1s both;
 }
 
 .heroSubtitle {
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: rgba(255, 255, 255, 0.95);
   line-height: 1.5;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
   animation: slideInUp 0.8s ease-out 0.2s both;
 }
 
 .heroDescription {
   font-size: 16px;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.7;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
   animation: slideInUp 0.8s ease-out 0.3s both;
 }
 
@@ -181,7 +171,7 @@
 }
 
 .heroLogo {
-  filter: drop-shadow(0 20px 40px rgba(99, 102, 241, 0.15));
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 60px rgba(255, 255, 255, 0.1));
   animation: float 4s ease-in-out infinite;
 }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminStorage, getAdminFirestore } from '@/lib/firebase-admin';
+import { sendPaymentValidationEmail } from '@/lib/emails/send-payment-validation';
 
 export async function POST(request: NextRequest) {
   try {
@@ -84,20 +85,16 @@ export async function POST(request: NextRequest) {
         const userName = userData?.name || userData?.displayName || 'Usuario';
 
         if (userEmail) {
-          const baseUrl = request.nextUrl?.origin || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-          const emailRes = await fetch(`${baseUrl}/api/emails/send-payment-validation`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+          try {
+            await sendPaymentValidationEmail({
               email: userEmail,
               name: userName,
               ticketQuantity: finalTicketQuantity,
               amount: finalAmount,
               paymentMethod: paymentMethod === 'yape' ? 'Yape' : paymentMethod === 'plin' ? 'Plin' : paymentMethod,
-            }),
-          });
-          if (!emailRes.ok) {
-            console.warn('No se pudo enviar el correo de validación:', await emailRes.text());
+            });
+          } catch (emailErr) {
+            console.warn('No se pudo enviar el correo de participación:', emailErr);
           }
         }
       } catch (emailErr) {

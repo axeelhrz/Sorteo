@@ -3,13 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FiMail, FiLock, FiLogIn } from 'react-icons/fi';
+import { FiMail, FiLock, FiLogIn, FiShield } from 'react-icons/fi';
 import { firebaseAuthService } from '@/services/firebase-auth-service';
 import { useAuthStore } from '@/store/auth-store';
-import Logo from './Logo';
-import styles from './LoginForm.module.css';
+import { UserRole } from '@/types/auth';
+import Logo from '@/components/Logo';
+import styles from '@/components/LoginForm.module.css';
 
-export default function LoginForm() {
+const ADMIN_EMAIL = 'tiketea.online@gmail.com';
+
+export default function AdminLoginPage() {
   const router = useRouter();
   const { setUser, setToken } = useAuthStore();
   const [formData, setFormData] = useState({
@@ -21,10 +24,7 @@ export default function LoginForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,20 +33,26 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
+      if (formData.email.toLowerCase().trim() !== ADMIN_EMAIL) {
+        setError('Acceso restringido. Solo el administrador puede ingresar aquí.');
+        setLoading(false);
+        return;
+      }
+
       const { user, token } = await firebaseAuthService.login(formData);
 
-      // Guardar token primero
-      setToken(token);
-      
-      // Guardar usuario
-      setUser(user);
+      if (user.role !== UserRole.ADMIN) {
+        setError('Esta cuenta no tiene permisos de administrador. Contacta al equipo técnico.');
+        await firebaseAuthService.logout();
+        setLoading(false);
+        return;
+      }
 
-      // Redirigir al dashboard
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 100);
-    } catch (err: any) {
-      setError(err.message || 'Credenciales inválidas');
+      setToken(token);
+      setUser(user);
+      router.push('/dashboard/admin');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Credenciales inválidas');
     } finally {
       setLoading(false);
     }
@@ -56,11 +62,14 @@ export default function LoginForm() {
     <div className={styles.container}>
       <div className={styles.formCard}>
         <Logo size="medium" className={styles.logo} />
-        <h2 className={styles.title}>Iniciar Sesión</h2>
-        <p className={styles.subtitle}>Accede a tu cuenta para continuar</p>
-        
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
+          <FiShield style={{ fontSize: 24, color: '#6366f1' }} />
+          <h2 className={styles.title}>Panel de Administración</h2>
+        </div>
+        <p className={styles.subtitle}>Inicia sesión para acceder al panel</p>
+
         {error && <div className={styles.errorMessage}>{error}</div>}
-        
+
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
             <label htmlFor="email" className={styles.label}>
@@ -75,7 +84,8 @@ export default function LoginForm() {
               onChange={handleChange}
               required
               className={styles.input}
-              placeholder="tu@email.com"
+              placeholder="Correo del administrador"
+              autoComplete="email"
             />
           </div>
 
@@ -93,16 +103,17 @@ export default function LoginForm() {
               required
               className={styles.input}
               placeholder="••••••••"
+              autoComplete="current-password"
             />
           </div>
 
           <button type="submit" disabled={loading} className={styles.submitButton}>
             {loading ? (
-              'Iniciando sesión...'
+              'Verificando...'
             ) : (
               <>
                 <FiLogIn className={styles.buttonIcon} />
-                Iniciar Sesión
+                Entrar al panel
               </>
             )}
           </button>
@@ -110,19 +121,8 @@ export default function LoginForm() {
 
         <div className={styles.footer}>
           <p className={styles.footerText}>
-            <Link href="/forgot-password" className={styles.footerLink}>
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </p>
-          <p className={styles.footerText}>
-            <Link href="/login/admin" className={styles.footerLink}>
-              Acceso administrador
-            </Link>
-          </p>
-          <p className={styles.footerText}>
-            ¿No tienes una cuenta?{' '}
-            <Link href="/register" className={styles.footerLink}>
-              Regístrate aquí
+            <Link href="/" className={styles.footerLink}>
+              ← Volver al inicio
             </Link>
           </p>
         </div>

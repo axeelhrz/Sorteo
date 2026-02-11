@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import * as admin from 'firebase-admin';
 import { getAdminAuth, getAdminFirestore } from '@/lib/firebase-admin';
 import { winnerVerificationService } from '@/services/winner-verification-service';
+import { sendWinnerNotificationEmail } from '@/lib/emails/send-winner-notification';
 import { RaffleStatus } from '@/types/raffle';
 
 interface TicketDoc {
@@ -153,28 +154,26 @@ export async function POST(
 
     if (userEmail) {
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/send-winner-notification`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: userEmail,
-            name: userName,
-            raffleId,
-            raffleTitle: productName,
-            productName,
-            productDescription,
-            productValue,
-            ticketNumber: winningTicket.ticketNumber,
-            verificationCode,
-            shopName,
-            shopEmail,
-            shopPhone,
-            shopSocialMedia,
-            winDate: new Date().toISOString(),
-          }),
+        await sendWinnerNotificationEmail({
+          email: userEmail,
+          name: userName,
+          raffleId,
+          raffleTitle: productName,
+          productName,
+          productDescription,
+          productValue,
+          ticketNumber: winningTicket.ticketNumber,
+          verificationCode,
+          shopName,
+          shopEmail,
+          shopPhone,
+          shopSocialMedia,
+          winDate: new Date().toISOString(),
         });
+        console.log('✅ Correo ganador enviado a:', userEmail);
       } catch (e) {
-        console.error('Error sending winner notification email:', e);
+        console.error('Error enviando correo al ganador:', e);
+        // No lanzar error para no bloquear la ejecución del sorteo
       }
     }
 

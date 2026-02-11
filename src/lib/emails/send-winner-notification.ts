@@ -2,12 +2,11 @@ import { sendEmail } from '@/lib/emailjs-server';
 
 function getTemplateId(): string {
   const id = process.env.EMAILJS_TEMPLATE_WINNER_NOTIFICATION?.trim();
-  if (!id) {
-    throw new Error(
-      'EMAILJS_TEMPLATE_WINNER_NOTIFICATION no está configurado. Crea una plantilla en https://dashboard.emailjs.com/admin/templates y pon su ID en .env.local'
-    );
-  }
-  return id;
+  if (id) return id;
+  // Fallback a plantilla genérica (debe tener {{message}}, {{to_email}}, {{to_name}})
+  const fallback = process.env.EMAILJS_TEMPLATE_ORGANIZER_PAYMENT_DONE || 'template_mgmgrng';
+  console.warn('EMAILJS_TEMPLATE_WINNER_NOTIFICATION no configurado. Usando plantilla genérica. Crea una plantilla específica en EmailJS para mejores resultados.');
+  return fallback;
 }
 
 export interface WinnerNotificationPayload {

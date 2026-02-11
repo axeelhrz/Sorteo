@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendEmail } from '@/lib/emailjs-server';
-
-const TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_PAYMENT_VALIDATION || process.env.EMAILJS_TEMPLATE_ORGANIZER_PAYMENT_DONE || 'template_mgmgrng';
+import { sendPaymentValidationEmail } from '@/lib/emails/send-payment-validation';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,19 +13,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const messageBody = `Hola ${name},\n\nTu participación se ha registrado y está siendo validada por nuestro equipo.\n\nDetalles de tu participación:\n• Cantidad de tickets: ${ticketQuantity}\n• Monto: S/ ${Number(amount).toFixed(2)}\n• Método de pago: ${paymentMethod}\n\nEl proceso de validación puede tomar hasta 24 horas. Te enviaremos un correo de confirmación una vez que tu participación sea aprobada.\n\n✓ Tu participación ha sido registrada correctamente.\n\nGracias por participar,\nEquipo TIKETEA`;
-
-    await sendEmail({
-      templateId: TEMPLATE_ID,
-      templateParams: {
-        to_email: email,
-        to_name: name,
-        subject: 'Participación en proceso de revisión - TIKETEA',
-        message: messageBody,
-        organizer_name: name,
-        product_name: 'Participación registrada',
-        amount_paid: `S/ ${Number(amount).toFixed(2)}`,
-      },
+    await sendPaymentValidationEmail({
+      email,
+      name,
+      ticketQuantity,
+      amount,
+      paymentMethod,
     });
 
     console.log('✅ Correo de participación registrada enviado a:', email);
