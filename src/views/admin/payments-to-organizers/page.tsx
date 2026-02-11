@@ -33,7 +33,7 @@ export default function AdminPaymentsToOrganizersPage() {
       const { data } = result;
       const withPayment = data.filter(
         (r: any) => r.paymentToOrganizerAt != null
-      );
+      ) as Raffle[];
       setPayments(withPayment);
     } catch (err: any) {
       setError(err.message || 'Error al cargar los pagos');
