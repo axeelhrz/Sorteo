@@ -230,10 +230,10 @@ export const adminSecureService = {
       .where('status', 'in', ['draft', 'pending_approval'])
       .get();
 
-    let raffles = snapshot.docs.map((doc) => ({
+    let raffles: AdminRaffleRecord[] = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    }));
+    } as AdminRaffleRecord));
 
     if (shopId) {
       raffles = raffles.filter((r) => r.shopId === shopId);
@@ -290,12 +290,12 @@ export const adminSecureService = {
       adminDb.collection('raffles').where('status', '==', 'active').get(),
       adminDb.collection('raffles').where('status', '==', 'sold_out').get(),
     ]);
-    let raffles = [...activeSnap.docs, ...soldOutSnap.docs].map((doc) => ({
+    let raffles: AdminRaffleRecord[] = [...activeSnap.docs, ...soldOutSnap.docs].map((doc) => ({
       id: doc.id,
       ...doc.data(),
       createdAt: toDate(doc.data().createdAt),
       activatedAt: toDate(doc.data().activatedAt),
-    }));
+    } as AdminRaffleRecord));
     if (shopId) {
       raffles = raffles.filter((r) => r.shopId === shopId);
     }

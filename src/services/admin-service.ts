@@ -31,6 +31,27 @@ export interface AdminDashboardStats {
   };
 }
 
+export interface PaymentHistoryResponse {
+  items: Array<{
+    id: string;
+    type: 'compra' | 'pago_organizador';
+    date: string;
+    amount: number;
+    status?: string;
+    userName?: string;
+    userEmail?: string;
+    shopName?: string;
+    opportunityName?: string;
+    raffleId?: string;
+    ticketQuantity?: number;
+    paymentEvidenceUrl?: string;
+    shopId?: string;
+    userId?: string;
+  }>;
+  shops: Array<{ id: string; name: string }>;
+  users: Array<{ id: string; name: string; email: string }>;
+}
+
 async function callAdminSecure<T>(action: string, payload?: any): Promise<T> {
   const response = await fetch('/api/admin/secure', {
     method: 'POST',
@@ -139,8 +160,8 @@ export const adminService = {
     shopId?: string;
     userId?: string;
     oportunidad?: string;
-  }) {
-    return callAdminSecure('getPaymentHistory', { filters });
+  }): Promise<PaymentHistoryResponse> {
+    return callAdminSecure<PaymentHistoryResponse>('getPaymentHistory', { filters });
   },
 
   async getAllUsers(limit: number, offset: number, filters?: { role?: string; status?: string }) {

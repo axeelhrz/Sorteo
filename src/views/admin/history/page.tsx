@@ -42,7 +42,7 @@ export default function AdminHistoryPage() {
       if (userId) filters.userId = userId;
       if (oportunidad.trim()) filters.oportunidad = oportunidad.trim();
       const res = await adminService.getPaymentHistory(filters);
-      setItems(res.items as HistoryItem[]);
+      setItems(res.items);
       setShops(res.shops);
       setUsers(res.users);
     } catch (err: any) {
