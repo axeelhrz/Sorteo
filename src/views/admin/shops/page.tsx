@@ -81,7 +81,7 @@ export default function ShopsManagement() {
 
   const handleViewDetail = async (shopId: string) => {
     try {
-      const data = await adminService.getShopDetail(shopId);
+      const data = (await adminService.getShopDetail(shopId)) as ShopDetail;
       setSelectedShop(data);
       setShowDetail(true);
     } catch (err: any) {
