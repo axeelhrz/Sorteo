@@ -52,33 +52,40 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
 
 export const firebaseRaffleWriteService = {
   /**
-   * Crea un nuevo sorteo
-   * Calcula automáticamente los tickets como el doble del valor de ticket
+   * Crea un nuevo sorteo.
+   * - Valor del producto: solo en product.value (lo ve la administración).
+   * - Precio por ticket: raffle.productValue; si se pasa costPerTicket se usa y se calculan los tickets.
    */
   async createRaffle(data: CreateRaffleDto): Promise<Raffle> {
     try {
-      // Obtener el producto para calcular los tickets
       const productDoc = await getDoc(doc(db, 'products', data.productId));
       if (!productDoc.exists()) {
         throw new Error('Producto no encontrado');
       }
 
       const productData = productDoc.data() as Product;
-      const productValue = productData.value || 0;
-      
-      // Calcular tickets: doble del valor de ticket
-      const totalTickets = Math.floor(productValue * 2);
+      const productValueReal = productData.value || 0; // valor del producto (solo admin)
+      const deliveryCost = productData.deliveryCost ?? 0;
+      const costPerTicket = data.costPerTicket ?? 0;
+
+      // Precio por ticket (lo que paga el participante): lo define el organizador o queda para que lo apruebe admin
+      const ticketPrice = costPerTicket > 0 ? costPerTicket : productValueReal / 2;
+      // Número de tickets: (valor producto + delivery) * ratio / precio por ticket (ratio 2)
+      const totalTickets =
+        ticketPrice > 0
+          ? Math.floor((productValueReal + deliveryCost) * 2 / ticketPrice)
+          : Math.floor(productValueReal * 2);
 
       if (totalTickets <= 0) {
-        throw new Error('El valor de ticket debe ser mayor a 0');
+        throw new Error('El precio por ticket debe ser mayor a 0');
       }
 
       const rafflesRef = collection(db, 'raffles');
       const raffleData = {
         shopId: data.shopId,
         productId: data.productId,
-        productValue: productValue,
-        totalTickets: totalTickets,
+        productValue: ticketPrice, // en el sorteo guardamos el precio por ticket (lo que ve el usuario)
+        totalTickets,
         soldTickets: 0,
         status: RaffleStatus.DRAFT,
         requiresDeposit: productData.requiresDeposit || false,

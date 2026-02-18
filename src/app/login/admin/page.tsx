@@ -101,8 +101,12 @@ export default function AdminLoginPage() {
 
         <div className={styles.footer}>
           <p className={styles.footerText}>
+            <Link href="/login/admin/register" className={styles.footerLink}>
+              Registrarse como administrador
+            </Link>
+            {' · '}
             <Link href="/" className={styles.footerLink}>
-              ← Volver al inicio
+              Volver al inicio
             </Link>
           </p>
         </div>

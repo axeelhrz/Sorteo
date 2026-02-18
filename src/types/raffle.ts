@@ -40,6 +40,8 @@ export interface Raffle {
 export interface CreateRaffleDto {
   shopId: string;
   productId: string;
+  /** Precio por ticket (S/.) sugerido por el organizador; la administración puede ajustarlo al aprobar */
+  costPerTicket?: number;
   thumbnail?: string; // Miniatura del sorteo
   specialConditions?: string;
 }
