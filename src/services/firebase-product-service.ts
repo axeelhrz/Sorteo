@@ -28,15 +28,16 @@ const convertTimestamp = (timestamp: any): Date => {
   return new Date();
 };
 
-// Helper para convertir documento de Firestore a Product
+// Helper para convertir documento de Firestore a Product (valor redondeado a 2 decimales)
 const convertProductDoc = (docSnap: QueryDocumentSnapshot<DocumentData>): Product => {
   const data = docSnap.data();
+  const rawValue = Number(data.value) || 0;
   return {
     id: docSnap.id,
     shopId: data.shopId || '',
     name: data.name || '',
     description: data.description || '',
-    value: data.value || 0,
+    value: Math.round(rawValue * 100) / 100,
     height: data.height || 0,
     width: data.width || 0,
     depth: data.depth || 0,
@@ -125,11 +126,13 @@ export const firebaseProductService = {
   async createProduct(data: CreateProductDto): Promise<Product> {
     try {
       const productsRef = collection(db, 'products');
+      // Redondear valor a 2 decimales para evitar 499.97 en lugar de 500
+      const valueRounded = Math.round(Number(data.value) * 100) / 100;
       const productData = {
         shopId: data.shopId,
         name: data.name,
         description: data.description,
-        value: data.value,
+        value: valueRounded,
         height: data.height,
         width: data.width,
         depth: data.depth,

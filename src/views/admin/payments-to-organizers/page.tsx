@@ -73,9 +73,12 @@ export default function AdminPaymentsToOrganizersPage() {
         <h2 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '24px', fontWeight: '700' }}>
           Pagos a Organizadores
         </h2>
-        <p style={{ margin: '0', color: '#64748b', fontSize: '14px' }}>
-          Listado de pagos realizados a organizadores por oportunidades finalizadas
+        <p style={{ margin: '0 0 12px 0', color: '#64748b', fontSize: '14px' }}>
+          Cuando envías el pago y subes la evidencia en <strong>Sorteos finalizados</strong>, el pago aparece aquí para que puedas confirmarlo.
         </p>
+        <div style={{ padding: '12px 16px', backgroundColor: '#eff6ff', border: '1px solid #93c5fd', borderRadius: '8px', fontSize: '13px', color: '#1e40af' }}>
+          <strong>Confirmar:</strong> Revisa que cada pago registrado coincida con el que enviaste al organizador (monto, evidencia y fecha).
+        </div>
       </div>
 
       {error && (

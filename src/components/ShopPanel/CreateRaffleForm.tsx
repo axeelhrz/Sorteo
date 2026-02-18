@@ -79,13 +79,14 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
       return;
     }
 
-    const value = parseFloat(productData.value);
+    // Redondear a 2 decimales para evitar errores de precisión (ej. 500 → 499.97)
+    const value = Math.round(parseFloat(productData.value) * 100) / 100;
     if (isNaN(value) || value <= 0) {
       setError('El valor del producto debe ser mayor a 0');
       return;
     }
 
-    const costPerTicketNum = parseFloat(productData.costPerTicket);
+    const costPerTicketNum = Math.round(parseFloat(productData.costPerTicket) * 100) / 100;
     if (isNaN(costPerTicketNum) || costPerTicketNum <= 0) {
       setError('El precio por ticket debe ser mayor a 0');
       return;

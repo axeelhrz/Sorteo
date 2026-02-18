@@ -39,7 +39,7 @@ const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'sorteos-activos', label: 'Sorteos Activos', icon: <FiPlay /> },
   { id: 'sorteos-finalizados', label: 'Sorteos Finalizados', icon: <FiCheckCircle /> },
   { id: 'tickets', label: 'Tickets', icon: <FiCreditCard /> },
-  { id: 'pagos', label: 'Pagos', icon: <FiDollarSign /> },
+  { id: 'pagos', label: 'Pagos (confirmar)', icon: <FiDollarSign /> },
   { id: 'historial', label: 'Historial', icon: <FiList /> },
   { id: 'usuarios', label: 'Usuarios', icon: <FiUsers /> },
   { id: 'organizadores', label: 'Organizadores', icon: <FiShoppingBag /> },
@@ -258,6 +258,14 @@ export default function AdminDashboard() {
                           <div className={styles.statValue} style={{ fontSize: '36px' }}>
                             S/. {(stats.payments.paymentToOrganizers ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('pagos')}
+                            className={styles.statLink}
+                            style={{ marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', color: '#6366f1', fontWeight: 600, fontSize: '14px', padding: 0, textDecoration: 'underline' }}
+                          >
+                            Ver listado para confirmar →
+                          </button>
                         </div>
                         <div>
                           <div className={styles.statLabel}>Ingreso de la Plataforma</div>

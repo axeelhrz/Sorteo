@@ -44,6 +44,7 @@ export default function FinishedRaffles() {
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
   const [paymentUploading, setPaymentUploading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentJustRegistered, setPaymentJustRegistered] = useState(false);
 
   const limit = 10;
 
@@ -127,6 +128,7 @@ export default function FinishedRaffles() {
       const updated = { ...selectedRaffle, paymentToOrganizerAt: new Date(), paymentEvidenceUrl };
       setSelectedRaffle(updated);
       setPaymentFile(null);
+      setPaymentJustRegistered(true);
     } catch (err: unknown) {
       setPaymentError(err instanceof Error ? err.message : 'Error al registrar el pago');
     } finally {
@@ -139,6 +141,7 @@ export default function FinishedRaffles() {
     setSelectedRaffle(null);
     setPaymentFile(null);
     setPaymentError(null);
+    setPaymentJustRegistered(false);
   };
 
   if (loading && raffles.length === 0) {
@@ -414,6 +417,13 @@ export default function FinishedRaffles() {
                   </ul>
                 </div>
               </section>
+
+              {/* Mensaje tras registrar pago: confirmar en Pagos */}
+              {paymentJustRegistered && selectedRaffle.paymentToOrganizerAt && (
+                <div style={{ padding: '14px 18px', backgroundColor: '#ecfdf5', border: '1px solid #10b981', borderRadius: '10px', marginBottom: '20px', fontSize: '14px', color: '#065f46' }}>
+                  <strong>Pago registrado correctamente.</strong> Aparecerá en la pestaña <strong>Pagos (confirmar)</strong> del panel para que puedas confirmarlo.
+                </div>
+              )}
 
               {/* Registrar pago al organizador */}
               {!selectedRaffle.paymentToOrganizerAt && (

@@ -381,7 +381,7 @@ export default function PendingRafflesPage() {
                 <div style={modalStyles.row}>
                   <span style={modalStyles.label}>Valor producto (organizador)</span>
                   <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: 600, color: '#059669' }}>
-                    S/. {Number(selectedRaffle.product?.value ?? selectedRaffle.productValue ?? 0).toFixed(2)}
+                    S/. {(Math.round(Number(selectedRaffle.product?.value ?? selectedRaffle.productValue ?? 0) * 100) / 100).toFixed(2)}
                   </p>
                 </div>
                 <div style={modalStyles.row}>

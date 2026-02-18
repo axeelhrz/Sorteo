@@ -254,10 +254,18 @@ export const adminSecureService = {
         const productDoc = raffle.productId
           ? await adminDb.collection('products').doc(raffle.productId).get()
           : null;
+        const productData = productDoc?.exists ? productDoc.data() : null;
+        const product = productData
+          ? {
+              id: productDoc!.id,
+              ...productData,
+              value: Math.round(Number(productData.value || 0) * 100) / 100,
+            }
+          : null;
         return {
           ...raffle,
           shop: shopDoc?.exists ? { id: shopDoc.id, ...shopDoc.data() } : null,
-          product: productDoc?.exists ? { id: productDoc.id, ...productDoc.data() } : null,
+          product,
         };
       })
     );
@@ -308,10 +316,14 @@ export const adminSecureService = {
         const productDoc = raffle.productId
           ? await adminDb.collection('products').doc(raffle.productId).get()
           : null;
+        const productData = productDoc?.exists ? productDoc.data() : null;
+        const product = productData
+          ? { id: productDoc!.id, ...productData, value: Math.round(Number(productData.value || 0) * 100) / 100 }
+          : null;
         return {
           ...raffle,
           shop: shopDoc?.exists ? { id: shopDoc.id, ...shopDoc.data() } : null,
-          product: productDoc?.exists ? { id: productDoc.id, ...productDoc.data() } : null,
+          product,
         };
       })
     );
@@ -355,10 +367,14 @@ export const adminSecureService = {
         const productDoc = raffle.productId
           ? await adminDb.collection('products').doc(raffle.productId).get()
           : null;
+        const productData = productDoc?.exists ? productDoc.data() : null;
+        const product = productData
+          ? { id: productDoc!.id, ...productData, value: Math.round(Number(productData.value || 0) * 100) / 100 }
+          : null;
         return {
           ...raffle,
           shop: shopDoc?.exists ? { id: shopDoc.id, ...shopDoc.data() } : null,
-          product: productDoc?.exists ? { id: productDoc.id, ...productDoc.data() } : null,
+          product,
         };
       })
     );
