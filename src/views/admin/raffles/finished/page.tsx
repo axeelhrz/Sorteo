@@ -213,16 +213,17 @@ export default function FinishedRaffles() {
               </thead>
               <tbody>
                 {raffles.map((raffle) => {
-                  const valorProducto = raffle.product?.value != null ? Math.round(Number(raffle.product.value) * 100) / 100 : null;
+                  const valorProducto = raffle.product?.value != null ? Math.round(Number(raffle.product.value)) : null;
+                  const unidadDisplay = Math.round(Number(raffle.productValue));
                   return (
                   <tr key={raffle.id} className={styles.finishedRow}>
                     <td className={styles.finishedTdOrg}>{raffle.shop.name}</td>
                     <td className={styles.finishedTdProduct}>{raffle.product.name}</td>
                     <td className={styles.finishedTdValue}>
-                      {valorProducto != null ? `S/. ${valorProducto.toFixed(2)}` : '—'}
+                      {valorProducto != null ? `S/. ${valorProducto.toLocaleString('es-PE')}` : '—'}
                     </td>
                     <td className={styles.finishedTdValue}>
-                      S/. {raffle.productValue.toFixed(2)}
+                      S/. {unidadDisplay.toLocaleString('es-PE')}
                     </td>
                     <td className={styles.finishedTdTickets}>
                       <span className={styles.ticketsCount}>
@@ -327,7 +328,7 @@ export default function FinishedRaffles() {
                   <label>Valor del producto</label>
                   <p className={styles.value}>
                     {selectedRaffle.product?.value != null
-                      ? `S/. ${(Math.round(Number(selectedRaffle.product.value) * 100) / 100).toFixed(2)}`
+                      ? `S/. ${Math.round(Number(selectedRaffle.product.value)).toLocaleString('es-PE')}`
                       : '—'}
                   </p>
                 </div>
@@ -341,7 +342,7 @@ export default function FinishedRaffles() {
                 </div>
                 <div className={styles.detailGridItem}>
                   <label>Unidad (valor de ticket)</label>
-                  <p className={styles.value}>S/. {selectedRaffle.productValue.toFixed(2)}</p>
+                  <p className={styles.value}>S/. {Math.round(Number(selectedRaffle.productValue)).toLocaleString('es-PE')}</p>
                 </div>
                 <div className={styles.detailGridItem}>
                   <label>Tickets Vendidos</label>
