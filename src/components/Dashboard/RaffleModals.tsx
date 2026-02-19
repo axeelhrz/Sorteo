@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { FiX, FiAlertTriangle, FiCheck } from 'react-icons/fi';
+import { FiAlertTriangle, FiCheck } from 'react-icons/fi';
 import { Raffle, WinnerInfo } from '@/types/raffle';
 import { WinnerValidation } from '@/components/ShopPanel/WinnerValidation';
 import { DeliveryEvidenceUpload } from '@/components/ShopPanel/DeliveryEvidenceUpload';
@@ -83,8 +83,8 @@ export default function RaffleModals({
                 <h2 className={styles.modalTitleNew}>Detalles de la Oportunidad</h2>
                 <p className={styles.modalSubtitle}>Información completa de la oportunidad</p>
               </div>
-              <button className={styles.modalCloseBtnNew} onClick={onCloseViewModal} type="button">
-                <FiX size={20} />
+              <button className={styles.modalCloseBtnNew} onClick={onCloseViewModal} type="button" aria-label="Cerrar">
+                <span className={styles.modalCloseX}>×</span>
               </button>
             </div>
 
@@ -333,8 +333,8 @@ export default function RaffleModals({
                 <h2 className={styles.modalTitleNew}>Activar Sorteo</h2>
                 <p className={styles.modalSubtitle}>Confirma que deseas activar este sorteo</p>
               </div>
-              <button className={styles.modalCloseBtnNew} onClick={onCloseActivateModal} type="button">
-                <FiX size={20} />
+              <button className={styles.modalCloseBtnNew} onClick={onCloseActivateModal} type="button" aria-label="Cerrar">
+                <span className={styles.modalCloseX}>×</span>
               </button>
             </div>
 
@@ -414,8 +414,8 @@ export default function RaffleModals({
                 <h2 className={styles.modalTitleNew}>Eliminar Sorteo</h2>
                 <p className={styles.modalSubtitle}>Esta acción no se puede deshacer</p>
               </div>
-              <button className={styles.modalCloseBtnNew} onClick={onCloseDeleteModal} type="button">
-                <FiX size={20} />
+              <button className={styles.modalCloseBtnNew} onClick={onCloseDeleteModal} type="button" aria-label="Cerrar">
+                <span className={styles.modalCloseX}>×</span>
               </button>
             </div>
 
