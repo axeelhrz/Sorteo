@@ -174,7 +174,7 @@ export default function ActiveRaffles() {
               <tbody>
                 {raffles.map((raffle) => {
                   const progress = getProgressPercentage(raffle.soldTickets, raffle.totalTickets);
-                  const valorProducto = raffle.product?.value != null ? Math.round(Number(raffle.product.value) * 100) / 100 : null;
+                  const valorProducto = raffle.product?.value != null ? Math.round(Number(raffle.product.value)) : null;
                   return (
                     <tr key={raffle.id}>
                       <td>
@@ -185,7 +185,7 @@ export default function ActiveRaffles() {
                       </td>
                       <td>
                         {valorProducto != null ? (
-                          <span className={styles.activeValue}>S/. {valorProducto.toFixed(2)}</span>
+                          <span className={styles.activeValue}>S/. {valorProducto.toLocaleString('es-PE')}</span>
                         ) : (
                           <span style={{ color: '#94a3b8' }}>—</span>
                         )}
