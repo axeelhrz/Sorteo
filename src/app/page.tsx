@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { FiArrowRight, FiZap, FiDollarSign, FiShare2, FiTrendingUp, FiShield } from 'react-icons/fi';
 import Logo from '@/components/Logo';
-import Testimonials from '@/components/Testimonials';
 import { useAuthStore } from '@/store/auth-store';
 import styles from './home.module.css';
 
@@ -118,9 +117,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Testimonials Section */}
-      <Testimonials />
 
       {/* How It Works Section */}
       <section id="como-funciona" className={styles.howItWorks}>

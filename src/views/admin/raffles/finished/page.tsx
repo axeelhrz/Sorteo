@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { FiCheck, FiCircle, FiUpload, FiX, FiExternalLink } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
 import styles from '@/views/admin/admin.module.css';
@@ -12,14 +13,14 @@ interface WinnerInfo {
   ticketNumber?: number;
   verificationCode?: string;
   claimedAt?: string | Date;
-  deliveryEvidence?: { photoUrl?: string; uploadedAt?: string | Date };
+  deliveryEvidence?: { photoUrl?: string; uploadedAt?: string | Date; additionalPhotos?: string[] };
   deliveryConfirmedAt?: string | Date;
 }
 
 interface Raffle {
   id: string;
   shop: { id: string; name: string };
-  product: { id: string; name: string };
+  product: { id: string; name: string; value?: number; deliveryCost?: number };
   productValue: number;
   totalTickets: number;
   soldTickets: number;
@@ -107,12 +108,19 @@ export default function FinishedRaffles() {
     return styles.statusEjecutado;
   };
 
-  const formatDate = (v: string | Date | undefined | { toDate?: () => Date } | null) => {
-    if (!v) return '—';
+  const formatDate = (v: string | Date | undefined | { toDate?: () => Date; _seconds?: number; seconds?: number } | null) => {
+    if (v == null || v === '') return '—';
+    let date: Date;
     if (typeof v === 'object' && v !== null && 'toDate' in v && typeof (v as { toDate: () => Date }).toDate === 'function') {
-      return (v as { toDate: () => Date }).toDate().toLocaleString();
+      date = (v as { toDate: () => Date }).toDate();
+    } else if (typeof v === 'object' && v !== null && ((v as any)._seconds != null || (v as any).seconds != null)) {
+      const sec = (v as any)._seconds ?? (v as any).seconds ?? 0;
+      date = new Date(sec * 1000);
+    } else {
+      date = new Date(v as string | Date);
     }
-    return new Date(v as string | Date).toLocaleString();
+    if (Number.isNaN(date.getTime())) return '—';
+    return date.toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
   };
 
   const handleRegisterPayment = async () => {
@@ -192,8 +200,9 @@ export default function FinishedRaffles() {
               <thead>
                 <tr>
                   <th className={styles.finishedTh}>Organizador</th>
-                  <th className={styles.finishedTh}>Producto</th>
+                  <th className={styles.finishedTh}>Oportunidad</th>
                   <th className={styles.finishedTh}>Valor</th>
+                  <th className={styles.finishedTh}>Unidad</th>
                   <th className={styles.finishedTh}>Tickets</th>
                   <th className={styles.finishedTh}>Ticket ganador</th>
                   <th className={styles.finishedTh}>Nombre de usuario</th>
@@ -203,10 +212,15 @@ export default function FinishedRaffles() {
                 </tr>
               </thead>
               <tbody>
-                {raffles.map((raffle) => (
+                {raffles.map((raffle) => {
+                  const valorProducto = raffle.product?.value != null ? Math.round(Number(raffle.product.value) * 100) / 100 : null;
+                  return (
                   <tr key={raffle.id} className={styles.finishedRow}>
                     <td className={styles.finishedTdOrg}>{raffle.shop.name}</td>
                     <td className={styles.finishedTdProduct}>{raffle.product.name}</td>
+                    <td className={styles.finishedTdValue}>
+                      {valorProducto != null ? `S/. ${valorProducto.toFixed(2)}` : '—'}
+                    </td>
                     <td className={styles.finishedTdValue}>
                       S/. {raffle.productValue.toFixed(2)}
                     </td>
@@ -235,20 +249,31 @@ export default function FinishedRaffles() {
                       </span>
                     </td>
                     <td className={styles.finishedTdActions}>
+                      <Link
+                        href={`/sorteos/${raffle.id}`}
+                        className={`${styles.btn} ${styles.btnPrimary} ${styles.btnVer}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}
+                        title="Ver oportunidad"
+                      >
+                        <FiExternalLink size={14} />
+                        Ver
+                      </Link>
                       <button
                         type="button"
-                        className={`${styles.btn} ${styles.btnPrimary} ${styles.btnVer}`}
+                        className={`${styles.btn} ${styles.btnVer}`}
+                        style={{ marginLeft: 8 }}
                         onClick={() => {
                           setSelectedRaffle(raffle);
                           setShowDetail(true);
                         }}
+                        title="Ver detalles en modal"
                       >
-                        <FiExternalLink size={14} />
-                        Ver
+                        Detalles
                       </button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -276,12 +301,12 @@ export default function FinishedRaffles() {
         </div>
       )}
 
-      {/* Detail Modal - Detalles del Sorteo Finalizado */}
+      {/* Detail Modal - Detalles de la Oportunidad Finalizada */}
       {showDetail && selectedRaffle && (
         <div className={`${styles.modal} ${styles.open}`}>
           <div className={styles.detailModalContent}>
             <div className={styles.detailModalHeader}>
-              <h2>Detalles del Sorteo Finalizado</h2>
+              <h2>Detalles de la Oportunidad Finalizada</h2>
             </div>
 
             <div className={styles.detailModalBody}>
@@ -295,11 +320,27 @@ export default function FinishedRaffles() {
                   <p className={styles.value}>{selectedRaffle.shop.name}</p>
                 </div>
                 <div className={styles.detailGridItem}>
-                  <label>Producto</label>
+                  <label>Oportunidad / Producto</label>
                   <p className={styles.value}>{selectedRaffle.product.name}</p>
                 </div>
                 <div className={styles.detailGridItem}>
-                  <label>Valor de Ticket</label>
+                  <label>Valor del producto</label>
+                  <p className={styles.value}>
+                    {selectedRaffle.product?.value != null
+                      ? `S/. ${(Math.round(Number(selectedRaffle.product.value) * 100) / 100).toFixed(2)}`
+                      : '—'}
+                  </p>
+                </div>
+                <div className={styles.detailGridItem}>
+                  <label>Costo de delivery</label>
+                  <p className={styles.value}>
+                    {selectedRaffle.product?.deliveryCost != null && selectedRaffle.product.deliveryCost > 0
+                      ? `S/. ${Number(selectedRaffle.product.deliveryCost).toFixed(2)}`
+                      : '—'}
+                  </p>
+                </div>
+                <div className={styles.detailGridItem}>
+                  <label>Unidad (valor de ticket)</label>
                   <p className={styles.value}>S/. {selectedRaffle.productValue.toFixed(2)}</p>
                 </div>
                 <div className={styles.detailGridItem}>
@@ -332,7 +373,7 @@ export default function FinishedRaffles() {
                 <div className={styles.detailGridItem} style={{ gridColumn: '1 / -1' }}>
                   <label>Fecha de Finalización</label>
                   <p className={styles.value}>
-                    {new Date(selectedRaffle.raffleExecutedAt).toLocaleString()}
+                    {formatDate(selectedRaffle.raffleExecutedAt)}
                   </p>
                 </div>
               </div>
@@ -361,6 +402,35 @@ export default function FinishedRaffles() {
                           ? formatDate(selectedRaffle.winnerInfo.deliveryEvidence.uploadedAt)
                           : '—'}
                       </div>
+                      {selectedRaffle.winnerInfo?.deliveryEvidence?.photoUrl && (
+                        <a
+                          href={selectedRaffle.winnerInfo.deliveryEvidence.photoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.evidenceLink}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 6 }}
+                        >
+                          <FiExternalLink size={14} />
+                          Ver evidencia de entrega
+                        </a>
+                      )}
+                      {selectedRaffle.winnerInfo?.deliveryEvidence?.additionalPhotos?.length ? (
+                        <div style={{ marginTop: 6 }}>
+                          {selectedRaffle.winnerInfo.deliveryEvidence.additionalPhotos.map((url, i) => (
+                            <a
+                              key={i}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={styles.evidenceLink}
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginRight: 8 }}
+                            >
+                              <FiExternalLink size={12} />
+                              Foto {i + 2}
+                            </a>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                   </li>
                   <li className={styles.lifecycleStep}>
@@ -400,15 +470,15 @@ export default function FinishedRaffles() {
                   <ul className={styles.lifecycleHelpList}>
                     <li>
                       <strong>1. Código único de ganador registrado</strong><br />
-                      Lo hace el <strong>organizador</strong>: en el detalle del sorteo (<code>/sorteos/{selectedRaffle.id}</code>) debe ingresar el código que el ganador le dio al contactarlo. Así se marca que validó al ganador.
+                      Lo hace el <strong>organizador</strong>: en el detalle de la oportunidad (<code>/sorteos/{selectedRaffle.id}</code>) debe ingresar el código que el ganador le dio al contactarlo. Así se marca que validó al ganador.
                     </li>
                     <li>
                       <strong>2. Organizador entregó producto (evidencia)</strong><br />
-                      Lo hace el <strong>organizador</strong>: en el mismo detalle del sorteo, después de validar el código, puede subir la foto o evidencia de entrega del premio.
+                      Lo hace el <strong>organizador</strong>: en el mismo detalle de la oportunidad, después de validar el código, puede subir la foto o evidencia de entrega del premio. El admin puede ver la evidencia con "Ver evidencia de entrega" arriba.
                     </li>
                     <li>
                       <strong>3. Ganador confirmó recepción</strong><br />
-                      Lo hace el <strong>ganador</strong>: en su panel (<code>/user-panel/won-raffles</code>), en “Sorteos ganados”, puede ver la evidencia y hacer clic en “Confirmar recepción” cuando reciba el premio.
+                      Lo hace el <strong>ganador</strong>: en su panel (<code>/user-panel/won-raffles</code>), en “Oportunidades ganadas”, puede ver la evidencia y hacer clic en “Confirmar recepción” cuando reciba el premio.
                     </li>
                     <li>
                       <strong>4. Pago al organizador</strong><br />

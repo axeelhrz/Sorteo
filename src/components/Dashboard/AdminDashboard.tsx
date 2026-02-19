@@ -288,7 +288,19 @@ export default function AdminDashboard() {
           {activeTab === 'sorteos-activos' && <ActiveRafflesPage />}
           {activeTab === 'sorteos-finalizados' && <FinishedRafflesPage />}
           {activeTab === 'tickets' && <AdminPaymentsPage />}
-          {activeTab === 'pagos' && <AdminPaymentsToOrganizersPage />}
+          {activeTab === 'pagos' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+              <section>
+                <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#64748b' }}>
+                  Las compras que en <strong>Historial</strong> aparecen como &quot;Pendiente&quot; se confirman aquí (aprobar o rechazar).
+                </p>
+                <AdminPaymentsPage />
+              </section>
+              <section>
+                <AdminPaymentsToOrganizersPage />
+              </section>
+            </div>
+          )}
           {activeTab === 'historial' && <AdminHistoryPage />}
           {activeTab === 'usuarios' && <AdminUsersPage />}
           {activeTab === 'organizadores' && <AdminShopsPage />}

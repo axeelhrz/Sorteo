@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
 
@@ -30,6 +31,7 @@ interface Raffle {
   totalTickets?: number;
   soldTickets?: number;
   specialConditions?: string;
+  thumbnail?: string;
   createdAt?: any;
   shop?: { id: string; name: string; publicEmail?: string; phone?: string };
   product?: {
@@ -359,6 +361,22 @@ export default function PendingRafflesPage() {
                 ID: {selectedRaffle.id}
               </p>
             </div>
+
+            {/* Imagen del producto */}
+            {(selectedRaffle.product?.mainImage || selectedRaffle.thumbnail) && (
+              <div style={{ padding: '16px 24px 0', marginBottom: '8px' }}>
+                <p style={{ ...modalStyles.sectionTitle, marginBottom: '10px' }}>Imagen del producto</p>
+                <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', maxWidth: '320px', maxHeight: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Image
+                    src={selectedRaffle.product?.mainImage || selectedRaffle.thumbnail!}
+                    alt={selectedRaffle.product?.name || 'Producto'}
+                    width={320}
+                    height={240}
+                    style={{ width: '100%', height: 'auto', maxHeight: '240px', objectFit: 'contain' }}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Datos ingresados por el organizador */}
             <div style={{ padding: '20px 24px' }}>

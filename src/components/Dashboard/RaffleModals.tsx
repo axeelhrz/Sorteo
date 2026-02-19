@@ -89,15 +89,15 @@ export default function RaffleModals({
             </div>
 
             <div className={styles.modalBodyNew}>
-              {/* Imagen del producto */}
-              <div style={{ marginBottom: '24px', borderRadius: '12px', overflow: 'hidden', position: 'relative', width: '100%', maxHeight: '240px', backgroundColor: '#f1f5f9' }}>
+              {/* Imagen del producto: se ve completa (contain), sin recortar */}
+              <div style={{ marginBottom: '24px', borderRadius: '12px', overflow: 'hidden', position: 'relative', width: '100%', minHeight: '200px', maxHeight: '480px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {(viewModal.raffle.thumbnail || viewModal.raffle.product?.mainImage) ? (
                   <Image
                     src={viewModal.raffle.thumbnail || viewModal.raffle.product!.mainImage!}
                     alt={viewModal.raffle.product?.name || 'Producto'}
-                    width={400}
-                    height={240}
-                    style={{ width: '100%', height: 'auto', objectFit: 'cover', maxHeight: '240px' }}
+                    width={600}
+                    height={400}
+                    style={{ width: '100%', height: 'auto', maxHeight: '480px', objectFit: 'contain' }}
                   />
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '180px', color: '#94a3b8', fontSize: '14px' }}>
@@ -153,12 +153,20 @@ export default function RaffleModals({
                   <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: '12px' }}>
                     Tickets
                   </h3>
-                  <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>
-                    {viewModal.raffle.soldTickets} / {viewModal.raffle.totalTickets}
-                  </p>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
-                    {Math.round((viewModal.raffle.soldTickets / viewModal.raffle.totalTickets) * 100)}% vendidos
-                  </p>
+                  {viewModal.raffle.totalTickets != null && viewModal.raffle.totalTickets > 0 ? (
+                    <>
+                      <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>
+                        {viewModal.raffle.soldTickets} / {viewModal.raffle.totalTickets}
+                      </p>
+                      <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                        {Math.round((viewModal.raffle.soldTickets / viewModal.raffle.totalTickets) * 100)}% vendidos
+                      </p>
+                    </>
+                  ) : (
+                    <p style={{ margin: '0', fontSize: '14px', color: '#64748b' }}>
+                      El número de tickets aún no está definido
+                    </p>
+                  )}
                 </div>
 
                 {/* Valor del Producto */}

@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { FiSearch, FiPlay, FiTrash2, FiTrendingUp, FiCheckCircle } from 'react-icons/fi';
+import Link from 'next/link';
+import { FiSearch, FiPlay, FiTrash2, FiTrendingUp, FiCheckCircle, FiExternalLink } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
 import styles from '@/views/admin/admin.module.css';
 
 interface Raffle {
   id: string;
   shop: { id: string; name: string };
-  product: { id: string; name: string };
+  product: { id: string; name: string; value?: number };
   productValue: number;
   totalTickets: number;
   soldTickets: number;
@@ -161,8 +162,9 @@ export default function ActiveRaffles() {
               <thead>
                 <tr>
                   <th>Organizador</th>
-                  <th>Producto</th>
+                  <th>Oportunidad</th>
                   <th>Valor</th>
+                  <th>Unidad</th>
                   <th>Tickets</th>
                   <th>Progreso</th>
                   <th>Activo desde</th>
@@ -172,6 +174,7 @@ export default function ActiveRaffles() {
               <tbody>
                 {raffles.map((raffle) => {
                   const progress = getProgressPercentage(raffle.soldTickets, raffle.totalTickets);
+                  const valorProducto = raffle.product?.value != null ? Math.round(Number(raffle.product.value) * 100) / 100 : null;
                   return (
                     <tr key={raffle.id}>
                       <td>
@@ -179,6 +182,13 @@ export default function ActiveRaffles() {
                       </td>
                       <td>
                         <span className={styles.activeProduct} style={{ color: '#0f172a', fontSize: 14 }}>{raffle.product.name}</span>
+                      </td>
+                      <td>
+                        {valorProducto != null ? (
+                          <span className={styles.activeValue}>S/. {valorProducto.toFixed(2)}</span>
+                        ) : (
+                          <span style={{ color: '#94a3b8' }}>—</span>
+                        )}
                       </td>
                       <td>
                         <span className={styles.activeValue}>S/. {raffle.productValue.toFixed(2)}</span>
@@ -203,7 +213,15 @@ export default function ActiveRaffles() {
                         {new Date(raffle.activatedAt).toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <div className={styles.actionButtons} style={{ justifyContent: 'flex-end' }}>
+                        <div className={styles.actionButtons} style={{ justifyContent: 'flex-end', gap: 8, flexWrap: 'wrap' }}>
+                          <Link
+                            href={`/sorteos/${raffle.id}`}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 12px', fontSize: 13, textDecoration: 'none', color: '#6366f1', border: '1px solid #6366f1', borderRadius: 8, backgroundColor: 'transparent', fontWeight: 600 }}
+                            title="Ver oportunidad"
+                          >
+                            <FiExternalLink size={14} />
+                            Ver
+                          </Link>
                           {progress === 100 && (
                             <button
                               className={`${styles.btn} ${styles.btnSuccess}`}
