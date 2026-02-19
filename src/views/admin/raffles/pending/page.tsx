@@ -399,7 +399,15 @@ export default function PendingRafflesPage() {
                 <div style={modalStyles.row}>
                   <span style={modalStyles.label}>Valor producto (organizador)</span>
                   <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: 600, color: '#059669' }}>
-                    S/. {(Math.round(Number(selectedRaffle.product?.value ?? selectedRaffle.productValue ?? 0) * 100) / 100).toFixed(2)}
+                    S/. {(Math.round(Number(selectedRaffle.product?.value ?? 0) * 100) / 100).toFixed(2)}
+                  </p>
+                </div>
+                <div style={modalStyles.row}>
+                  <span style={modalStyles.label}>Unidad de participación (valor del ticket sugerido)</span>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: 600, color: '#6366f1' }}>
+                    S/. {(selectedRaffle.productValue != null && selectedRaffle.productValue > 0)
+                      ? (Math.round(Number(selectedRaffle.productValue) * 100) / 100).toFixed(2)
+                      : '—'}
                   </p>
                 </div>
                 <div style={modalStyles.row}>
@@ -424,7 +432,7 @@ export default function PendingRafflesPage() {
               <p style={{ ...modalStyles.sectionTitle, marginBottom: '14px' }}>Aprobación</p>
               <div style={{ display: 'grid', gap: '16px' }}>
                 <div>
-                  <label style={modalStyles.label}>Unidad de participación (S/.)</label>
+                  <label style={modalStyles.label}>Unidad de participación (S/.) — valor por ticket</label>
                   <input
                     type="number"
                     min="0.01"
@@ -434,7 +442,7 @@ export default function PendingRafflesPage() {
                     style={modalStyles.input}
                   />
                   <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
-                    Por defecto según valor del producto: 0-50 → S/1, 50.01-100 → S/2, 100.1+ → S/5. Puedes modificarlo.
+                    Lo que vale cada ticket. Por defecto según valor del producto: 0-50 → S/1, 50.01-100 → S/2, 100.1+ → S/5. Puedes modificarlo.
                   </small>
                 </div>
                 <div>
@@ -458,7 +466,7 @@ export default function PendingRafflesPage() {
                     style={modalStyles.input}
                   />
                   <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
-                    (valor producto + delivery) × ratio / unidad de participación ≈ número de tickets
+                    (valor producto + delivery) × ratio / valor por ticket ≈ número de tickets
                   </small>
                 </div>
               </div>
