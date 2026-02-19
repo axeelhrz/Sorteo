@@ -157,11 +157,10 @@ export const adminSecureService = {
   async getPendingPayments() {
     const snapshot = await adminDb
       .collection('payments')
-      .where('status', '==', 'pending_validation')
-      .orderBy('voucherUploadedAt', 'desc')
+      .where('status', 'in', ['pending', 'pending_validation'])
       .get();
 
-    return snapshot.docs.map((doc) => {
+    const docs = snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -171,6 +170,8 @@ export const adminSecureService = {
         voucherUploadedAt: toDate(data.voucherUploadedAt),
       };
     });
+    docs.sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0));
+    return docs;
   },
 
   async approvePaymentAndAssignTickets(paymentId: string, adminId: string) {
