@@ -148,12 +148,14 @@ export default function RaffleModals({
                   </span>
                 </div>
 
-                {/* Tickets */}
+                {/* Tickets (no se muestra mientras está pendiente de aprobación) */}
                 <div>
                   <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: '12px' }}>
                     Tickets
                   </h3>
-                  {viewModal.raffle.totalTickets != null && viewModal.raffle.totalTickets > 0 ? (
+                  {viewModal.raffle.status === 'draft' || viewModal.raffle.status === 'pending_approval' ? (
+                    <p style={{ margin: '0', fontSize: '14px', color: '#94a3b8' }}>—</p>
+                  ) : viewModal.raffle.totalTickets != null && viewModal.raffle.totalTickets > 0 ? (
                     <>
                       <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>
                         {viewModal.raffle.soldTickets} / {viewModal.raffle.totalTickets}
@@ -169,13 +171,15 @@ export default function RaffleModals({
                   )}
                 </div>
 
-                {/* Valor del Producto */}
+                {/* Valor del Producto (valor declarado por el organizador) */}
                 <div>
                   <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: '12px' }}>
                     Valor del Producto
                   </h3>
                   <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#10b981' }}>
-                    S/. {viewModal.raffle.productValue.toFixed(2)}
+                    {viewModal.raffle.product?.value != null
+                      ? `S/. ${Math.round(Number(viewModal.raffle.product.value)).toLocaleString('es-PE')}`
+                      : '—'}
                   </p>
                 </div>
 

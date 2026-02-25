@@ -20,8 +20,6 @@ interface ProductFormData {
   description: string;
   /** Valor real del producto (solo lo ve la administración) */
   value: string;
-  /** Precio por ticket (S/.) — lo que paga el participante por cada ticket */
-  costPerTicket: string;
   organizerWhatsapp: string;
   hasDelivery: boolean;
   deliveryType: 'local' | 'national' | 'international' | '';
@@ -47,7 +45,6 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     name: '',
     description: '',
     value: '',
-    costPerTicket: '',
     organizerWhatsapp: shop.phone || '',
     hasDelivery: false,
     deliveryType: '',
@@ -83,12 +80,6 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     const value = Math.round(parseFloat(productData.value) * 100) / 100;
     if (isNaN(value) || value <= 0) {
       setError('El valor del producto debe ser mayor a 0');
-      return;
-    }
-
-    const costPerTicketNum = Math.round(parseFloat(productData.costPerTicket) * 100) / 100;
-    if (isNaN(costPerTicketNum) || costPerTicketNum <= 0) {
-      setError('El precio por ticket debe ser mayor a 0');
       return;
     }
 
@@ -171,7 +162,6 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
         raffle = await raffleService.createRaffle({
           shopId: shop.id,
           productId: product.id,
-          costPerTicket: costPerTicketNum,
           specialConditions: specialConditionsText || undefined,
         });
       } catch (raffleError: any) {
@@ -319,11 +309,8 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
           />
         </div>
 
-        {/* Valor del producto (solo admin) y Precio por ticket (lo que paga el participante) */}
+        {/* Valor del producto (solo lo ve la administración; el precio por ticket lo define el admin al aprobar) */}
         <div style={{ marginTop: 16, marginBottom: 8, padding: '12px 0', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>
-          <p className={styles.formLabel} style={{ marginBottom: 12, fontWeight: 600, color: '#374151' }}>
-            Valor del producto y precio por ticket
-          </p>
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
               Valor del producto (S/.) <span style={{ color: 'red' }}>*</span>
@@ -339,25 +326,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
               required
             />
             <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
-              Valor real del producto. Solo lo ve la administración. Será abonado al Organizador al finalizar la oportunidad.
-            </small>
-          </div>
-          <div className={styles.formGroup} style={{ marginTop: 16 }}>
-            <label className={styles.formLabel}>
-              Precio por ticket (S/.) <span style={{ color: 'red' }}>*</span>
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0.01"
-              value={productData.costPerTicket}
-              onChange={(e) => handleProductChange('costPerTicket', e.target.value)}
-              className={styles.formInput}
-              placeholder="Ej: 2.00"
-              required
-            />
-            <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
-              Lo que paga el participante por cada ticket. La administración puede ajustarlo al aprobar la oportunidad.
+              Valor real del producto. Solo lo ve la administración. Será abonado al Organizador al finalizar la oportunidad. El precio por ticket lo define la administración al aprobar la oportunidad.
             </small>
           </div>
         </div>

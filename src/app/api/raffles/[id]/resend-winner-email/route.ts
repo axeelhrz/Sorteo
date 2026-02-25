@@ -104,6 +104,9 @@ export async function POST(
       );
     }
 
+    // Log para verificar que se envía al ganador (en EmailJS la plantilla debe tener To Email = {{to_email}})
+    console.log('Reenviando correo al ganador:', { raffleId, to: winnerEmail, winnerName });
+
     const shopId = raffleData.shopId || '';
     const productId = raffleData.productId || '';
     let productName = 'Premio';

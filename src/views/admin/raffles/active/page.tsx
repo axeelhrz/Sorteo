@@ -117,7 +117,7 @@ export default function ActiveRaffles() {
     <div>
       <div style={{ marginBottom: '24px' }}>
         <h2 style={{ margin: '0 0 6px 0', color: '#0f172a', fontSize: '22px', fontWeight: 700 }}>
-          Sorteos Activos
+          Activos
         </h2>
         <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
           Gestiona sorteos en curso. Ejecuta cuando se complete la venta o cancela si es necesario.

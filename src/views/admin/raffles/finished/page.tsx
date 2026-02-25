@@ -163,7 +163,7 @@ export default function FinishedRaffles() {
   return (
     <div className={styles.finishedPage}>
       <div className={styles.finishedPageHeader}>
-        <h2 className={styles.finishedPageTitle}>Sorteos Finalizados</h2>
+        <h2 className={styles.finishedPageTitle}>Finalizados</h2>
         <p className={styles.finishedPageSubtitle}>Oportunidades ejecutadas y ganadores asignados</p>
       </div>
 

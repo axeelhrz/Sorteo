@@ -399,7 +399,7 @@
   border-bottom: none;
 }
 
-/* Página Sorteos Finalizados */
+/* Página Finalizados */
 .finishedPage {
   max-width: 1200px;
 }
@@ -454,7 +454,7 @@
   color: #94a3b8;
 }
 
-/* Tabla Sorteos Finalizados - diseño mejorado */
+/* Tabla Finalizados - diseño mejorado */
 .tableScroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -689,7 +689,7 @@
   color: #721c24;
 }
 
-/* Estados de cierre (Sorteos Finalizados) */
+/* Estados de cierre (Finalizados) */
 .statusBadge.statusEjecutado {
   background-color: #e0f2fe;
   color: #0369a1;

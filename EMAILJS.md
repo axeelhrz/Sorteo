@@ -56,9 +56,10 @@ Ve a **[Templates](https://dashboard.emailjs.com/admin/templates)** y crea:
 
 #### Plantilla: Notificación al ganador
 - **ID** → `EMAILJS_TEMPLATE_WINNER_NOTIFICATION`
-- Variables: `{{to_email}}`, `{{to_name}}`, `{{message}}`, `{{product_name}}`, `{{ticket_number}}`, `{{verification_code}}`, `{{raffle_url}}`, `{{shop_name}}`, `{{win_date}}`
+- **To Email (destinatario):** debe ser exactamente **`{{to_email}}`**. Si pones un email fijo (o el de tu cuenta), el correo **solo llegará a ese email** y no al ganador.
+- Variables en el cuerpo: `{{to_name}}`, `{{message}}`, `{{product_name}}`, `{{ticket_number}}`, `{{verification_code}}`, `{{raffle_url}}`, `{{shop_name}}`, `{{win_date}}`
 
-Si usas la plantilla genérica `template_mgmgrng`, debe incluir al menos `{{message}}`, `{{to_email}}` y `{{to_name}}`.
+Si usas la plantilla genérica `template_mgmgrng`, el campo **To Email** debe ser `{{to_email}}` y el cuerpo al menos `{{message}}`, `{{to_name}}`.
 
 ### 4. Configurar `.env.local` (o variables en Vercel)
 
@@ -91,3 +92,4 @@ NEXT_PUBLIC_APP_URL=https://www.tiketeaonline.com
 | "EMAILJS_PRIVATE_KEY no está configurado" | Falta la clave privada | Añadir `EMAILJS_PRIVATE_KEY` en `.env.local` |
 | "The template ID not found" (400) | ID de plantilla incorrecto o inexistente | Crear la plantilla en EmailJS y copiar el ID exacto |
 | No llegan correos | Plantilla sin `to_email` correcto | Verificar que la plantilla use `{{to_email}}` como destinatario |
+| El correo solo llega al email de EmailJS / a un solo correo | En la plantilla, "To Email" está fijo (ej. tu correo de prueba) | En EmailJS → Templates → tu plantilla de ganador → **To Email** debe ser exactamente `{{to_email}}` (sin comillas ni otro texto). Así el envío irá al correo real del ganador. |

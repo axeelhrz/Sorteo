@@ -76,6 +76,10 @@ export const adminService = {
     return callAdminSecure('getPendingPayments');
   },
 
+  async getPayments(filters?: { status?: string; raffleId?: string }): Promise<Payment[]> {
+    return callAdminSecure('getPayments', filters);
+  },
+
   async getUserData(userId: string): Promise<{ email: string; name: string }> {
     return callAdminSecure('getUserData', { userId });
   },

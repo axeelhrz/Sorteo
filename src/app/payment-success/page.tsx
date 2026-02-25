@@ -90,7 +90,7 @@ function PaymentSuccessContent() {
 
           {raffle && (
             <div className={styles.summaryItem}>
-              <span>Sorteo:</span>
+              <span>Oportunidad:</span>
               <span className={styles.value}>
                 {raffle.product?.name || 'Producto'}
               </span>
@@ -136,7 +136,7 @@ function PaymentSuccessContent() {
             className={styles.primaryButton}
             onClick={() => router.push('/dashboard/store')}
           >
-            Ver mis sorteos
+            Ver mis oportunidades
           </button>
           <button
             className={styles.secondaryButton}

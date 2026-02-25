@@ -92,6 +92,27 @@ export default function RaffleDetailPage() {
     return () => window.removeEventListener('focus', onFocus);
   }, [user, raffleId, refreshUserTickets]);
 
+  // Refrescar participaciones y sorteo cuando el usuario vuelve a la pestaña o a la página (p. ej. tras comprar en checkout)
+  useEffect(() => {
+    if (!raffleId) return;
+    const refetch = () => {
+      publicRaffleService.getRaffleById(raffleId).then(setRaffle).catch(() => {});
+      if (user) refreshUserTickets();
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') refetch();
+    };
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) refetch(); // Página restaurada desde bfcache (p. ej. botón Atrás)
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pageshow', onPageShow);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pageshow', onPageShow);
+    };
+  }, [raffleId, user, refreshUserTickets]);
+
   if (isLoading) {
     return (
       <main className={styles.container}>
@@ -169,6 +190,36 @@ export default function RaffleDetailPage() {
             </div>
           </div>
 
+          {/* Organizador */}
+          {raffle.shop?.name && (
+            <p className={styles.organizerName}>{raffle.shop.name}</p>
+          )}
+
+          {/* Más información - redes del organizador */}
+          {raffle.shop?.socialMedia && (() => {
+            const sm = raffle.shop.socialMedia as Record<string, string> | undefined;
+            if (!sm || typeof sm !== 'object') return null;
+            const entries = Object.entries(sm).filter(([, v]) => v && String(v).trim());
+            if (entries.length === 0) return null;
+            const labels: Record<string, string> = { facebook: 'Facebook', instagram: 'Instagram', twitter: 'X', tiktok: 'TikTok', whatsapp: 'WhatsApp', website: 'Sitio web' };
+            return (
+              <div className={styles.socialMedia}>
+                <h4 className={styles.socialLabel}>Más información</h4>
+                <div className={styles.socialLinks}>
+                  {entries.map(([key, value]) => {
+                    const url = String(value).trim().startsWith('http') ? value : (key === 'instagram' ? `https://instagram.com/${value.replace('@', '')}` : key === 'facebook' ? `https://facebook.com/${value}` : key === 'whatsapp' ? `https://wa.me/${value.replace(/\D/g, '')}` : key === 'tiktok' ? `https://tiktok.com/@${value.replace('@', '')}` : key === 'twitter' ? `https://twitter.com/${value.replace('@', '')}` : value);
+                    const label = labels[key] || key;
+                    return (
+                      <a key={key} href={url} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                        {label}
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Description below photo */}
           {raffle.product?.description && (
             <div className={styles.descriptionBox}>
@@ -187,26 +238,11 @@ export default function RaffleDetailPage() {
           <div className={styles.valueBox}>
             <span className={styles.valueLabel}>Unidad de participación</span>
             <span className={styles.valueAmount}>S/ {Number(raffle.productValue).toFixed(2)}</span>
-            {raffle.product?.value != null && (
-              <span className={styles.valueSubtext}>
-                Valor del producto: S/ {Number(raffle.product.value).toFixed(2)}
-              </span>
-            )}
           </div>
 
           {/* Entrega del premio */}
           <div className={styles.deliveryInfo}>
             <h4 className={styles.deliveryTitle}>Entrega del premio</h4>
-            <div className={styles.deliveryCostRow} style={{ marginTop: 12, marginBottom: 0 }}>
-              <span className={styles.deliveryCostLabel}>Delivery</span>
-              <span className={styles.deliveryCostValue}>
-                {raffle.product?.pickupInStore
-                  ? 'N/A'
-                  : raffle.product?.deliveryCost != null && raffle.product.deliveryCost > 0
-                    ? `S/ ${Number(raffle.product.deliveryCost).toFixed(2)}`
-                    : 'N/A'}
-              </span>
-            </div>
             <div className={styles.deliveryOptions}>
               {raffle.product?.hasDelivery ? (
                 <div className={styles.deliveryOption}>

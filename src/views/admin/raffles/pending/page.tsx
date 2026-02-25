@@ -403,14 +403,6 @@ export default function PendingRafflesPage() {
                   </p>
                 </div>
                 <div style={modalStyles.row}>
-                  <span style={modalStyles.label}>Unidad de participación (valor del ticket sugerido)</span>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: 600, color: '#6366f1' }}>
-                    S/. {(selectedRaffle.productValue != null && selectedRaffle.productValue > 0)
-                      ? (Math.round(Number(selectedRaffle.productValue) * 100) / 100).toFixed(2)
-                      : '—'}
-                  </p>
-                </div>
-                <div style={modalStyles.row}>
                   <span style={modalStyles.label}>Entrega</span>
                   <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#475569' }}>
                     {selectedRaffle.product?.hasDelivery

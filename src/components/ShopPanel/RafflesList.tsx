@@ -116,7 +116,9 @@ export function RafflesList({ shopId }: RafflesListProps) {
                 <StatusBadge status={raffle.status} />
               </td>
               <td className={styles.tableCell}>
-                {raffle.soldTickets} / {raffle.totalTickets}
+                {(raffle.status === RaffleStatus.PENDING_APPROVAL || raffle.status === RaffleStatus.DRAFT)
+                  ? '—'
+                  : `${raffle.soldTickets} / ${raffle.totalTickets}`}
               </td>
               <td className={styles.tableCell}>{new Date(raffle.createdAt).toLocaleDateString()}</td>
               <td className={styles.tableCell}>

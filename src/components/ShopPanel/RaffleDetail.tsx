@@ -138,8 +138,10 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
             <div className={styles.raffleDetailItemValue}>{raffle.product?.name}</div>
           </div>
           <div className={styles.raffleDetailItem}>
-            <div className={styles.raffleDetailItemLabel}>Valor</div>
-            <div className={styles.raffleDetailItemValue}>S/. {Number(raffle.productValue).toFixed(2)}</div>
+            <div className={styles.raffleDetailItemLabel}>Valor del producto</div>
+            <div className={styles.raffleDetailItemValue}>
+              {raffle.product?.value != null ? `S/. ${Math.round(Number(raffle.product.value)).toLocaleString('es-PE')}` : '—'}
+            </div>
           </div>
           <div className={styles.raffleDetailItem}>
             <div className={styles.raffleDetailItemLabel}>Altura</div>
@@ -160,6 +162,7 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
         </div>
       </div>
 
+      {raffle.status !== 'draft' && raffle.status !== 'pending_approval' && (
       <div className={styles.raffleDetailSection}>
         <div className={styles.raffleDetailSectionTitle}>Progreso de tickets</div>
         <div className={styles.ticketProgress}>
@@ -177,6 +180,7 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
           </div>
         </div>
       </div>
+      )}
 
       <div className={styles.raffleDetailSection}>
         <div className={styles.raffleDetailSectionTitle}>Información del sorteo</div>

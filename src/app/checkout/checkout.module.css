@@ -278,7 +278,16 @@
 .methodLogoPlin {
   border: none;
   box-shadow: none;
-  background: #fff;
+  background: transparent;
+  overflow: hidden;
+  padding: 6px;
+  border-radius: 10px;
+}
+
+.methodLogoPlin img {
+  object-fit: contain;
+  border: none !important;
+  outline: none;
 }
 
 .methodButton:hover .methodLogo {
@@ -390,7 +399,7 @@
 .qrWrapperPlin {
   border: none;
   box-shadow: none;
-  background: #fff;
+  background: #f8fafc;
   padding: 20px;
 }
 
@@ -409,15 +418,18 @@
   height: auto;
   max-width: 100%;
   max-height: 400px;
-  object-fit: scale-down;
+  object-fit: contain;
   image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+  border: none;
+  outline: none;
   border-radius: 0;
 }
 
 .qrWrapperPlin .qrCode {
   border-radius: 0;
+  background: transparent;
 }
 
 /* Manual Section */
@@ -498,6 +510,16 @@
   box-shadow: 0 2px 12px rgba(79, 70, 229, 0.4);
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
+}
+
+.copyBtn svg {
+  width: 22px;
+  height: 22px;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  fill: currentColor;
 }
 
 .copyBtn::before {
@@ -509,6 +531,7 @@
   height: 100%;
   background: rgba(255, 255, 255, 0.2);
   transition: left 0.3s ease;
+  z-index: 0;
 }
 
 .copyBtn:hover::before {

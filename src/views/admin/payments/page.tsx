@@ -26,17 +26,22 @@ export default function AdminPaymentsPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('all');
+  const [raffleIdFilter, setRaffleIdFilter] = useState('');
 
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
-    loadPendingPayments();
-  }, [page]);
+    loadPayments();
+  }, [page, statusFilter, raffleIdFilter]);
 
-  const loadPendingPayments = async () => {
+  const loadPayments = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getPendingPayments();
+      const data = await adminService.getPayments({
+        status: statusFilter,
+        raffleId: raffleIdFilter.trim() || undefined,
+      });
       
       // Enrich payments with user and raffle data
       const enrichedPayments = await Promise.all(
@@ -76,7 +81,7 @@ export default function AdminPaymentsPage() {
       
       setSuccessMessage('Pago aprobado y tickets asignados exitosamente.');
       setShowSuccessModal(true);
-      await loadPendingPayments();
+      await loadPayments();
       setSelectedPayment(null);
     } catch (error: any) {
       console.error('Error approving payment:', error);
@@ -103,7 +108,7 @@ export default function AdminPaymentsPage() {
       
       setSuccessMessage('Pago rechazado. El usuario ha sido notificado.');
       setShowSuccessModal(true);
-      await loadPendingPayments();
+      await loadPayments();
       setSelectedPayment(null);
       setShowRejectModal(false);
       setRejectReason('');
@@ -122,8 +127,8 @@ export default function AdminPaymentsPage() {
   const getStatusBadge = (status: string) => {
     const statusConfig: { [key: string]: { label: string; color: string; bgColor: string } } = {
       pending: { label: 'Pendiente', color: '#FF9800', bgColor: '#FFF3E0' },
-      pending_validation: { label: 'En validación', color: '#2196F3', bgColor: '#E3F2FD' },
-      completed: { label: 'Completado', color: '#4CAF50', bgColor: '#E8F5E9' },
+      pending_validation: { label: 'Pendiente', color: '#FF9800', bgColor: '#FFF3E0' },
+      completed: { label: 'Aprobado', color: '#4CAF50', bgColor: '#E8F5E9' },
       failed: { label: 'Fallido', color: '#F44336', bgColor: '#FFEBEE' },
       refunded: { label: 'Reembolsado', color: '#9C27B0', bgColor: '#F3E5F5' },
     };
@@ -153,7 +158,10 @@ export default function AdminPaymentsPage() {
     );
   }
 
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
+  const paginatedPayments = payments.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+
+  const isPending = (s: string) => s === 'pending' || s === 'pending_validation';
 
   return (
     <div>
@@ -162,15 +170,65 @@ export default function AdminPaymentsPage() {
           Aprobar compras de tickets
         </h2>
         <p style={{ margin: '0', color: '#64748b', fontSize: '14px' }}>
-          Total: {total} compras pendientes de aprobación
+          Total: {total} compras
+          {statusFilter === 'pending' && ' pendientes'}
+          {statusFilter === 'completed' && ' aprobadas'}
+          {raffleIdFilter.trim() && ` (oportunidad ${raffleIdFilter.trim().substring(0, 8)}…)`}
         </p>
+      </div>
+
+      {/* Filtros */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', marginBottom: '20px' }}>
+        <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>
+          Estado:
+          <select
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value as 'all' | 'pending' | 'completed'); setPage(0); }}
+            style={{
+              marginLeft: '8px',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0',
+              fontSize: '14px',
+              fontWeight: '500',
+            }}
+          >
+            <option value="all">Todos</option>
+            <option value="pending">Pendiente</option>
+            <option value="completed">Aprobado</option>
+          </select>
+        </label>
+        <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>
+          ID Oportunidad:
+          <input
+            type="text"
+            value={raffleIdFilter}
+            onChange={(e) => { setRaffleIdFilter(e.target.value); setPage(0); }}
+            placeholder="Ej: abc123..."
+            style={{
+              marginLeft: '8px',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0',
+              fontSize: '14px',
+              width: '180px',
+            }}
+          />
+        </label>
       </div>
 
       {payments.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e8ecf1' }}>
           <FiCheck style={{ fontSize: '48px', color: '#10b981', marginBottom: '16px' }} />
-          <h3 style={{ color: '#1e293b', fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>No hay compras pendientes</h3>
-          <p style={{ color: '#64748b', fontSize: '14px', margin: '0' }}>Todas las compras de tickets han sido aprobadas</p>
+          <h3 style={{ color: '#1e293b', fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>
+            No hay compras
+            {statusFilter === 'pending' && ' pendientes'}
+            {statusFilter === 'completed' && ' aprobadas'}
+            {raffleIdFilter.trim() ? ' para esta oportunidad' : ''}
+          </h3>
+          <p style={{ color: '#64748b', fontSize: '14px', margin: '0' }}>
+            {statusFilter === 'all' ? 'No hay registros de compras.' : 'Cambia el filtro para ver otros estados.'}
+          </p>
         </div>
       ) : (
         <>
@@ -184,7 +242,10 @@ export default function AdminPaymentsPage() {
                       Usuario
                     </th>
                     <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Sorteo
+                      ID Oportunidad
+                    </th>
+                    <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Oportunidad
                     </th>
                     <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Monto
@@ -201,7 +262,7 @@ export default function AdminPaymentsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {payments.map((payment) => (
+                  {paginatedPayments.map((payment) => (
                     <tr key={payment.id} style={{ borderBottom: '1px solid #e8ecf1', transition: 'background-color 0.2s ease' }}
                       onMouseEnter={(e) => {
                         (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
@@ -215,6 +276,9 @@ export default function AdminPaymentsPage() {
                           <div style={{ fontWeight: '600', marginBottom: '2px' }}>{payment.userName || 'Usuario'}</div>
                           <div style={{ fontSize: '12px', color: '#64748b' }}>{payment.userEmail || 'N/A'}</div>
                         </div>
+                      </td>
+                      <td style={{ padding: '14px 16px', color: '#64748b', fontSize: '12px', fontFamily: 'monospace' }}>
+                        {payment.raffleId ? `${payment.raffleId.substring(0, 8)}…` : '—'}
                       </td>
                       <td style={{ padding: '14px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>
                         {payment.raffleName || 'N/A'}
@@ -233,7 +297,7 @@ export default function AdminPaymentsPage() {
                           onClick={() => setSelectedPayment(payment)}
                           style={{
                             padding: '8px 14px',
-                            backgroundColor: '#667eea',
+                            backgroundColor: isPending(payment.status) ? '#667eea' : '#94a3b8',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
@@ -246,16 +310,16 @@ export default function AdminPaymentsPage() {
                             transition: 'all 0.2s ease',
                           }}
                           onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLElement).style.backgroundColor = '#5568d3';
-                            (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = isPending(payment.status) ? '#5568d3' : '#64748b';
+                            (e.currentTarget as HTMLElement).style.boxShadow = isPending(payment.status) ? '0 2px 8px rgba(102, 126, 234, 0.3)' : 'none';
                           }}
                           onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLElement).style.backgroundColor = '#667eea';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = isPending(payment.status) ? '#667eea' : '#94a3b8';
                             (e.currentTarget as HTMLElement).style.boxShadow = 'none';
                           }}
                         >
                           <FiEye style={{ fontSize: '14px' }} />
-                          Revisar
+                          {isPending(payment.status) ? 'Revisar' : 'Ver'}
                         </button>
                       </td>
                     </tr>
@@ -580,7 +644,11 @@ export default function AdminPaymentsPage() {
                   <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>{selectedPayment.userEmail}</p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sorteo</p>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>ID Oportunidad</p>
+                  <p style={{ margin: '0', color: '#1e293b', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace' }}>{selectedPayment.raffleId || '—'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Oportunidad</p>
                   <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>{selectedPayment.raffleName}</p>
                 </div>
                 <div>
@@ -690,77 +758,84 @@ export default function AdminPaymentsPage() {
               )}
             </div>
 
-            {/* Acciones */}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setShowRejectModal(true)}
-                disabled={validating}
-                type="button"
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#b91c1c',
-                  color: '#ffffff',
-                  border: '2px solid #991b1b',
-                  borderRadius: '8px',
-                  cursor: validating ? 'not-allowed' : 'pointer',
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s ease',
-                  opacity: validating ? 0.6 : 1,
-                  boxShadow: '0 2px 4px rgba(185, 28, 28, 0.3)',
-                }}
-                onMouseEnter={(e) => {
-                  if (!validating) {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = '#991b1b';
-                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(185, 28, 28, 0.4)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = '#b91c1c';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 4px rgba(185, 28, 28, 0.3)';
-                }}
-              >
-                <FiX style={{ fontSize: '16px' }} />
-                Rechazar
-              </button>
-              <button
-                onClick={handleApprovePayment}
-                disabled={validating}
-                type="button"
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#047857',
-                  color: '#ffffff',
-                  border: '2px solid #065f46',
-                  borderRadius: '8px',
-                  cursor: validating ? 'not-allowed' : 'pointer',
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s ease',
-                  opacity: validating ? 0.6 : 1,
-                  boxShadow: '0 2px 4px rgba(4, 120, 87, 0.3)',
-                }}
-                onMouseEnter={(e) => {
-                  if (!validating) {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = '#065f46';
-                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(4, 120, 87, 0.4)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = '#047857';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 4px rgba(4, 120, 87, 0.3)';
-                }}
-              >
-                <FiCheck style={{ fontSize: '16px' }} />
-                {validating ? 'Procesando...' : 'Aprobar'}
-              </button>
-            </div>
+            {/* Acciones: solo para pagos pendientes */}
+            {isPending(selectedPayment.status) && (
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => setShowRejectModal(true)}
+                  disabled={validating}
+                  type="button"
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: '#b91c1c',
+                    color: '#ffffff',
+                    border: '2px solid #991b1b',
+                    borderRadius: '8px',
+                    cursor: validating ? 'not-allowed' : 'pointer',
+                    fontSize: '15px',
+                    fontWeight: '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s ease',
+                    opacity: validating ? 0.6 : 1,
+                    boxShadow: '0 2px 4px rgba(185, 28, 28, 0.3)',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!validating) {
+                      (e.currentTarget as HTMLElement).style.backgroundColor = '#991b1b';
+                      (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(185, 28, 28, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#b91c1c';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 4px rgba(185, 28, 28, 0.3)';
+                  }}
+                >
+                  <FiX style={{ fontSize: '16px' }} />
+                  Rechazar
+                </button>
+                <button
+                  onClick={handleApprovePayment}
+                  disabled={validating}
+                  type="button"
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: '#047857',
+                    color: '#ffffff',
+                    border: '2px solid #065f46',
+                    borderRadius: '8px',
+                    cursor: validating ? 'not-allowed' : 'pointer',
+                    fontSize: '15px',
+                    fontWeight: '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s ease',
+                    opacity: validating ? 0.6 : 1,
+                    boxShadow: '0 2px 4px rgba(4, 120, 87, 0.3)',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!validating) {
+                      (e.currentTarget as HTMLElement).style.backgroundColor = '#065f46';
+                      (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(4, 120, 87, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#047857';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 4px rgba(4, 120, 87, 0.3)';
+                  }}
+                >
+                  <FiCheck style={{ fontSize: '16px' }} />
+                  {validating ? 'Procesando...' : 'Aprobar'}
+                </button>
+              </div>
+            )}
+            {selectedPayment.status === 'completed' && (
+              <div style={{ padding: '12px 16px', backgroundColor: '#E8F5E9', borderRadius: '8px', color: '#2E7D32', fontSize: '14px', fontWeight: '600' }}>
+                Este pago ya fue aprobado.
+              </div>
+            )}
           </div>
         </div>
       )}

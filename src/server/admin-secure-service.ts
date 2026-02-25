@@ -155,10 +155,32 @@ export const adminSecureService = {
   },
 
   async getPendingPayments() {
-    const snapshot = await adminDb
-      .collection('payments')
-      .where('status', 'in', ['pending', 'pending_validation'])
-      .get();
+    return this.getPayments({ status: 'pending' });
+  },
+
+  /**
+   * Obtiene pagos con filtros opcionales: status (all | pending | completed), raffleId.
+   * pending = pending + pending_validation; completed = aprobados.
+   */
+  async getPayments(payload?: { status?: string; raffleId?: string }) {
+    const status = payload?.status || 'all';
+    const raffleId = payload?.raffleId?.trim() || undefined;
+
+    let query: Query = adminDb.collection('payments') as Query;
+
+    if (status === 'pending') {
+      query = query.where('status', 'in', ['pending', 'pending_validation']);
+    } else if (status === 'completed') {
+      query = query.where('status', '==', 'completed');
+    } else {
+      query = query.where('status', 'in', ['pending', 'pending_validation', 'completed']);
+    }
+
+    if (raffleId) {
+      query = query.where('raffleId', '==', raffleId);
+    }
+
+    const snapshot = await query.get();
 
     const docs = snapshot.docs.map((doc) => {
       const data = doc.data();

@@ -74,7 +74,7 @@ export default function AdminPaymentsToOrganizersPage() {
           Pagos a Organizadores
         </h2>
         <p style={{ margin: '0 0 12px 0', color: '#64748b', fontSize: '14px' }}>
-          Cuando envías el pago y subes la evidencia en <strong>Sorteos finalizados</strong>, el pago aparece aquí para que puedas confirmarlo.
+          Cuando envías el pago y subes la evidencia en <strong>Finalizados</strong>, el pago aparece aquí para que puedas confirmarlo.
         </p>
         <div style={{ padding: '12px 16px', backgroundColor: '#eff6ff', border: '1px solid #93c5fd', borderRadius: '8px', fontSize: '13px', color: '#1e40af' }}>
           <strong>Confirmar:</strong> Revisa que cada pago registrado coincida con el que enviaste al organizador (monto, evidencia y fecha).
@@ -95,7 +95,7 @@ export default function AdminPaymentsToOrganizersPage() {
             Los pagos a organizadores se registran al subir la evidencia en cada oportunidad finalizada.
           </p>
           <Link href="/dashboard/admin" style={{ display: 'inline-block', marginTop: '16px', color: '#667eea', fontWeight: 600, textDecoration: 'none' }}>
-            Ir a Sorteos Finalizados →
+            Ir a Finalizados →
           </Link>
         </div>
       ) : (

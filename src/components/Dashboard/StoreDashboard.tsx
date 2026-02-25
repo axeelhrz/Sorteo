@@ -475,21 +475,27 @@ export default function StoreDashboard() {
                           </div>
                         </td>
                         <td>
-                          <div className={styles.ticketsInfo}>
-                            <span className={styles.ticketsCount}>
-                              {raffle.soldTickets}/{raffle.totalTickets}
-                            </span>
-                            <div className={styles.progressBar}>
-                              <div 
-                                className={styles.progressFill}
-                                style={{ width: `${(raffle.soldTickets / raffle.totalTickets) * 100}%` }}
-                              />
+                          {(raffle.status === 'pending_approval' || raffle.status === 'draft') ? (
+                            <span className={styles.ticketsCount} style={{ color: '#94a3b8' }}>—</span>
+                          ) : (
+                            <div className={styles.ticketsInfo}>
+                              <span className={styles.ticketsCount}>
+                                {raffle.soldTickets}/{raffle.totalTickets}
+                              </span>
+                              <div className={styles.progressBar}>
+                                <div 
+                                  className={styles.progressFill}
+                                  style={{ width: `${raffle.totalTickets > 0 ? (raffle.soldTickets / raffle.totalTickets) * 100 : 0}%` }}
+                                />
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </td>
                         <td>
                           <span className={styles.price}>
-                            S/. {raffle.productValue.toFixed(2)}
+                            {raffle.product?.value != null
+                              ? `S/. ${Math.round(Number(raffle.product.value)).toLocaleString('es-PE')}`
+                              : '—'}
                           </span>
                         </td>
                         <td>

@@ -34,6 +34,9 @@ export async function POST(request: NextRequest) {
       case 'getPendingPayments':
         data = await adminSecureService.getPendingPayments();
         break;
+      case 'getPayments':
+        data = await adminSecureService.getPayments(params);
+        break;
       case 'approvePaymentAndAssignTickets':
         data = await adminSecureService.approvePaymentAndAssignTickets(
           params.paymentId,

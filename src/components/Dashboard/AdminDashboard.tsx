@@ -35,9 +35,9 @@ type AdminTab = 'resumen' | 'sorteos-pendientes' | 'sorteos-activos' | 'sorteos-
 
 const TABS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'resumen', label: 'Resumen', icon: <FiBarChart2 /> },
-  { id: 'sorteos-pendientes', label: 'Sorteos Pendientes', icon: <FiClock /> },
-  { id: 'sorteos-activos', label: 'Sorteos Activos', icon: <FiPlay /> },
-  { id: 'sorteos-finalizados', label: 'Sorteos Finalizados', icon: <FiCheckCircle /> },
+  { id: 'sorteos-pendientes', label: 'Pendientes', icon: <FiClock /> },
+  { id: 'sorteos-activos', label: 'Activos', icon: <FiPlay /> },
+  { id: 'sorteos-finalizados', label: 'Finalizados', icon: <FiCheckCircle /> },
   { id: 'tickets', label: 'Tickets', icon: <FiCreditCard /> },
   { id: 'pagos', label: 'Pagos (confirmar)', icon: <FiDollarSign /> },
   { id: 'historial', label: 'Historial', icon: <FiList /> },
@@ -187,7 +187,7 @@ export default function AdminDashboard() {
                   <div className={styles.statCard}>
                     <div className={styles.statHeader}>
                       <div>
-                        <div className={styles.statLabel}>Sorteos activos</div>
+                        <div className={styles.statLabel}>Activos</div>
                         <div className={styles.statValue}>{stats.raffles.active}</div>
                       </div>
                       <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
