@@ -375,11 +375,26 @@ export default function UserDashboard() {
                                     <strong style={{ color: '#475569', marginBottom: '8px', display: 'block' }}>Tus tickets:</strong>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                       {ticketsForRaffle.length > 0 ? (
-                                        ticketsForRaffle.map((t) => (
-                                          <span key={t.id} style={{ padding: '4px 10px', backgroundColor: '#e2e8f0', borderRadius: '6px', fontWeight: 600 }}>
-                                            #{t.number}
-                                          </span>
-                                        ))
+                                        ticketsForRaffle.map((t) => {
+                                          const isWinner = hasWon && winnersInfo.get(r.id)?.ticketNumber === t.number;
+                                          return (
+                                            <span
+                                              key={t.id}
+                                              style={{
+                                                padding: '4px 10px',
+                                                borderRadius: '6px',
+                                                fontWeight: 600,
+                                                backgroundColor: isWinner ? '#059669' : '#e2e8f0',
+                                                color: isWinner ? '#fff' : undefined,
+                                                border: isWinner ? '2px solid #047857' : undefined,
+                                                boxShadow: isWinner ? '0 2px 8px rgba(5, 150, 105, 0.3)' : undefined,
+                                              }}
+                                              title={isWinner ? 'Ticket ganador' : undefined}
+                                            >
+                                              #{t.number}{isWinner ? ' 🏆' : ''}
+                                            </span>
+                                          );
+                                        })
                                       ) : (
                                         <span style={{ color: '#64748b' }}>Sin tickets</span>
                                       )}
