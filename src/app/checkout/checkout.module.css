@@ -434,6 +434,8 @@
 .qrWrapperPlin .qrCode {
   border-radius: 28px;
   background: #ffffff;
+  /* Escala un poco para que las líneas negras del borde inferior y derecho queden fuera y se recorten */
+  transform: scale(1.05);
 }
 
 /* Manual Section */
