@@ -257,6 +257,10 @@ export default function StoreDashboard() {
           </div>
           
           <div className={styles.headerRight}>
+            <button className={styles.primaryCta} onClick={handleCreateRaffle} type="button" title="Crear nueva oportunidad">
+              <FiPlus />
+              <span>Nueva Oportunidad</span>
+            </button>
             <div className={styles.userCard}>
               <div className={styles.userAvatar}>
                 {(shop?.name || user?.name || 'O').charAt(0).toUpperCase()}
@@ -286,7 +290,6 @@ export default function StoreDashboard() {
                 <span className={styles.userRole}>Organizador</span>
               </div>
             </div>
-            
             <button onClick={handleLogout} className={styles.logoutBtn}>
               <FiLogOut />
               <span>Salir</span>
@@ -298,21 +301,13 @@ export default function StoreDashboard() {
       {/* Main Content */}
       <main className={styles.mainContent}>
         {/* Tabs Navigation */}
-        <div className={styles.tabsContainer}>
+        <nav className={styles.tabsContainer} aria-label="Secciones del panel">
           <button 
             className={`${styles.tab} ${activeTab === 'overview' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('overview')}
           >
             <FiPackage />
             <span>Resumen</span>
-          </button>
-          <button 
-            className={styles.tab}
-            onClick={handleCreateRaffle}
-            type="button"
-          >
-            <FiPlus />
-            <span>Crear Oportunidad</span>
           </button>
           <button 
             className={`${styles.tab} ${activeTab === 'raffles' ? styles.tabActive : ''}`}
@@ -328,45 +323,68 @@ export default function StoreDashboard() {
             <FiDollarSign />
             <span>Ganancias</span>
           </button>
-        </div>
+        </nav>
 
         {/* Tab Content */}
         {activeTab === 'overview' && (
-          <>
-            {/* Stats Grid */}
+          <div className={styles.overviewSection}>
             <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <div>
-                <div className={styles.statLabel}>Oportunidades Activas</div>
-                <div className={styles.statValue}>{stats.totalRaffles}</div>
+              <div className={styles.statCard}>
+                <div className={styles.statHeader}>
+                  <div>
+                    <div className={styles.statLabel}>Oportunidades</div>
+                    <div className={styles.statValue}>{stats.totalRaffles}</div>
+                  </div>
+                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' }}>
+                    <FiShoppingBag />
+                  </div>
+                </div>
+                <div className={styles.statChange}>
+                  <span>Total registradas</span>
+                </div>
               </div>
-              <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-                <FiShoppingBag />
+              <div className={styles.statCard}>
+                <div className={styles.statHeader}>
+                  <div>
+                    <div className={styles.statLabel}>Ingresos totales</div>
+                    <div className={styles.statValue}>S/. {stats.totalRevenue.toFixed(2)}</div>
+                  </div>
+                  <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+                    <FiDollarSign />
+                  </div>
+                </div>
+                <div className={styles.statChange}>
+                  <span>De tickets vendidos</span>
+                </div>
               </div>
             </div>
-            <div className={styles.statChange}>
-              <span>↑ 0% este mes</span>
+            <div className={styles.quickActions}>
+              <h3 className={styles.quickActionsTitle}>Acciones rápidas</h3>
+              <div className={styles.actionsGrid}>
+                <button type="button" className={styles.actionCard} onClick={handleCreateRaffle}>
+                  <div className={styles.actionIcon}>
+                    <FiPlus />
+                  </div>
+                  <span className={styles.actionTitle}>Crear oportunidad</span>
+                  <span className={styles.actionDesc}>Publica un nuevo producto para sorteo</span>
+                </button>
+                <button type="button" className={styles.actionCard} onClick={() => setActiveTab('raffles')}>
+                  <div className={styles.actionIcon}>
+                    <FiShoppingBag />
+                  </div>
+                  <span className={styles.actionTitle}>Ver mis oportunidades</span>
+                  <span className={styles.actionDesc}>Gestiona activas, pendientes y finalizadas</span>
+                </button>
+                <button type="button" className={styles.actionCard} onClick={() => setActiveTab('earnings')}>
+                  <div className={styles.actionIcon}>
+                    <FiDollarSign />
+                  </div>
+                  <span className={styles.actionTitle}>Ganancias</span>
+                  <span className={styles.actionDesc}>Ingresos y depósitos</span>
+                </button>
+              </div>
             </div>
           </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <div>
-                <div className={styles.statLabel}>Ingresos Totales</div>
-                <div className={styles.statValue}>S/. {stats.totalRevenue.toFixed(2)}</div>
-              </div>
-              <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }}>
-                <FiDollarSign />
-              </div>
-            </div>
-            <div className={styles.statChange}>
-              <span>↑ 0% este mes</span>
-            </div>
-          </div>
-        </div>
-
-          </>
         )}
 
         {activeTab === 'raffles' && (
