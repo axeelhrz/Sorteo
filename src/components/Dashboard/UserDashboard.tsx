@@ -61,7 +61,6 @@ export default function UserDashboard() {
   const [winnersInfo, setWinnersInfo] = useState<Map<string, WinnerInfo>>(new Map());
   const [tabMyRaffles, setTabMyRaffles] = useState<TabMyRaffles>('participados');
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ticketQuantity, setTicketQuantity] = useState<{ [raffleId: string]: number }>({});
   const [expandedTicketsRaffleId, setExpandedTicketsRaffleId] = useState<string | null>(null);
@@ -70,8 +69,6 @@ export default function UserDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-
         if (!user?.id) {
           const [activeResult, allProducts] = await Promise.all([
             publicRaffleService.getActiveRaffles({ limit: 100 }),
@@ -129,8 +126,6 @@ export default function UserDashboard() {
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Error al cargar los datos');
-      } finally {
-        setLoading(false);
       }
     };
 
