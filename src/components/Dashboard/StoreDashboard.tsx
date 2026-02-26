@@ -111,12 +111,22 @@ export default function StoreDashboard() {
       const rafflesData = await raffleService.getRafflesByShop(shop.id);
       setRaffles(rafflesData || []);
 
-      // Actualizar estadísticas
+      // Calcular ingresos reales: suma de (tickets vendidos × precio por ticket) de cada oportunidad
+      const list = rafflesData || [];
+      let ticketsSold = 0;
+      let totalRevenue = 0;
+      for (const r of list) {
+        const sold = r.soldTickets ?? 0;
+        const pricePerTicket = r.productValue ?? 0;
+        ticketsSold += sold;
+        totalRevenue += sold * pricePerTicket;
+      }
+
       setStats({
         totalProducts: 0,
-        totalRaffles: rafflesData?.length || 0,
-        ticketsSold: 0,
-        totalRevenue: 0
+        totalRaffles: list.length,
+        ticketsSold,
+        totalRevenue
       });
 
       console.log('Raffles loaded:', rafflesData);
