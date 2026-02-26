@@ -11,6 +11,7 @@ import { ticketAssignmentService } from '@/services/ticket-assignment-service';
 import { firebaseUserParticipationService } from '@/services/firebase-user-participation-service';
 import { winnerVerificationService } from '@/services/winner-verification-service';
 import { publicRaffleService } from '@/services/public-raffle-service';
+import { productService } from '@/services/product-service';
 import { DeliveryConfirmation } from '@/components/UserPanel/DeliveryConfirmation';
 import type { WinnerInfo } from '@/types/raffle';
 import styles from './UserDashboard.module.css';
@@ -71,55 +72,60 @@ export default function UserDashboard() {
       try {
         setLoading(true);
 
-        const { productService } = await import('@/services/product-service');
-
-        const activeResult = await publicRaffleService.getActiveRaffles({ limit: 100 });
-        setActiveRaffles(activeResult.data.map((r: any) => ({
-          ...r,
-          createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
-        })));
-
-        const allProducts = await productService.getAllProducts();
-        setProducts(allProducts);
-
-        if (user?.id) {
-          const tickets = await ticketAssignmentService.getAllUserTickets(user.id);
-          setMyTickets(tickets.map((t) => ({
-            id: t.id,
-            raffleId: t.raffleId,
-            number: t.ticketNumber,
-            status: t.status,
-            purchasedAt: t.purchaseDate instanceof Date ? t.purchaseDate.toISOString() : String(t.purchaseDate),
-          })));
-
-          const parts = await firebaseUserParticipationService.getUserParticipations(user.id);
-          setParticipations(parts.map((r) => ({
+        if (!user?.id) {
+          const [activeResult, allProducts] = await Promise.all([
+            publicRaffleService.getActiveRaffles({ limit: 100 }),
+            productService.getAllProducts(),
+          ]);
+          setActiveRaffles(activeResult.data.map((r: any) => ({
             ...r,
-            createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : (r.createdAt as unknown as string),
+            createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
           })));
-
-          const won = await firebaseUserParticipationService.getUserWonRaffles(user.id);
-          setWonRaffles(won.map((r) => ({
-            ...r,
-            createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : (r.createdAt as unknown as string),
-          })));
-
-          const winMap = new Map<string, WinnerInfo>();
-          for (const r of won) {
-            try {
-              const info = await winnerVerificationService.getWinnerInfo(r.id);
-              if (info) winMap.set(r.id, info);
-            } catch (_e) {
-              // ignore
-            }
-          }
-          setWinnersInfo(winMap);
-        } else {
+          setProducts(allProducts);
           setMyTickets([]);
           setParticipations([]);
           setWonRaffles([]);
           setWinnersInfo(new Map());
+          return;
         }
+
+        const [activeResult, allProducts, tickets, parts, won] = await Promise.all([
+          publicRaffleService.getActiveRaffles({ limit: 100 }),
+          productService.getAllProducts(),
+          ticketAssignmentService.getAllUserTickets(user.id),
+          firebaseUserParticipationService.getUserParticipations(user.id),
+          firebaseUserParticipationService.getUserWonRaffles(user.id),
+        ]);
+
+        setActiveRaffles(activeResult.data.map((r: any) => ({
+          ...r,
+          createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
+        })));
+        setProducts(allProducts);
+        setMyTickets(tickets.map((t) => ({
+          id: t.id,
+          raffleId: t.raffleId,
+          number: t.ticketNumber,
+          status: t.status,
+          purchasedAt: t.purchaseDate instanceof Date ? t.purchaseDate.toISOString() : String(t.purchaseDate),
+        })));
+        setParticipations(parts.map((r) => ({
+          ...r,
+          createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : (r.createdAt as unknown as string),
+        })));
+        setWonRaffles(won.map((r) => ({
+          ...r,
+          createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : (r.createdAt as unknown as string),
+        })));
+
+        const winnerResults = await Promise.allSettled(
+          won.map((r) => winnerVerificationService.getWinnerInfo(r.id))
+        );
+        const winMap = new Map<string, WinnerInfo>();
+        winnerResults.forEach((result, i) => {
+          if (result.status === 'fulfilled' && result.value) winMap.set(won[i].id, result.value);
+        });
+        setWinnersInfo(winMap);
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Error al cargar los datos');
@@ -194,19 +200,9 @@ export default function UserDashboard() {
     return statusColors[status] || '#757575';
   };
 
-  if (loading) {
-    return (
-      <div className={styles.dashboard}>
-        <div className={styles.loadingContainer}>
-          <p>Cargando...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.dashboard}>
-      {/* Header */}
+      {/* Header: siempre visible para que la página se sienta rápida */}
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerLeft}>
@@ -238,6 +234,12 @@ export default function UserDashboard() {
       <main className={styles.mainContent}>
         {error && <div className={styles.errorBanner}>{error}</div>}
 
+        {loading ? (
+          <div className={styles.loadingContainer}>
+            <p>Cargando oportunidades y tus datos...</p>
+          </div>
+        ) : (
+          <>
         {/* Stats Grid */}
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
@@ -680,6 +682,8 @@ export default function UserDashboard() {
             </div>
           )}
         </div>
+          </>
+        )}
       </main>
     </div>
   );
