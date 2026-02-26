@@ -351,7 +351,14 @@ export default function UserDashboard() {
                                 </button>
                               </td>
                               <td>
-                                <span className={styles.ticketBadge} style={{ backgroundColor: statusColors[displayStatus] || '#64748b' }}>
+                                <span
+                                  className={styles.ticketBadge}
+                                  style={{
+                                    backgroundColor: statusColors[displayStatus] || '#64748b',
+                                    color: '#fff',
+                                    borderColor: 'transparent',
+                                  }}
+                                >
                                   {displayStatus}
                                 </span>
                               </td>
@@ -425,7 +432,14 @@ export default function UserDashboard() {
                               <td>🏆 {productName}</td>
                               <td>#{winnerInfo?.ticketNumber ?? '-'}</td>
                               <td>
-                                <span className={styles.ticketBadge} style={{ backgroundColor: '#10b981' }}>
+                                <span
+                                  className={styles.ticketBadge}
+                                  style={{
+                                    backgroundColor: '#059669',
+                                    color: '#fff',
+                                    borderColor: 'transparent',
+                                  }}
+                                >
                                   Ganado
                                 </span>
                               </td>

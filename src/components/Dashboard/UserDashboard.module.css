@@ -323,13 +323,17 @@
 .raffleImageContainer {
   position: relative;
   width: 100%;
-  padding-bottom: 66.67%;
+  min-height: 200px;
+  aspect-ratio: 1;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .raffleImage {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .raffleImagePlaceholder {
