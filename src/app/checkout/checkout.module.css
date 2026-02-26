@@ -430,8 +430,9 @@
   background: transparent;
 }
 
+/* Recorta la imagen PLIN para quitar el borde negro del asset; solo se ve la tarjeta blanca */
 .qrWrapperPlin .qrCode {
-  border-radius: 0;
+  border-radius: 28px;
   background: #ffffff;
 }
 
