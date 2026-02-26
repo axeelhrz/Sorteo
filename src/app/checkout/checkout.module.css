@@ -417,7 +417,7 @@
   box-shadow: none;
 }
 
-/* Contenedor que recorta la imagen PLIN: fondo blanco, solo la tarjeta queda visible flotando */
+/* Contenedor que recorta la imagen PLIN: fondo blanco, sin bordes ni sombra, plasmado en el fondo */
 .plinImageClip {
   position: relative;
   width: 100%;
@@ -428,7 +428,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .plinImageClip .qrCode {
