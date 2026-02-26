@@ -291,6 +291,12 @@
   color: #8b5cf6;
 }
 
+.socialEmpty {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
 .viewShopButton {
   width: 100%;
   padding: 14px 20px;

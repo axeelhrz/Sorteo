@@ -209,30 +209,35 @@ export default function RaffleDetailPage() {
             </div>
           )}
 
-          {/* Redes sociales del organizador (debajo de la descripción) */}
-          {raffle.shop?.socialMedia && (() => {
-            const sm = raffle.shop.socialMedia as Record<string, string> | undefined;
-            if (!sm || typeof sm !== 'object') return null;
-            const entries = Object.entries(sm).filter(([, v]) => v && String(v).trim());
-            if (entries.length === 0) return null;
-            const labels: Record<string, string> = { facebook: 'Facebook', instagram: 'Instagram', twitter: 'X', tiktok: 'TikTok', whatsapp: 'WhatsApp', website: 'Sitio web' };
-            return (
-              <div className={styles.socialMedia}>
-                <h4 className={styles.socialLabel}>Redes del organizador</h4>
-                <div className={styles.socialLinks}>
-                  {entries.map(([key, value]) => {
-                    const url = String(value).trim().startsWith('http') ? value : (key === 'instagram' ? `https://instagram.com/${value.replace('@', '')}` : key === 'facebook' ? `https://facebook.com/${value}` : key === 'whatsapp' ? `https://wa.me/${value.replace(/\D/g, '')}` : key === 'tiktok' ? `https://tiktok.com/@${value.replace('@', '')}` : key === 'twitter' ? `https://twitter.com/${value.replace('@', '')}` : value);
-                    const label = labels[key] || key;
-                    return (
-                      <a key={key} href={url} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                        {label}
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })()}
+          {/* Redes sociales del organizador (siempre debajo de la descripción) */}
+          {raffle.shop && (
+            <div className={styles.socialMedia}>
+              <h4 className={styles.socialLabel}>Redes del organizador</h4>
+              {(() => {
+                const sm = raffle.shop?.socialMedia as Record<string, string> | undefined;
+                const entries = sm && typeof sm === 'object' ? Object.entries(sm).filter(([, v]) => v && String(v).trim()) : [];
+                const labels: Record<string, string> = { facebook: 'Facebook', instagram: 'Instagram', twitter: 'X', tiktok: 'TikTok', whatsapp: 'WhatsApp', website: 'Sitio web' };
+                if (entries.length === 0) {
+                  return (
+                    <p className={styles.socialEmpty}>El organizador no ha agregado redes sociales aún.</p>
+                  );
+                }
+                return (
+                  <div className={styles.socialLinks}>
+                    {entries.map(([key, value]) => {
+                      const url = String(value).trim().startsWith('http') ? value : (key === 'instagram' ? `https://instagram.com/${value.replace('@', '')}` : key === 'facebook' ? `https://facebook.com/${value}` : key === 'whatsapp' ? `https://wa.me/${value.replace(/\D/g, '')}` : key === 'tiktok' ? `https://tiktok.com/@${value.replace('@', '')}` : key === 'twitter' ? `https://twitter.com/${value.replace('@', '')}` : value);
+                      const label = labels[key] || key;
+                      return (
+                        <a key={key} href={url} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                          {label}
+                        </a>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
         </div>
 
         {/* Right Column - Title, Unit, Delivery, Participa, Progress, Tus participaciones */}
