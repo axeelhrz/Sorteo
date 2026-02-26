@@ -98,6 +98,8 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
     updatedAt: convertTimestamp(data.updatedAt),
     activatedAt: data.activatedAt ? convertTimestamp(data.activatedAt) : undefined,
     raffleExecutedAt: data.raffleExecutedAt ? convertTimestamp(data.raffleExecutedAt) : undefined,
+    paymentToOrganizerAt: data.paymentToOrganizerAt ? convertTimestamp(data.paymentToOrganizerAt) : undefined,
+    paymentEvidenceUrl: data.paymentEvidenceUrl,
   };
 
   // Cargar relaciones si existen

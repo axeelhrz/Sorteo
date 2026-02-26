@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { 
@@ -39,12 +39,18 @@ export default function StoreDashboard() {
     totalProducts: 0,
     totalRaffles: 0,
     ticketsSold: 0,
-    totalRevenue: 0
+    totalRevenue: 0,
+    pendingPayment: 0,
+    paidThisMonth: 0,
   });
 
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [raffleStatusFilter, setRaffleStatusFilter] = useState<'all' | 'active' | 'finished' | 'draft'>('all');
-  const [deposits] = useState<any[]>([]);
+  const [deposits, setDeposits] = useState<Array<{ id: string; date: Date; concept: string; amount: number; status: string; evidenceUrl?: string }>>([]);
+  const startOfMonth = useMemo(() => {
+    const n = new Date();
+    return new Date(n.getFullYear(), n.getMonth(), 1);
+  }, []);
   const [viewModal, setViewModal] = useState({ isOpen: false, raffle: null as Raffle | null });
   const [activateModal, setActivateModal] = useState({ isOpen: false, raffleId: null as string | null, raffleName: null as string | null });
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, raffleId: null as string | null, raffleName: null as string | null });
@@ -111,22 +117,51 @@ export default function StoreDashboard() {
       const rafflesData = await raffleService.getRafflesByShop(shop.id);
       setRaffles(rafflesData || []);
 
-      // Calcular ingresos reales: suma de (tickets vendidos × precio por ticket) de cada oportunidad
+      // Calcular ingresos y cobros a partir de las oportunidades
       const list = rafflesData || [];
       let ticketsSold = 0;
       let totalRevenue = 0;
+      let pendingPayment = 0;
+      let paidThisMonth = 0;
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const depositsList: Array<{ id: string; date: Date; concept: string; amount: number; status: string; evidenceUrl?: string }> = [];
+
       for (const r of list) {
         const sold = r.soldTickets ?? 0;
         const pricePerTicket = r.productValue ?? 0;
+        const amount = sold * pricePerTicket;
         ticketsSold += sold;
-        totalRevenue += sold * pricePerTicket;
+        totalRevenue += amount;
+
+        if (r.status === 'finished') {
+          const paidAt = r.paymentToOrganizerAt instanceof Date ? r.paymentToOrganizerAt : r.paymentToOrganizerAt ? new Date(r.paymentToOrganizerAt as string | number) : undefined;
+          if (paidAt) {
+            depositsList.push({
+              id: r.id,
+              date: paidAt,
+              concept: r.product?.name || 'Oportunidad',
+              amount,
+              status: 'Cobrado',
+              evidenceUrl: r.paymentEvidenceUrl,
+            });
+            if (paidAt >= startOfMonth) paidThisMonth += amount;
+          } else {
+            pendingPayment += amount;
+          }
+        }
       }
+
+      depositsList.sort((a, b) => b.date.getTime() - a.date.getTime());
+      setDeposits(depositsList);
 
       setStats({
         totalProducts: 0,
         totalRaffles: list.length,
         ticketsSold,
-        totalRevenue
+        totalRevenue,
+        pendingPayment,
+        paidThisMonth,
       });
 
       console.log('Raffles loaded:', rafflesData);
@@ -609,17 +644,21 @@ export default function StoreDashboard() {
               <div className={styles.earningCard}>
                 <div className={styles.earningLabel}>Total Acumulado</div>
                 <div className={styles.earningValue}>S/. {stats.totalRevenue.toFixed(2)}</div>
-                <div className={styles.earningChange}>+0% este mes</div>
+                <div className={styles.earningChange}>Ingresos por tickets vendidos</div>
               </div>
               <div className={styles.earningCard}>
                 <div className={styles.earningLabel}>Pendiente de Cobro</div>
-                <div className={styles.earningValue}>S/. 0.00</div>
-                <div className={styles.earningChange}>0 transacciones</div>
+                <div className={styles.earningValue}>S/. {(stats.pendingPayment ?? 0).toFixed(2)}</div>
+                <div className={styles.earningChange}>
+                  {raffles.filter((r) => r.status === 'finished' && !r.paymentToOrganizerAt).length} oportunidad(es) finalizada(s) sin pago registrado
+                </div>
               </div>
               <div className={styles.earningCard}>
                 <div className={styles.earningLabel}>Cobrado Este Mes</div>
-                <div className={styles.earningValue}>S/. 0.00</div>
-                <div className={styles.earningChange}>0 depósitos</div>
+                <div className={styles.earningValue}>S/. {(stats.paidThisMonth ?? 0).toFixed(2)}</div>
+                <div className={styles.earningChange}>
+                  {deposits.filter((d) => d.date >= startOfMonth).length} depósito(s) este mes
+                </div>
               </div>
             </div>
 
@@ -644,17 +683,21 @@ export default function StoreDashboard() {
                   <tbody>
                     {deposits.map((deposit) => (
                       <tr key={deposit.id}>
-                        <td>{deposit.date}</td>
+                        <td>{deposit.date.toLocaleDateString('es-PE', { dateStyle: 'medium' })}</td>
                         <td>{deposit.concept}</td>
-                        <td>S/. {deposit.amount}</td>
+                        <td>S/. {deposit.amount.toFixed(2)}</td>
                         <td>
                           <span className={styles.badge}>{deposit.status}</span>
                         </td>
                         <td>
                           <div className={styles.actions}>
-                            <button className={styles.actionBtn} title="Ver">
-                              <FiEye />
-                            </button>
+                            {deposit.evidenceUrl ? (
+                              <a href={deposit.evidenceUrl} target="_blank" rel="noopener noreferrer" className={styles.actionBtn} title="Ver evidencia">
+                                <FiEye />
+                              </a>
+                            ) : (
+                              <span className={styles.actionBtn} title="Sin evidencia">—</span>
+                            )}
                           </div>
                         </td>
                       </tr>
