@@ -6,10 +6,10 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { FiSearch, FiLock, FiArrowLeft, FiHome } from 'react-icons/fi';
 import { publicRaffleService } from '@/services/public-raffle-service';
+import { ticketAssignmentService } from '@/services/ticket-assignment-service';
 import { useAuth } from '@/hooks/useAuth';
 import { Raffle, RaffleStatus } from '@/types/raffle';
 import { BuyTicketsBlock } from '@/components/marketplace/BuyTicketsBlock';
-import { apiClient } from '@/lib/api-client';
 import styles from './detail.module.css';
 
 export default function RaffleDetailPage() {
@@ -69,17 +69,23 @@ export default function RaffleDetailPage() {
   }, [raffleId, raffle?.status]);
 
   const refreshUserTickets = useCallback(async () => {
-    if (!user || !raffleId) return;
+    if (!user?.id || !raffleId) return;
     try {
       setLoadingTickets(true);
-      const response = await apiClient.get(`/api/raffle-tickets?raffleId=${raffleId}`);
-      setUserTickets(response.data || []);
+      const tickets = await ticketAssignmentService.getUserTicketsForRaffle(user.id, raffleId);
+      setUserTickets(
+        tickets.map((t) => ({
+          id: t.id,
+          number: t.ticketNumber,
+          createdAt: t.createdAt instanceof Date ? t.createdAt.toISOString() : (t.createdAt as unknown as string),
+        }))
+      );
     } catch (err) {
       console.error('Error loading user tickets:', err);
     } finally {
       setLoadingTickets(false);
     }
-  }, [user, raffleId]);
+  }, [user?.id, raffleId]);
 
   useEffect(() => {
     refreshUserTickets();
@@ -190,12 +196,20 @@ export default function RaffleDetailPage() {
             </div>
           </div>
 
-          {/* Organizador */}
+          {/* Organizador: "Por [nombre]" */}
           {raffle.shop?.name && (
-            <p className={styles.organizerName}>{raffle.shop.name}</p>
+            <p className={styles.organizerName}>Por {raffle.shop.name}</p>
           )}
 
-          {/* Más información - redes del organizador */}
+          {/* Description below photo */}
+          {raffle.product?.description && (
+            <div className={styles.descriptionBox}>
+              <h3 className={styles.descriptionTitle}>Descripción del producto</h3>
+              <p className={styles.productDescription}>{raffle.product.description}</p>
+            </div>
+          )}
+
+          {/* Redes sociales del organizador (debajo de la descripción) */}
           {raffle.shop?.socialMedia && (() => {
             const sm = raffle.shop.socialMedia as Record<string, string> | undefined;
             if (!sm || typeof sm !== 'object') return null;
@@ -204,7 +218,7 @@ export default function RaffleDetailPage() {
             const labels: Record<string, string> = { facebook: 'Facebook', instagram: 'Instagram', twitter: 'X', tiktok: 'TikTok', whatsapp: 'WhatsApp', website: 'Sitio web' };
             return (
               <div className={styles.socialMedia}>
-                <h4 className={styles.socialLabel}>Más información</h4>
+                <h4 className={styles.socialLabel}>Redes del organizador</h4>
                 <div className={styles.socialLinks}>
                   {entries.map(([key, value]) => {
                     const url = String(value).trim().startsWith('http') ? value : (key === 'instagram' ? `https://instagram.com/${value.replace('@', '')}` : key === 'facebook' ? `https://facebook.com/${value}` : key === 'whatsapp' ? `https://wa.me/${value.replace(/\D/g, '')}` : key === 'tiktok' ? `https://tiktok.com/@${value.replace('@', '')}` : key === 'twitter' ? `https://twitter.com/${value.replace('@', '')}` : value);
@@ -219,14 +233,6 @@ export default function RaffleDetailPage() {
               </div>
             );
           })()}
-
-          {/* Description below photo */}
-          {raffle.product?.description && (
-            <div className={styles.descriptionBox}>
-              <h3 className={styles.descriptionTitle}>Descripción del producto</h3>
-              <p className={styles.productDescription}>{raffle.product.description}</p>
-            </div>
-          )}
         </div>
 
         {/* Right Column - Title, Unit, Delivery, Participa, Progress, Tus participaciones */}
