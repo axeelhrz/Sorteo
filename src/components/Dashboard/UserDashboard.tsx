@@ -61,7 +61,7 @@ export default function UserDashboard() {
   const [winnersInfo, setWinnersInfo] = useState<Map<string, WinnerInfo>>(new Map());
   const [tabMyRaffles, setTabMyRaffles] = useState<TabMyRaffles>('participados');
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ticketQuantity, setTicketQuantity] = useState<{ [raffleId: string]: number }>({});
   const [expandedTicketsRaffleId, setExpandedTicketsRaffleId] = useState<string | null>(null);
@@ -233,13 +233,7 @@ export default function UserDashboard() {
       {/* Main Content */}
       <main className={styles.mainContent}>
         {error && <div className={styles.errorBanner}>{error}</div>}
-
-        {loading ? (
-          <div className={styles.loadingContainer}>
-            <p>Cargando oportunidades y tus datos...</p>
-          </div>
-        ) : (
-          <>
+        {/* Contenido visible de inmediato; los datos se cargan en segundo plano como en Admin/Store */}
         {/* Stats Grid */}
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
@@ -682,8 +676,6 @@ export default function UserDashboard() {
             </div>
           )}
         </div>
-          </>
-        )}
       </main>
     </div>
   );
