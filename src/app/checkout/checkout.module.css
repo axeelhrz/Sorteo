@@ -400,9 +400,12 @@
   border: none;
   box-shadow: none;
   background: #ffffff;
-  padding: 24px;
+  padding: 32px;
   border-radius: 24px;
-  overflow: hidden;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .qrWrapperPlin::before {
@@ -412,6 +415,31 @@
 .qrWrapperPlin:hover {
   transform: none;
   box-shadow: none;
+}
+
+/* Contenedor que recorta la imagen PLIN: fondo blanco, solo la tarjeta queda visible flotando */
+.plinImageClip {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.plinImageClip .qrCode {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 0;
+  /* Escala para que el negro del asset quede fuera y solo se vea la tarjeta blanca */
+  transform: scale(1.12);
 }
 
 .qrCode {
@@ -428,14 +456,6 @@
   outline: none;
   border-radius: 0;
   background: transparent;
-}
-
-/* Recorta la imagen PLIN para quitar el borde negro del asset; solo se ve la tarjeta blanca */
-.qrWrapperPlin .qrCode {
-  border-radius: 28px;
-  background: #ffffff;
-  /* Escala un poco para que las líneas negras del borde inferior y derecho queden fuera y se recorten */
-  transform: scale(1.05);
 }
 
 /* Manual Section */

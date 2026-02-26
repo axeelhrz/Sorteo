@@ -264,11 +264,13 @@ function CheckoutContent() {
                       />
                     )}
                     {selectedMethod === 'plin' && (
-                      <img 
-                        src="/assets/plin.png" 
-                        alt="QR PLIN" 
-                        className={styles.qrCode}
-                      />
+                      <div className={styles.plinImageClip}>
+                        <img 
+                          src="/assets/plin.png" 
+                          alt="QR PLIN" 
+                          className={styles.qrCode}
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
