@@ -13,7 +13,12 @@ interface WinnerInfo {
   ticketNumber?: number;
   verificationCode?: string;
   claimedAt?: string | Date;
-  deliveryEvidence?: { photoUrl?: string; uploadedAt?: string | Date; additionalPhotos?: string[] };
+  deliveryEvidence?: {
+    photoUrl?: string;
+    uploadedAt?: string | Date;
+    additionalPhotos?: string[];
+    deliveryCostReceiptUrl?: string;
+  };
   deliveryConfirmedAt?: string | Date;
 }
 
