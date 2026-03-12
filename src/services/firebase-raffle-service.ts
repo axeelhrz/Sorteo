@@ -59,6 +59,10 @@ const convertWinnerInfo = (raw: any): WinnerInfo | undefined => {
         uploadedBy: raw.deliveryEvidence.uploadedBy || '',
         notes: raw.deliveryEvidence.notes,
         additionalPhotos: raw.deliveryEvidence.additionalPhotos,
+        deliveryCostReceiptUrl: raw.deliveryEvidence.deliveryCostReceiptUrl,
+        deliveryCostReceiptUploadedAt: raw.deliveryEvidence.deliveryCostReceiptUploadedAt
+          ? convertTimestamp(raw.deliveryEvidence.deliveryCostReceiptUploadedAt)
+          : undefined,
       }
     : undefined;
   return {

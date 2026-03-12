@@ -261,6 +261,7 @@ export default function RaffleModals({
                             <DeliveryEvidenceUpload
                               raffleId={viewModal.raffle.id}
                               currentUserId={currentUserId}
+                              deliveryCost={viewModal.raffle.product?.deliveryCost ?? 0}
                               onUploadSuccess={(winnerInfo) => {
                                 onEvidenceUploadSuccess?.(winnerInfo);
                               }}
@@ -296,6 +297,23 @@ export default function RaffleModals({
                               <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
                                 Subido el {new Date(viewModal.raffle.winnerInfo.deliveryEvidence.uploadedAt).toLocaleString('es-PE', { dateStyle: 'long', timeStyle: 'short' })}
                               </p>
+                            )}
+                            {viewModal.raffle.winnerInfo.deliveryEvidence.deliveryCostReceiptUrl && (
+                              <div style={{ marginTop: '8px' }}>
+                                <p style={{ margin: '0 0 6px 0', fontSize: '13px', fontWeight: '600', color: '#64748b' }}>Comprobante costo de delivery</p>
+                                <a
+                                  href={viewModal.raffle.winnerInfo.deliveryEvidence.deliveryCostReceiptUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{ display: 'block', maxWidth: '280px' }}
+                                >
+                                  <img
+                                    src={viewModal.raffle.winnerInfo.deliveryEvidence.deliveryCostReceiptUrl}
+                                    alt="Comprobante costo de delivery"
+                                    style={{ width: '100%', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)' }}
+                                  />
+                                </a>
+                              </div>
                             )}
                           </div>
                         </div>

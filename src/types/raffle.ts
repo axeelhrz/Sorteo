@@ -90,6 +90,9 @@ export interface DeliveryEvidence {
   uploadedBy: string;
   notes?: string;
   additionalPhotos?: string[];
+  /** URL del comprobante del costo de delivery (obligatorio cuando la oportunidad tiene delivery con costo) */
+  deliveryCostReceiptUrl?: string;
+  deliveryCostReceiptUploadedAt?: Date;
 }
 
 // DTO para validar código de ganador
@@ -104,6 +107,8 @@ export interface UploadDeliveryEvidenceDto {
   photoUrl: string;
   notes?: string;
   additionalPhotos?: string[];
+  /** URL del comprobante del costo de delivery (requerido cuando el producto tiene deliveryCost > 0) */
+  deliveryCostReceiptUrl?: string;
 }
 
 // DTO para confirmar recepción del premio

@@ -12,7 +12,15 @@ function defaultCostPerTicket(productValue: number): number {
   return 5;
 }
 
-/** Número de tickets por defecto: floor((valor producto + costo delivery) * ratio / costo por ticket) */
+/** Formatea el valor declarado para mostrar: evita artefactos de coma flotante (ej. 34.98 cuando el organizador declaró 35) */
+function formatDeclaredValue(val: number): string {
+  const rounded = Math.round(val * 100) / 100;
+  const nearest = Math.round(rounded);
+  if (Math.abs(rounded - nearest) < 0.02) return nearest.toFixed(2);
+  return rounded.toFixed(2);
+}
+
+/** Número de tickets por defecto: ceil((valor producto + costo delivery) * ratio / costo por ticket) — se redondea al superior */
 function defaultNumberOfTickets(
   productValue: number,
   deliveryCost: number,
@@ -21,7 +29,7 @@ function defaultNumberOfTickets(
 ): number {
   const totalBase = productValue + (deliveryCost || 0);
   if (costPerTicket <= 0) return 0;
-  return Math.floor((totalBase * ratio) / costPerTicket);
+  return Math.ceil((totalBase * ratio) / costPerTicket);
 }
 
 interface Raffle {
@@ -126,6 +134,23 @@ export default function PendingRafflesPage() {
         costPerTicket,
         totalTickets: numberOfTickets,
       });
+      const organizerEmail = selectedRaffle.shop?.publicEmail || '';
+      if (organizerEmail) {
+        try {
+          await fetch('/api/emails/send-organizer-opportunity-approved', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: organizerEmail,
+              organizerName: selectedRaffle.shop?.name || 'Organizador',
+              productName: selectedRaffle.product?.name || 'Oportunidad',
+              raffleId: selectedRaffle.id,
+            }),
+          });
+        } catch (e) {
+          console.error('Error enviando correo de oportunidad aprobada:', e);
+        }
+      }
       setRaffles(raffles.filter((r) => r.id !== selectedRaffle.id));
       setTotal(total - 1);
       setShowApproveModal(false);
@@ -399,7 +424,7 @@ export default function PendingRafflesPage() {
                 <div style={modalStyles.row}>
                   <span style={modalStyles.label}>Valor producto (organizador)</span>
                   <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: 600, color: '#059669' }}>
-                    S/. {(Math.round(Number(selectedRaffle.product?.value ?? 0) * 100) / 100).toFixed(2)}
+                    S/. {formatDeclaredValue(Number(selectedRaffle.product?.value ?? 0))}
                   </p>
                 </div>
                 <div style={modalStyles.row}>

@@ -286,6 +286,7 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
             <DeliveryEvidenceUpload
               raffleId={raffle.id}
               currentUserId={user.id}
+              deliveryCost={raffle.product?.deliveryCost ?? 0}
               onUploadSuccess={handleEvidenceUploadSuccess}
             />
           )}
@@ -309,6 +310,18 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
                     timeStyle: 'short',
                   })}
                 </p>
+                {winnerInfo.deliveryEvidence.deliveryCostReceiptUrl && (
+                  <div style={{ marginTop: '12px' }}>
+                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#475569', marginBottom: '8px' }}>Comprobante costo de delivery</p>
+                    <a href={winnerInfo.deliveryEvidence.deliveryCostReceiptUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
+                      <img
+                        src={winnerInfo.deliveryEvidence.deliveryCostReceiptUrl}
+                        alt="Comprobante costo de delivery"
+                        style={{ maxWidth: '300px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                      />
+                    </a>
+                  </div>
+                )}
                 {winnerInfo.deliveryStatus === 'delivered' && winnerInfo.deliveryDeadline && (
                   <div className={styles.alert} style={{ marginTop: '16px' }}>
                     ⏰ El ganador tiene hasta el{' '}

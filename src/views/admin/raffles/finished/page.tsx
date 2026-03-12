@@ -432,6 +432,18 @@ export default function FinishedRaffles() {
                           ))}
                         </div>
                       ) : null}
+                      {selectedRaffle.winnerInfo?.deliveryEvidence?.deliveryCostReceiptUrl ? (
+                        <a
+                          href={selectedRaffle.winnerInfo.deliveryEvidence.deliveryCostReceiptUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.evidenceLink}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 6 }}
+                        >
+                          <FiExternalLink size={14} />
+                          Comprobante costo de delivery
+                        </a>
+                      ) : null}
                     </div>
                   </li>
                   <li className={styles.lifecycleStep}>

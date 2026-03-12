@@ -39,14 +39,23 @@ Todos los correos transaccionales se envían con **EmailJS** (REST API desde el 
 1. Crea una cuenta en [EmailJS](https://www.emailjs.com/)
 2. Conecta un servicio de email (Gmail, Outlook, etc.) en **Email Services**
 
-### 2. Activar envío desde servidor
+### 2. Nombre del remitente (From name)
+
+Los correos que reciben los usuarios muestran el **nombre del remitente** configurado en EmailJS. Si aparece un nombre de prueba (por ejemplo "axeelhrz"), cámbialo así:
+
+1. En **Email Services**: edita el servicio de correo conectado (Gmail, Outlook, etc.) y revisa el campo **From Name** (o equivalente). Pon el nombre que quieres que vean los usuarios (ej. **TIKETEA** o el nombre de tu negocio).
+2. En **Templates**: algunas plantillas permiten definir un From name por plantilla. Revisa que no quede un valor de prueba y usa el mismo nombre profesional.
+
+Así los destinatarios verán "TIKETEA" (o el nombre que configures) en lugar de un alias de desarrollo.
+
+### 3. Activar envío desde servidor
 
 1. En **Account → Security**, activa **"Allow API requests from non-browser applications"**
 2. En **Account → API Keys**, copia:
    - **Public Key** → `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`
    - **Private Key** → `EMAILJS_PRIVATE_KEY` (solo en servidor, nunca en el frontend)
 
-### 3. Plantillas en EmailJS
+### 4. Plantillas en EmailJS
 
 Ve a **[Templates](https://dashboard.emailjs.com/admin/templates)** y crea:
 
@@ -61,7 +70,7 @@ Ve a **[Templates](https://dashboard.emailjs.com/admin/templates)** y crea:
 
 Si usas la plantilla genérica `template_mgmgrng`, el campo **To Email** debe ser `{{to_email}}` y el cuerpo al menos `{{message}}`, `{{to_name}}`.
 
-### 4. Configurar `.env.local` (o variables en Vercel)
+### 5. Configurar `.env.local` (o variables en Vercel)
 
 ```env
 # EmailJS (obligatorio para correos)
@@ -77,7 +86,7 @@ EMAILJS_TEMPLATE_WINNER_NOTIFICATION=template_yyyyy
 NEXT_PUBLIC_APP_URL=https://www.tiketeaonline.com
 ```
 
-### 5. Verificación
+### 6. Verificación
 
 - **Participación registrada**: sube un comprobante en checkout y revisa que llegue el correo.
 - **Ganador**: ejecuta una oportunidad desde el panel admin y comprueba que el ganador reciba el correo con el código.
@@ -93,3 +102,4 @@ NEXT_PUBLIC_APP_URL=https://www.tiketeaonline.com
 | "The template ID not found" (400) | ID de plantilla incorrecto o inexistente | Crear la plantilla en EmailJS y copiar el ID exacto |
 | No llegan correos | Plantilla sin `to_email` correcto | Verificar que la plantilla use `{{to_email}}` como destinatario |
 | El correo solo llega al email de EmailJS / a un solo correo | En la plantilla, "To Email" está fijo (ej. tu correo de prueba) | En EmailJS → Templates → tu plantilla de ganador → **To Email** debe ser exactamente `{{to_email}}` (sin comillas ni otro texto). Así el envío irá al correo real del ganador. |
+| El remitente muestra un nombre de prueba (ej. "axeelhrz") | From name configurado con un alias de desarrollo en EmailJS | En EmailJS → Email Services (y/o Templates), cambia el **From Name** al nombre que deben ver los usuarios (ej. TIKETEA). |

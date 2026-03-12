@@ -743,13 +743,13 @@ export default function AdminPaymentsPage() {
                 )}
               </div>
               {selectedPayment.voucherUrl ? (
-                <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #e8ecf1', maxHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc' }}>
+                <div style={{ borderRadius: '8px', border: '1px solid #e8ecf1', maxHeight: '500px', overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', backgroundColor: '#f8fafc' }}>
                   <Image
                     src={selectedPayment.voucherUrl}
                     alt="Comprobante"
                     width={600}
                     height={800}
-                    style={{ maxWidth: '100%', height: 'auto' }}
+                    style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }}
                     unoptimized
                   />
                 </div>

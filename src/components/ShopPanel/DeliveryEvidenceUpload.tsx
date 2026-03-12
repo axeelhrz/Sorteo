@@ -25,21 +25,28 @@ async function uploadDeliveryEvidenceImage(file: File): Promise<string> {
 interface DeliveryEvidenceUploadProps {
   raffleId: string;
   currentUserId: string;
+  /** Si > 0, se exige subir comprobante del costo de delivery para sustentar la devolución */
+  deliveryCost?: number;
   onUploadSuccess?: (winnerInfo: WinnerInfo) => void;
 }
 
 export function DeliveryEvidenceUpload({
   raffleId,
   currentUserId,
+  deliveryCost = 0,
   onUploadSuccess,
 }: DeliveryEvidenceUploadProps) {
   const [mainPhoto, setMainPhoto] = useState<File | null>(null);
   const [mainPhotoPreview, setMainPhotoPreview] = useState<string | null>(null);
   const [additionalPhotos, setAdditionalPhotos] = useState<File[]>([]);
   const [additionalPhotoPreviews, setAdditionalPhotoPreviews] = useState<string[]>([]);
+  const [deliveryCostReceipt, setDeliveryCostReceipt] = useState<File | null>(null);
+  const [deliveryCostReceiptPreview, setDeliveryCostReceiptPreview] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const requiresDeliveryCostReceipt = deliveryCost > 0;
 
   const handleMainPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,11 +102,35 @@ export function DeliveryEvidenceUpload({
     setAdditionalPhotoPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleDeliveryCostReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('El comprobante no debe superar los 5MB');
+        return;
+      }
+      setDeliveryCostReceipt(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setDeliveryCostReceiptPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeDeliveryCostReceipt = () => {
+    setDeliveryCostReceipt(null);
+    setDeliveryCostReceiptPreview(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!mainPhoto) {
       alert('Debes subir al menos una foto de la entrega');
+      return;
+    }
+
+    if (requiresDeliveryCostReceipt && !deliveryCostReceipt) {
+      alert('Debes subir el comprobante del costo de delivery para sustentar la devolución del valor.');
       return;
     }
 
@@ -117,18 +148,25 @@ export function DeliveryEvidenceUpload({
         additionalPhotoUrls.push(url);
       }
 
-      // 3. Guardar evidencia en Firestore
+      // 3. Subir comprobante de costo de delivery si aplica
+      let deliveryCostReceiptUrl: string | undefined;
+      if (deliveryCostReceipt) {
+        deliveryCostReceiptUrl = await uploadDeliveryEvidenceImage(deliveryCostReceipt);
+      }
+
+      // 4. Guardar evidencia en Firestore
       const winnerInfo = await winnerVerificationService.uploadDeliveryEvidence(
         {
           raffleId,
           photoUrl: mainPhotoUrl,
           notes: notes.trim() || undefined,
           additionalPhotos: additionalPhotoUrls.length > 0 ? additionalPhotoUrls : undefined,
+          deliveryCostReceiptUrl,
         },
         currentUserId
       );
 
-      // 4. Enviar correos: al ganador (evidencia disponible) y al organizador (espera confirmación del ganador)
+      // 5. Enviar correos: al ganador (evidencia disponible) y al organizador (espera confirmación del ganador)
       try {
         await fetch(`/api/raffles/${raffleId}/notify-after-delivery-evidence`, { method: 'POST' });
       } catch (e) {
@@ -147,6 +185,8 @@ export function DeliveryEvidenceUpload({
         setMainPhotoPreview(null);
         setAdditionalPhotos([]);
         setAdditionalPhotoPreviews([]);
+        setDeliveryCostReceipt(null);
+        setDeliveryCostReceiptPreview(null);
         setNotes('');
         setSuccess(false);
       }, 2000);
@@ -253,6 +293,49 @@ export function DeliveryEvidenceUpload({
           )}
         </div>
 
+        {/* Comprobante costo de delivery (obligatorio cuando hay costo de delivery) */}
+        {requiresDeliveryCostReceipt && (
+          <div className={styles.section}>
+            <label className={styles.label}>
+              Comprobante del costo de delivery <span className={styles.required}>*</span>
+            </label>
+            <p className={styles.hint}>
+              Sube el comprobante que sustente el costo de envío para la devolución del valor (máx. 5MB)
+            </p>
+
+            {!deliveryCostReceiptPreview ? (
+              <label className={styles.uploadArea}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleDeliveryCostReceiptChange}
+                  className={styles.fileInput}
+                  disabled={loading}
+                />
+                <FiUpload className={styles.uploadIcon} />
+                <span className={styles.uploadText}>
+                  Haz clic para seleccionar el comprobante
+                </span>
+                <span className={styles.uploadHint}>
+                  JPG, PNG o WEBP (máx. 5MB)
+                </span>
+              </label>
+            ) : (
+              <div className={styles.photoPreview}>
+                <img src={deliveryCostReceiptPreview} alt="Comprobante delivery" className={styles.previewImage} />
+                <button
+                  type="button"
+                  onClick={removeDeliveryCostReceipt}
+                  className={styles.removeButton}
+                  disabled={loading}
+                >
+                  <FiX />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Notas */}
         <div className={styles.section}>
           <label htmlFor="notes" className={styles.label}>
@@ -280,7 +363,7 @@ export function DeliveryEvidenceUpload({
         <button
           type="submit"
           className={styles.submitButton}
-          disabled={loading || !mainPhoto || success}
+          disabled={loading || !mainPhoto || success || (requiresDeliveryCostReceipt && !deliveryCostReceipt)}
         >
           {loading ? (
             <>

@@ -140,12 +140,17 @@ export const winnerVerificationService = {
       const deliveryDeadline = new Date();
       deliveryDeadline.setDate(deliveryDeadline.getDate() + 7);
       
+      const now = new Date();
       const deliveryEvidence = {
         photoUrl: data.photoUrl,
-        uploadedAt: new Date(),
+        uploadedAt: now,
         uploadedBy,
         notes: data.notes ?? '',
         additionalPhotos: data.additionalPhotos || [],
+        ...(data.deliveryCostReceiptUrl && {
+          deliveryCostReceiptUrl: data.deliveryCostReceiptUrl,
+          deliveryCostReceiptUploadedAt: now,
+        }),
       };
       
       await updateDoc(raffleRef, {

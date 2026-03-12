@@ -403,32 +403,6 @@ export default function StoreDashboard() {
                 </div>
               </div>
             </div>
-            <div className={styles.quickActions}>
-              <h3 className={styles.quickActionsTitle}>Acciones rápidas</h3>
-              <div className={styles.actionsGrid}>
-                <button type="button" className={styles.actionCard} onClick={handleCreateRaffle}>
-                  <div className={styles.actionIcon}>
-                    <FiPlus />
-                  </div>
-                  <span className={styles.actionTitle}>Crear oportunidad</span>
-                  <span className={styles.actionDesc}>Publica un nuevo producto para sorteo</span>
-                </button>
-                <button type="button" className={styles.actionCard} onClick={() => setActiveTab('raffles')}>
-                  <div className={styles.actionIcon}>
-                    <FiShoppingBag />
-                  </div>
-                  <span className={styles.actionTitle}>Ver mis oportunidades</span>
-                  <span className={styles.actionDesc}>Gestiona activas, pendientes y finalizadas</span>
-                </button>
-                <button type="button" className={styles.actionCard} onClick={() => setActiveTab('earnings')}>
-                  <div className={styles.actionIcon}>
-                    <FiDollarSign />
-                  </div>
-                  <span className={styles.actionTitle}>Ganancias</span>
-                  <span className={styles.actionDesc}>Ingresos y depósitos</span>
-                </button>
-              </div>
-            </div>
           </div>
         )}
 

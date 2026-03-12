@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/emailjs-server';
 
-const TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_OPPORTUNITY_UNDER_REVIEW || 'template_mgmgrng';
+const TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_ORGANIZER_OPPORTUNITY_APPROVED || 'template_mgmgrng';
 
 /**
- * POST /api/emails/send-opportunity-under-review
- * Envía al organizador un correo indicando que su solicitud de oportunidad está en revisión.
+ * POST /api/emails/send-organizer-opportunity-approved
+ * Envía al organizador un correo indicando que su oportunidad fue aprobada.
  * Usa EmailJS para el envío.
  */
 export async function POST(request: NextRequest) {
@@ -23,9 +23,9 @@ export async function POST(request: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const message =
       `Hola ${organizerName},\n\n` +
-      `Hemos recibido tu solicitud de oportunidad para el producto "${productName}". ` +
-      `Nuestro equipo la está revisando y te notificaremos cuando sea aprobada o si necesitamos más información.\n\n` +
-      `✓ Tu solicitud está en revisión.\n\n` +
+      `Tu oportunidad para el producto "${productName}" ha sido aprobada. ` +
+      `Ya está activa y los usuarios pueden participar.\n\n` +
+      `Puedes gestionarla desde tu panel del organizador.\n\n` +
       `Gracias por usar TIKETEA,\nEquipo TIKETEA`;
 
     await sendEmail({
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       templateParams: {
         to_email: email,
         to_name: organizerName,
-        subject: 'Solicitud de oportunidad en revisión - TIKETEA',
+        subject: `Oportunidad aprobada - ${productName}`,
         message,
         organizer_name: organizerName,
         product_name: productName,
@@ -42,14 +42,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log('✅ Correo opportunity under review enviado a:', email, 'product:', productName);
+    console.log('✅ Correo opportunity approved enviado a:', email, 'product:', productName);
     return NextResponse.json({
       success: true,
       message: 'Email enviado correctamente',
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error al enviar el correo';
-    console.error('Error sending opportunity under review email:', error);
+    console.error('Error sending organizer opportunity approved email:', error);
     return NextResponse.json(
       { error: 'Error al enviar el correo', details: message },
       { status: 500 }
