@@ -18,6 +18,7 @@ import {
 import { firebaseShopService } from '@/services/firebase-shop-service';
 import { raffleService } from '@/services/raffle-service';
 import { raffleUpdateService } from '@/services/raffle-update-service';
+import { computeOrganizerPayout } from '@/lib/organizer-payout';
 import { Shop } from '@/types/shop';
 import { Raffle, WinnerInfo } from '@/types/raffle';
 import CreateRaffleModal from './CreateRaffleModal';
@@ -130,24 +131,25 @@ export default function StoreDashboard() {
       for (const r of list) {
         const sold = r.soldTickets ?? 0;
         const pricePerTicket = r.productValue ?? 0;
-        const amount = sold * pricePerTicket;
+        const grossSales = sold * pricePerTicket;
         ticketsSold += sold;
-        totalRevenue += amount;
+        totalRevenue += grossSales;
 
         if (r.status === 'finished') {
+          const organizerAmount = computeOrganizerPayout(r.product);
           const paidAt = r.paymentToOrganizerAt instanceof Date ? r.paymentToOrganizerAt : r.paymentToOrganizerAt ? new Date(r.paymentToOrganizerAt as string | number) : undefined;
           if (paidAt) {
             depositsList.push({
               id: r.id,
               date: paidAt,
               concept: r.product?.name || 'Oportunidad',
-              amount,
+              amount: organizerAmount,
               status: 'Cobrado',
               evidenceUrl: r.paymentEvidenceUrl,
             });
-            if (paidAt >= startOfMonth) paidThisMonth += amount;
+            if (paidAt >= startOfMonth) paidThisMonth += organizerAmount;
           } else {
-            pendingPayment += amount;
+            pendingPayment += organizerAmount;
           }
         }
       }

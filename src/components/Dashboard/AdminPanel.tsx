@@ -25,6 +25,9 @@ interface DashboardStats {
     failed: number;
     refunded: number;
     totalRevenue: number;
+    paymentToOrganizers?: number;
+    organizerAccrued?: number;
+    platformIncome?: number;
   };
 }
 
@@ -355,7 +358,11 @@ export default function AdminPanel() {
         <div style={{ fontSize: '36px', fontWeight: '700', color: '#27ae60' }}>
           S/. {(stats?.payments.totalRevenue || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
-        <p style={{ margin: '8px 0 0 0', color: '#64748b', fontSize: '13px' }}>Ingresos acumulados de la plataforma</p>
+        <p style={{ margin: '8px 0 4px 0', color: '#64748b', fontSize: '13px' }}>Por pagos completados</p>
+        <p style={{ margin: 0, color: '#64748b', fontSize: '13px' }}>
+          Corresponde a organizadores: S/. {(stats?.payments.organizerAccrued ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} · 
+          Ingreso plataforma: S/. {(stats?.payments.platformIncome ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </p>
       </div>
     </>
   );

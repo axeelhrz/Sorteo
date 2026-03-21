@@ -2,6 +2,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import type { Query } from 'firebase-admin/firestore';
 import { getAdminFirestore } from '@/lib/firebase-admin';
 import { assignTicketsToUserAdmin } from './ticket-assignment-admin';
+import { computeOrganizerPayout } from './organizer-payout';
 
 const adminDb = getAdminFirestore();
 
@@ -81,14 +82,13 @@ export const adminSecureService = {
 
     let pendingRaffles = 0;
     let activeRaffles = 0;
-    let finishedRaffles = 0;
     let cancelledRaffles = 0;
     let rejectedRaffles = 0;
+    const finishedRaffleDocs = rafflesSnap.docs.filter((d) => (d.data().status || '').toLowerCase() === 'finished');
     rafflesSnap.docs.forEach((doc) => {
       const status = (doc.data().status || '').toLowerCase();
       if (status === 'pending_approval' || status === 'draft') pendingRaffles++;
       else if (status === 'active' || status === 'sold_out') activeRaffles++;
-      else if (status === 'finished') finishedRaffles++;
       else if (status === 'cancelled') cancelledRaffles++;
       else if (status === 'rejected') rejectedRaffles++;
     });
@@ -113,17 +113,37 @@ export const adminSecureService = {
       }
     });
 
-    let paymentToOrganizers = 0;
-    rafflesSnap.docs.forEach((doc) => {
-      const data = doc.data();
-      if (data.status === 'finished' && data.paymentToOrganizerAt) {
-        const sold = data.soldTickets || 0;
-        const price = data.productValue || 0;
-        paymentToOrganizers += sold * price;
+    const productIds = [...new Set(finishedRaffleDocs.map((d) => d.data().productId).filter(Boolean))] as string[];
+
+    const productSnaps = await Promise.all(
+      productIds.map((id) => adminDb.collection('products').doc(id).get())
+    );
+    const productMap = new Map<string, { value?: number; deliveryCost?: number; hasDelivery?: boolean }>();
+    productIds.forEach((id, i) => {
+      const snap = productSnaps[i];
+      if (snap?.exists) {
+        const p = snap.data() || {};
+        productMap.set(id, {
+          value: p.value,
+          deliveryCost: p.deliveryCost,
+          hasDelivery: p.hasDelivery,
+        });
       }
     });
 
-    const platformIncome = Math.max(0, totalRevenue - paymentToOrganizers);
+    let paymentToOrganizers = 0;
+    let organizerAccrued = 0;
+    finishedRaffleDocs.forEach((doc) => {
+      const data = doc.data();
+      const product = productMap.get(data.productId || '') || null;
+      const payout = computeOrganizerPayout(product);
+      organizerAccrued += payout;
+      if (data.paymentToOrganizerAt) {
+        paymentToOrganizers += payout;
+      }
+    });
+
+    const platformIncome = Math.max(0, totalRevenue - organizerAccrued);
 
     return {
       users: { total: usersSnap.size },
@@ -136,7 +156,7 @@ export const adminSecureService = {
       raffles: {
         pending: pendingRaffles,
         active: activeRaffles,
-        finished: finishedRaffles,
+        finished: finishedRaffleDocs.length,
         cancelled: cancelledRaffles,
         rejected: rejectedRaffles,
       },
@@ -149,6 +169,7 @@ export const adminSecureService = {
         refunded: refundedPayments,
         totalRevenue,
         paymentToOrganizers,
+        organizerAccrued,
         platformIncome,
       },
     };

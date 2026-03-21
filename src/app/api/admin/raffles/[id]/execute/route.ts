@@ -4,6 +4,7 @@ import { getAdminAuth, getAdminFirestore } from '@/lib/firebase-admin';
 import { winnerVerificationService } from '@/services/winner-verification-service';
 import { sendWinnerNotificationEmail } from '@/lib/emails/send-winner-notification';
 import { RaffleStatus } from '@/types/raffle';
+import { computeOrganizerPayout } from '@/server/organizer-payout';
 
 interface TicketDoc {
   id: string;
@@ -127,6 +128,7 @@ export async function POST(
     let productName = 'Premio';
     let productDescription = '';
     let productValue = raffleData.productValue ?? 0;
+    let productData: { value?: number; deliveryCost?: number; hasDelivery?: boolean } | null = null;
     let shopName = 'Organizador';
     let shopEmail = '';
 
@@ -137,6 +139,7 @@ export async function POST(
         productName = p.name || productName;
         productDescription = p.description || '';
         productValue = p.value ?? productValue;
+        productData = { value: p.value, deliveryCost: p.deliveryCost, hasDelivery: p.hasDelivery };
       }
     }
     let shopPhone = '';
@@ -180,7 +183,7 @@ export async function POST(
     const organizerEmail = shopEmail;
     if (organizerEmail) {
       try {
-        const amountOrganizer = productValue * soldTickets;
+        const amountOrganizer = computeOrganizerPayout(productData);
         await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/send-organizer-raffle-finished`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

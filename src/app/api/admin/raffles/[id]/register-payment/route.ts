@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminFirestore, getAdminStorage } from '@/lib/firebase-admin';
+import { computeOrganizerPayout } from '@/server/organizer-payout';
 
 /**
  * POST /api/admin/raffles/[id]/register-payment
@@ -100,17 +101,16 @@ export async function POST(
 
     const productId = raffleData.productId || '';
     let productName = 'Premio';
-    let productValue = raffleData.productValue ?? 0;
+    let productData: { value?: number; deliveryCost?: number; hasDelivery?: boolean } | null = null;
     if (productId) {
       const productSnap = await db.collection('products').doc(productId).get();
       if (productSnap.exists) {
         const p = productSnap.data()!;
         productName = p.name || productName;
-        productValue = p.value ?? productValue;
+        productData = { value: p.value, deliveryCost: p.deliveryCost, hasDelivery: p.hasDelivery };
       }
     }
-    const soldTickets = raffleData.soldTickets || 0;
-    const amountPaid = productValue * soldTickets;
+    const amountPaid = computeOrganizerPayout(productData);
 
     if (organizerEmail) {
       try {

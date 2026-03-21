@@ -254,9 +254,12 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div>
-                          <div className={styles.statLabel}>Pago Organizadores</div>
+                          <div className={styles.statLabel}>Corresponde a organizadores</div>
                           <div className={styles.statValue} style={{ fontSize: '36px' }}>
-                            S/. {(stats.payments.paymentToOrganizers ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            S/. {(stats.payments.organizerAccrued ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </div>
+                          <div className={styles.statChange} style={{ marginTop: 4 }}>
+                            <span>Liquidado: S/. {(stats.payments.paymentToOrganizers ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           </div>
                           <button
                             type="button"

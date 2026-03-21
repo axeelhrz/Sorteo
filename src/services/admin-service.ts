@@ -27,6 +27,7 @@ export interface AdminDashboardStats {
     refunded: number;
     totalRevenue: number;
     paymentToOrganizers: number;
+    organizerAccrued: number;
     platformIncome: number;
   };
 }
