@@ -403,11 +403,22 @@
   color: white;
 }
 
+.rafflePriceBlock {
+  margin: 10px 0 15px 0;
+}
+
 .rafflePrice {
   font-size: 20px;
   font-weight: 700;
   color: #6366f1;
-  margin: 10px 0 15px 0;
+  margin: 0;
+}
+
+.rafflePriceRef {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  margin: 6px 0 0 0;
 }
 
 .progressSection {
@@ -490,11 +501,22 @@
   color: #0f172a;
 }
 
+.totalPriceBlock {
+  margin: 8px 0;
+}
+
 .totalPrice {
   font-size: 14px;
   font-weight: 600;
-  margin: 8px 0;
+  margin: 0;
   color: #0f172a;
+}
+
+.totalPriceRef {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  margin: 4px 0 0 0;
 }
 
 .buyBtn {

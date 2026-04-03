@@ -33,6 +33,10 @@ export interface Raffle {
   paymentToOrganizerAt?: Date;
   /** URL de evidencia del pago al organizador (subida por admin) */
   paymentEvidenceUrl?: string;
+  /** El organizador confirmó haber recibido el depósito */
+  organizerPaymentConfirmedAt?: Date;
+  /** UID de Firebase del organizador que confirmó */
+  organizerPaymentConfirmedBy?: string;
   shop?: Shop;
   product?: Product;
 }

@@ -6,6 +6,7 @@ import { FiCheck, FiCheckCircle, FiX, FiEye, FiDownload, FiChevronLeft, FiChevro
 import { adminService } from '@/services/admin-service';
 import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { formatUsdc, penToUsdc } from '@/lib/pen-usdc-display';
 
 interface PaymentWithDetails extends Payment {
   userName?: string;
@@ -659,11 +660,21 @@ export default function AdminPaymentsPage() {
                   <div>
                     <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Unidad de Participación</p>
                     <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>S/. {Number(selectedPayment.costPerTicket).toFixed(2)}</p>
+                    {penToUsdc(Number(selectedPayment.costPerTicket)) != null ? (
+                      <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '13px', fontWeight: '600' }}>
+                        {formatUsdc(penToUsdc(Number(selectedPayment.costPerTicket))!)}
+                      </p>
+                    ) : null}
                   </div>
                 )}
                 <div>
                   <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Monto esperado</p>
                   <p style={{ margin: '0', color: '#10b981', fontSize: '16px', fontWeight: '700' }}>S/. {Number(selectedPayment.amount).toFixed(2)}</p>
+                  {penToUsdc(Number(selectedPayment.amount)) != null ? (
+                    <p style={{ margin: '4px 0 0 0', color: '#059669', fontSize: '14px', fontWeight: '700' }}>
+                      {formatUsdc(penToUsdc(Number(selectedPayment.amount))!)}
+                    </p>
+                  ) : null}
                 </div>
                 <div>
                   <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Método</p>

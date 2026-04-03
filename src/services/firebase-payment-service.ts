@@ -29,7 +29,7 @@ export interface Payment {
   amount: number;
   ticketQuantity: number;
   status: 'pending' | 'pending_validation' | 'completed' | 'failed' | 'refunded';
-  paymentMethod?: 'yape' | 'plin' | 'dale';
+  paymentMethod?: 'yape' | 'plin' | 'dale' | 'crypto';
   voucherUrl?: string;
   transactionId?: string;
   failureReason?: string;
@@ -136,7 +136,7 @@ export const firebasePaymentService = {
   async confirmPaymentWithVoucher(
     paymentId: string,
     voucherFile: File,
-    paymentMethod: 'yape' | 'plin' | 'dale'
+    paymentMethod: 'yape' | 'plin' | 'dale' | 'crypto'
   ): Promise<Payment> {
     try {
       const auth = getAuth();

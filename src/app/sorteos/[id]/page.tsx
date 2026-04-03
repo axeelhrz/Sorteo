@@ -10,6 +10,8 @@ import { ticketAssignmentService } from '@/services/ticket-assignment-service';
 import { useAuth } from '@/hooks/useAuth';
 import { Raffle, RaffleStatus } from '@/types/raffle';
 import { BuyTicketsBlock } from '@/components/marketplace/BuyTicketsBlock';
+import { getOrganizerSocialDisplayItems } from '@/lib/organizer-social-display';
+import { formatUsdc, penToUsdc } from '@/lib/pen-usdc-display';
 import styles from './detail.module.css';
 
 export default function RaffleDetailPage() {
@@ -153,6 +155,8 @@ export default function RaffleDetailPage() {
   const isSoldOut = raffle.status === RaffleStatus.SOLD_OUT;
   const isFinished = raffle.status === RaffleStatus.FINISHED;
   const isPaused = raffle.status === RaffleStatus.PAUSED;
+  const unitParticipationPen = Number(raffle.productValue);
+  const unitParticipationUsdc = penToUsdc(unitParticipationPen);
 
   return (
     <main className={styles.container}>
@@ -214,25 +218,34 @@ export default function RaffleDetailPage() {
             <div className={styles.socialMedia}>
               <h4 className={styles.socialLabel}>Redes del organizador</h4>
               {(() => {
-                const sm = raffle.shop?.socialMedia as Record<string, string> | undefined;
-                const entries = sm && typeof sm === 'object' ? Object.entries(sm).filter(([, v]) => v && String(v).trim()) : [];
-                const labels: Record<string, string> = { facebook: 'Facebook', instagram: 'Instagram', twitter: 'X', tiktok: 'TikTok', whatsapp: 'WhatsApp', website: 'Sitio web' };
-                if (entries.length === 0) {
+                const items = getOrganizerSocialDisplayItems(
+                  raffle.shop?.socialMedia,
+                  raffle.specialConditions ?? undefined
+                );
+                if (items.length === 0) {
                   return (
                     <p className={styles.socialEmpty}>El organizador no ha agregado redes sociales aún.</p>
                   );
                 }
                 return (
                   <div className={styles.socialLinks}>
-                    {entries.map(([key, value]) => {
-                      const url = String(value).trim().startsWith('http') ? value : (key === 'instagram' ? `https://instagram.com/${value.replace('@', '')}` : key === 'facebook' ? `https://facebook.com/${value}` : key === 'whatsapp' ? `https://wa.me/${value.replace(/\D/g, '')}` : key === 'tiktok' ? `https://tiktok.com/@${value.replace('@', '')}` : key === 'twitter' ? `https://twitter.com/${value.replace('@', '')}` : value);
-                      const label = labels[key] || key;
-                      return (
-                        <a key={key} href={url} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                          {label}
+                    {items.map((item, i) =>
+                      item.kind === 'link' ? (
+                        <a
+                          key={`social-link-${i}-${item.key}`}
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.socialLink}
+                        >
+                          {item.label}
                         </a>
-                      );
-                    })}
+                      ) : (
+                        <p key={`social-text-${i}-${item.key}`} className={styles.socialText}>
+                          {item.content}
+                        </p>
+                      )
+                    )}
                   </div>
                 );
               })()}
@@ -248,7 +261,16 @@ export default function RaffleDetailPage() {
           {/* Unit of participation */}
           <div className={styles.valueBox}>
             <span className={styles.valueLabel}>Unidad de participación</span>
-            <span className={styles.valueAmount}>S/ {Number(raffle.productValue).toFixed(2)}</span>
+            <div className={styles.valueAmountBlock}>
+              {unitParticipationUsdc != null ? (
+                <>
+                  <span className={styles.valueAmount}>{formatUsdc(unitParticipationUsdc)}</span>
+                  <span className={styles.valueAmountRef}>≈ S/ {unitParticipationPen.toFixed(2)}</span>
+                </>
+              ) : (
+                <span className={styles.valueAmount}>S/ {unitParticipationPen.toFixed(2)}</span>
+              )}
+            </div>
           </div>
 
           {/* Entrega del premio */}

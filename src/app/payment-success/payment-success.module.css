@@ -84,6 +84,15 @@
   word-break: break-all;
 }
 
+.valueSub {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 4px;
+  word-break: normal;
+}
+
 .infoBox {
   background: #e8f5e9;
   border-left: 4px solid #4caf50;

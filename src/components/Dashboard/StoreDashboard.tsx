@@ -13,12 +13,14 @@ import {
   FiTrash2,
   FiEye,
   FiCreditCard,
-  FiDownload
+  FiDownload,
+  FiCheck
 } from 'react-icons/fi';
 import { firebaseShopService } from '@/services/firebase-shop-service';
 import { raffleService } from '@/services/raffle-service';
 import { raffleUpdateService } from '@/services/raffle-update-service';
-import { computeOrganizerPayout } from '@/lib/organizer-payout';
+import { computeOrganizerPayout, isOrganizerPayoutEligible } from '@/lib/organizer-payout';
+import { getOrganizerClosureDisplay } from '@/lib/organizer-raffle-closure-display';
 import { Shop } from '@/types/shop';
 import { Raffle, WinnerInfo } from '@/types/raffle';
 import CreateRaffleModal from './CreateRaffleModal';
@@ -26,6 +28,15 @@ import RaffleModals from './RaffleModals';
 import styles from './StoreDashboard.module.css';
 
 type TabType = 'overview' | 'raffles' | 'earnings';
+
+type OrganizerDepositRow = {
+  id: string;
+  date: Date;
+  concept: string;
+  amount: number;
+  evidenceUrl?: string;
+  organizerConfirmedAt?: Date;
+};
 
 export default function StoreDashboard() {
   const router = useRouter();
@@ -40,14 +51,19 @@ export default function StoreDashboard() {
     totalProducts: 0,
     totalRaffles: 0,
     ticketsSold: 0,
-    totalRevenue: 0,
+    /** Liquidado por la plataforma (solo con depósito registrado por admin). */
+    totalPaidToOrganizer: 0,
+    /** Volumen bruto ventas de tickets (referencial, no es la liquidación). */
+    ticketSalesVolume: 0,
     pendingPayment: 0,
     paidThisMonth: 0,
   });
 
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [raffleStatusFilter, setRaffleStatusFilter] = useState<'all' | 'active' | 'finished' | 'draft'>('all');
-  const [deposits, setDeposits] = useState<Array<{ id: string; date: Date; concept: string; amount: number; status: string; evidenceUrl?: string }>>([]);
+  const [deposits, setDeposits] = useState<OrganizerDepositRow[]>([]);
+  const [confirmingDepositId, setConfirmingDepositId] = useState<string | null>(null);
+  const [confirmDepositError, setConfirmDepositError] = useState<string | null>(null);
   const startOfMonth = useMemo(() => {
     const n = new Date();
     return new Date(n.getFullYear(), n.getMonth(), 1);
@@ -121,34 +137,42 @@ export default function StoreDashboard() {
       // Calcular ingresos y cobros a partir de las oportunidades
       const list = rafflesData || [];
       let ticketsSold = 0;
-      let totalRevenue = 0;
+      let ticketSalesVolume = 0;
+      let totalPaidToOrganizer = 0;
       let pendingPayment = 0;
       let paidThisMonth = 0;
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const depositsList: Array<{ id: string; date: Date; concept: string; amount: number; status: string; evidenceUrl?: string }> = [];
+      const depositsList: OrganizerDepositRow[] = [];
 
       for (const r of list) {
         const sold = r.soldTickets ?? 0;
         const pricePerTicket = r.productValue ?? 0;
         const grossSales = sold * pricePerTicket;
         ticketsSold += sold;
-        totalRevenue += grossSales;
+        ticketSalesVolume += grossSales;
 
         if (r.status === 'finished') {
           const organizerAmount = computeOrganizerPayout(r.product);
           const paidAt = r.paymentToOrganizerAt instanceof Date ? r.paymentToOrganizerAt : r.paymentToOrganizerAt ? new Date(r.paymentToOrganizerAt as string | number) : undefined;
+          const organizerConfirmedAt =
+            r.organizerPaymentConfirmedAt instanceof Date
+              ? r.organizerPaymentConfirmedAt
+              : r.organizerPaymentConfirmedAt
+                ? new Date(r.organizerPaymentConfirmedAt as string | number)
+                : undefined;
           if (paidAt) {
+            totalPaidToOrganizer += organizerAmount;
             depositsList.push({
               id: r.id,
               date: paidAt,
               concept: r.product?.name || 'Oportunidad',
               amount: organizerAmount,
-              status: 'Cobrado',
               evidenceUrl: r.paymentEvidenceUrl,
+              organizerConfirmedAt,
             });
             if (paidAt >= startOfMonth) paidThisMonth += organizerAmount;
-          } else {
+          } else if (isOrganizerPayoutEligible(r)) {
             pendingPayment += organizerAmount;
           }
         }
@@ -161,7 +185,8 @@ export default function StoreDashboard() {
         totalProducts: 0,
         totalRaffles: list.length,
         ticketsSold,
-        totalRevenue,
+        totalPaidToOrganizer,
+        ticketSalesVolume,
         pendingPayment,
         paidThisMonth,
       });
@@ -170,6 +195,34 @@ export default function StoreDashboard() {
     } catch (error) {
       console.error('Error loading data:', error);
       setRaffles([]);
+    }
+  };
+
+  const handleConfirmOrganizerPayment = async (raffleId: string) => {
+    setConfirmDepositError(null);
+    setConfirmingDepositId(raffleId);
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (!token) {
+        setConfirmDepositError('Inicia sesión de nuevo para confirmar.');
+        return;
+      }
+      const res = await fetch(`/api/raffles/${raffleId}/confirm-organizer-payment`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setConfirmDepositError(
+          typeof data.error === 'string' ? data.error : data.details || `Error ${res.status}`
+        );
+        return;
+      }
+      await loadData();
+    } catch (e) {
+      setConfirmDepositError(e instanceof Error ? e.message : 'Error al confirmar la recepción');
+    } finally {
+      setConfirmingDepositId(null);
     }
   };
 
@@ -393,15 +446,20 @@ export default function StoreDashboard() {
               <div className={styles.statCard}>
                 <div className={styles.statHeader}>
                   <div>
-                    <div className={styles.statLabel}>Ingresos totales</div>
-                    <div className={styles.statValue}>S/. {stats.totalRevenue.toFixed(2)}</div>
+                    <div className={styles.statLabel}>Liquidado por la plataforma</div>
+                    <div className={styles.statValue}>S/. {stats.totalPaidToOrganizer.toFixed(2)}</div>
                   </div>
                   <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
                     <FiDollarSign />
                   </div>
                 </div>
                 <div className={styles.statChange}>
-                  <span>De tickets vendidos</span>
+                  <span>Solo depósitos ya registrados por administración</span>
+                </div>
+                <div className={styles.statChange} style={{ marginTop: '6px' }}>
+                  <span>
+                    Volumen ventas tickets (referencial): S/. {stats.ticketSalesVolume.toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -501,7 +559,10 @@ export default function StoreDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredRaffles.map((raffle) => (
+                    {filteredRaffles.map((raffle) => {
+                      const organizerClosure =
+                        raffle.status === 'finished' ? getOrganizerClosureDisplay(raffle) : null;
+                      return (
                       <tr key={raffle.id}>
                         <td>
                           <div className={styles.raffleInfo}>
@@ -545,16 +606,38 @@ export default function StoreDashboard() {
                           </span>
                         </td>
                         <td>
-                          <span className={`${styles.badge} ${styles[`badge${raffle.status}`]}`}>
-                            {raffle.status === 'draft' && 'Borrador'}
-                            {raffle.status === 'pending_approval' && 'Pendiente'}
-                            {raffle.status === 'active' && 'Activo'}
-                            {raffle.status === 'paused' && 'Pausado'}
-                            {raffle.status === 'sold_out' && 'Agotado'}
-                            {raffle.status === 'finished' && 'Finalizado'}
-                            {raffle.status === 'cancelled' && 'Cancelado'}
-                            {raffle.status === 'rejected' && 'Rechazado'}
-                          </span>
+                          {organizerClosure ? (
+                            <div className={styles.closureCell}>
+                              <span className={`${styles.badge} ${styles[`badge${raffle.status}`]}`}>
+                                Finalizado
+                              </span>
+                              <span
+                                className={`${styles.closureHint} ${
+                                  organizerClosure.tone === 'action_required'
+                                    ? styles.closureHintEmphasis
+                                    : ''
+                                }`}
+                              >
+                                {organizerClosure.headline}
+                                {organizerClosure.detail ? (
+                                  <span className={styles.closureHintDetail}>
+                                    {organizerClosure.detail}
+                                  </span>
+                                ) : null}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className={`${styles.badge} ${styles[`badge${raffle.status}`]}`}>
+                              {raffle.status === 'draft' && 'Borrador'}
+                              {raffle.status === 'pending_approval' && 'Pendiente'}
+                              {raffle.status === 'active' && 'Activo'}
+                              {raffle.status === 'paused' && 'Pausado'}
+                              {raffle.status === 'sold_out' && 'Agotado'}
+                              {raffle.status === 'finished' && 'Finalizado'}
+                              {raffle.status === 'cancelled' && 'Cancelado'}
+                              {raffle.status === 'rejected' && 'Rechazado'}
+                            </span>
+                          )}
                         </td>
                         <td>
                           <span className={styles.date}>
@@ -593,7 +676,8 @@ export default function StoreDashboard() {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -618,15 +702,17 @@ export default function StoreDashboard() {
             {/* Earnings Stats */}
             <div className={styles.earningsGrid}>
               <div className={styles.earningCard}>
-                <div className={styles.earningLabel}>Total Acumulado</div>
-                <div className={styles.earningValue}>S/. {stats.totalRevenue.toFixed(2)}</div>
-                <div className={styles.earningChange}>Ingresos por tickets vendidos</div>
+                <div className={styles.earningLabel}>Total cobrado (histórico)</div>
+                <div className={styles.earningValue}>S/. {stats.totalPaidToOrganizer.toFixed(2)}</div>
+                <div className={styles.earningChange}>
+                  Suma liquidada por la plataforma (depósitos registrados)
+                </div>
               </div>
               <div className={styles.earningCard}>
                 <div className={styles.earningLabel}>Pendiente de Cobro</div>
                 <div className={styles.earningValue}>S/. {(stats.pendingPayment ?? 0).toFixed(2)}</div>
                 <div className={styles.earningChange}>
-                  {raffles.filter((r) => r.status === 'finished' && !r.paymentToOrganizerAt).length} oportunidad(es) finalizada(s) sin pago registrado
+                  {raffles.filter((r) => isOrganizerPayoutEligible(r)).length} oportunidad(es) lista(s) para pago (entrega acreditada, sin depósito aún)
                 </div>
               </div>
               <div className={styles.earningCard}>
@@ -637,6 +723,15 @@ export default function StoreDashboard() {
                 </div>
               </div>
             </div>
+
+            {confirmDepositError ? (
+              <div
+                className={styles.confirmDepositError}
+                role="alert"
+              >
+                {confirmDepositError}
+              </div>
+            ) : null}
 
             {deposits.length === 0 ? (
               <div className={styles.emptyState}>
@@ -663,17 +758,51 @@ export default function StoreDashboard() {
                         <td>{deposit.concept}</td>
                         <td>S/. {deposit.amount.toFixed(2)}</td>
                         <td>
-                          <span className={styles.badge}>{deposit.status}</span>
+                          <div className={styles.depositStatusCell}>
+                            <span
+                              className={`${styles.badge} ${
+                                deposit.organizerConfirmedAt
+                                  ? styles.depositBadgeConfirmed
+                                  : styles.depositBadgePending
+                              }`}
+                            >
+                              {deposit.organizerConfirmedAt
+                                ? 'Recepción confirmada'
+                                : 'Pendiente de confirmar'}
+                            </span>
+                            {deposit.organizerConfirmedAt ? (
+                              <span className={styles.depositConfirmDate}>
+                                {deposit.organizerConfirmedAt.toLocaleDateString('es-PE', {
+                                  dateStyle: 'medium',
+                                })}
+                              </span>
+                            ) : null}
+                          </div>
                         </td>
                         <td>
                           <div className={styles.actions}>
                             {deposit.evidenceUrl ? (
                               <a href={deposit.evidenceUrl} target="_blank" rel="noopener noreferrer" className={styles.actionBtn} title="Ver evidencia">
                                 <FiEye />
+                                <span className={styles.actionBtnLabel}>Evidencia</span>
                               </a>
                             ) : (
                               <span className={styles.actionBtn} title="Sin evidencia">—</span>
                             )}
+                            {!deposit.organizerConfirmedAt ? (
+                              <button
+                                type="button"
+                                className={styles.confirmReceiptBtn}
+                                title="Confirmar que recibiste el depósito"
+                                disabled={confirmingDepositId === deposit.id}
+                                onClick={() => handleConfirmOrganizerPayment(deposit.id)}
+                              >
+                                <FiCheck />
+                                <span className={styles.actionBtnLabel}>
+                                  {confirmingDepositId === deposit.id ? '…' : 'Confirmar'}
+                                </span>
+                              </button>
+                            ) : null}
                           </div>
                         </td>
                       </tr>

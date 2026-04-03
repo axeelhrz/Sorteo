@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { FiCopy, FiCheck, FiX, FiUpload, FiCheckCircle } from 'react-icons/fi';
 import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
+import { formatUsdc, penToUsdc, solesPerUsdc } from '@/lib/pen-usdc-display';
 import styles from './checkout.module.css';
 
 export const dynamic = 'force-dynamic';
 
-type PaymentMethod = 'yape' | 'plin' | null;
+/** Único método de pago en checkout: criptomoneda */
+const CHECKOUT_PAYMENT_METHOD = 'crypto' as const;
+const CRYPTO_WALLET_ADDRESS = 'Gx9g45pNsENwczo197GTFgJrh6BN3pEZKqiEAfPZ453m';
+const CRYPTO_QR_PATH = '/assets/QR-cripto.png';
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
@@ -19,12 +22,12 @@ function CheckoutContent() {
   const [payment, setPayment] = useState<Payment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>(null);
   const [copied, setCopied] = useState(false);
   const [confirmingPayment, setConfirmingPayment] = useState(false);
   const [voucherFile, setVoucherFile] = useState<File | null>(null);
   const [voucherPreview, setVoucherPreview] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const confirmInFlightRef = useRef(false);
 
   useEffect(() => {
     if (!paymentId) {
@@ -47,8 +50,6 @@ function CheckoutContent() {
 
     fetchPayment();
   }, [paymentId]);
-
-  const phoneNumber = '984908819';
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -86,8 +87,7 @@ function CheckoutContent() {
   };
 
   const handleConfirmPayment = async () => {
-    if (!payment || !selectedMethod) {
-      setError('Selecciona un método de participación');
+    if (!payment) {
       return;
     }
 
@@ -96,6 +96,10 @@ function CheckoutContent() {
       return;
     }
 
+    if (confirmInFlightRef.current) {
+      return;
+    }
+    confirmInFlightRef.current = true;
     setConfirmingPayment(true);
     setError(null);
 
@@ -104,7 +108,7 @@ function CheckoutContent() {
       const formData = new FormData();
       formData.append('voucher', voucherFile);
       formData.append('paymentId', payment.id);
-      formData.append('paymentMethod', selectedMethod);
+      formData.append('paymentMethod', CHECKOUT_PAYMENT_METHOD);
       formData.append('amount', String(payment.amount ?? 0));
       formData.append('ticketQuantity', String(payment.ticketQuantity ?? 1));
 
@@ -129,6 +133,7 @@ function CheckoutContent() {
       console.error('Error confirming payment:', err);
       setError(err instanceof Error ? err.message : 'Error al confirmar la participación');
       setConfirmingPayment(false);
+      confirmInFlightRef.current = false;
     }
   };
 
@@ -174,6 +179,10 @@ function CheckoutContent() {
     );
   }
 
+  const amountPen = Number(payment.amount);
+  const amountUsdc = penToUsdc(amountPen);
+  const rateConfigured = solesPerUsdc() != null;
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.checkoutContainer}>
@@ -194,102 +203,76 @@ function CheckoutContent() {
               <span className={styles.summaryValue}>{payment.ticketQuantity} unidades</span>
             </div>
             <div className={styles.summaryDivider}></div>
-            <div className={styles.summaryRow}>
-              <span className={styles.summaryLabel}>Total a pagar</span>
-              <span className={styles.summaryTotal}>S/ {Number(payment.amount).toFixed(2)}</span>
-            </div>
+            {amountUsdc != null ? (
+              <>
+                <div className={styles.summaryRow}>
+                  <span className={styles.summaryLabel}>Total a enviar (USDC)</span>
+                  <span className={styles.summaryTotal}>{formatUsdc(amountUsdc)}</span>
+                </div>
+                <div className={styles.summaryRow}>
+                  <span className={styles.summaryLabel}>Referencia en soles</span>
+                  <span className={styles.summaryValue}>S/ {amountPen.toFixed(2)}</span>
+                </div>
+              </>
+            ) : (
+              <div className={styles.summaryRow}>
+                <span className={styles.summaryLabel}>Total a pagar</span>
+                <span className={styles.summaryTotal}>S/ {amountPen.toFixed(2)}</span>
+              </div>
+            )}
+            {!rateConfigured ? (
+              <p className={styles.summaryRateNote}>
+                Tipo de cambio USDC no configurado: se muestra solo el monto en soles.
+              </p>
+            ) : null}
           </div>
         </div>
 
-        {/* Payment Methods */}
+        {/* Método único: criptomoneda */}
         <div className={styles.paymentMethodsCard}>
           <h2 className={styles.cardTitle}>Método de participación</h2>
-          <p className={styles.cardSubtitle}>Selecciona tu billetera digital</p>
-          
-          <div className={styles.methodsContainer}>
-            <button
-              className={`${styles.methodButton} ${selectedMethod === 'yape' ? styles.methodActive : ''}`}
-              onClick={() => setSelectedMethod('yape')}
-            >
-              <div className={styles.methodLogo}>
-                <Image src="/assets/yape-logo.png" alt="YAPE" width={48} height={48} />
-              </div>
-              <span className={styles.methodName}>YAPE</span>
-              {selectedMethod === 'yape' && (
-                <div className={styles.methodCheck}>
-                  <FiCheckCircle />
-                </div>
-              )}
-            </button>
-
-            <button
-              className={`${styles.methodButton} ${selectedMethod === 'plin' ? styles.methodActive : ''}`}
-              onClick={() => setSelectedMethod('plin')}
-            >
-              <div className={`${styles.methodLogo} ${styles.methodLogoPlin}`}>
-                <Image src="/assets/plin-logo.png" alt="PLIN" width={48} height={48} />
-              </div>
-              <span className={styles.methodName}>PLIN</span>
-              {selectedMethod === 'plin' && (
-                <div className={styles.methodCheck}>
-                  <FiCheckCircle />
-                </div>
-              )}
-            </button>
-          </div>
+          <p className={styles.cardSubtitle}>
+            Pago único con criptomoneda: escanea el QR o copia la dirección de wallet
+          </p>
         </div>
 
-        {/* Payment Instructions */}
-        {selectedMethod && (
-          <>
+        {/* Instrucciones de pago */}
+        <>
             <div className={styles.instructionsCard}>
               <h2 className={styles.cardTitle}>Realiza tu participación</h2>
               
               <div className={styles.instructionsLayout}>
-                {/* QR Code Section */}
                 <div className={styles.qrSection}>
                   <div className={styles.qrHeader}>
-                    <h3 className={styles.qrTitle}>Escanea el código QR</h3>
+                    <h3 className={styles.qrTitle}>Código QR de la wallet</h3>
                     <p className={styles.qrSubtitle}>
-                      Abre tu app de {selectedMethod.toUpperCase()} y escanea
+                      Escanea con tu wallet o exchange compatible (red Solana) y envía el equivalente al monto de referencia
                     </p>
                   </div>
                   
-                  <div className={`${styles.qrWrapper} ${selectedMethod === 'plin' ? styles.qrWrapperPlin : ''}`}>
-                    {selectedMethod === 'yape' && (
-                      <img 
-                        src="/assets/yape.png" 
-                        alt="QR YAPE" 
-                        className={styles.qrCode}
-                      />
-                    )}
-                    {selectedMethod === 'plin' && (
-                      <div className={styles.plinImageClip}>
-                        <img 
-                          src="/assets/plin.png" 
-                          alt="QR PLIN" 
-                          className={styles.qrCode}
-                        />
-                      </div>
-                    )}
+                  <div className={styles.qrWrapper}>
+                    <img
+                      src={CRYPTO_QR_PATH}
+                      alt="QR wallet criptomoneda"
+                      className={styles.qrCode}
+                    />
                   </div>
                 </div>
 
-                {/* Manual Payment Section */}
                 <div className={styles.manualSection}>
                   <div className={styles.manualHeader}>
-                    <h3 className={styles.manualTitle}>O paga manualmente</h3>
-                    <p className={styles.manualSubtitle}>Envía al siguiente número</p>
+                    <h3 className={styles.manualTitle}>Dirección de wallet</h3>
+                    <p className={styles.manualSubtitle}>Copia y pega en tu app si prefieres no usar el QR</p>
                   </div>
 
                   <div className={styles.phoneCard}>
-                    <span className={styles.phoneLabel}>Número de celular</span>
-                    <div className={styles.phoneRow}>
-                      <span className={styles.phoneValue}>{phoneNumber}</span>
+                    <span className={styles.phoneLabel}>Wallet (Solana)</span>
+                    <div className={`${styles.phoneRow} ${styles.walletRow}`}>
+                      <span className={`${styles.phoneValue} ${styles.walletValue}`}>{CRYPTO_WALLET_ADDRESS}</span>
                       <button 
                         className={styles.copyBtn}
-                        onClick={() => copyToClipboard(phoneNumber)}
-                        title="Copiar número"
+                        onClick={() => copyToClipboard(CRYPTO_WALLET_ADDRESS)}
+                        title="Copiar dirección"
                       >
                         {copied ? <FiCheck /> : <FiCopy />}
                       </button>
@@ -297,12 +280,29 @@ function CheckoutContent() {
                   </div>
 
                   <div className={styles.amountCard}>
-                    <span className={styles.amountLabel}>Monto exacto</span>
-                    <span className={styles.amountValue}>S/ {Number(payment.amount).toFixed(2)}</span>
+                    {amountUsdc != null ? (
+                      <>
+                        <span className={styles.amountLabel}>Monto a enviar (USDC)</span>
+                        <span className={styles.amountValue}>{formatUsdc(amountUsdc)}</span>
+                        <span className={styles.amountRefLabel}>Referencia en soles</span>
+                        <span className={styles.amountRefValue}>S/ {amountPen.toFixed(2)}</span>
+                        <p className={styles.amountRateHint}>
+                          Tipo de cambio configurado por la plataforma (soles por 1 USDC), no es cotización en tiempo real.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <span className={styles.amountLabel}>Monto de referencia (soles)</span>
+                        <span className={styles.amountValue}>S/ {amountPen.toFixed(2)}</span>
+                      </>
+                    )}
                   </div>
 
                   <div className={styles.infoBox}>
-                    <p>💡 Asegúrate de enviar el monto exacto para evitar demoras en la verificación</p>
+                    <p>
+                      Envía la cantidad en USDC indicada arriba cuando el tipo de cambio esté configurado; si no, usa el monto en soles como referencia y envía el equivalente en tu wallet.
+                      El comprobante debe ser legible (captura del envío, hash o detalle de la transacción).
+                    </p>
                   </div>
                 </div>
               </div>
@@ -367,7 +367,7 @@ function CheckoutContent() {
               )}
 
               <div className={styles.warningAlert}>
-                <strong>⚠️ Importante:</strong> Asegúrate de que el comprobante sea legible y muestre claramente el monto y la fecha de la transacción.
+                <strong>⚠️ Importante:</strong> El comprobante debe mostrar de forma clara el envío a esta wallet, fecha y monto o identificador de la transacción.
               </div>
             </div>
 
@@ -406,8 +406,7 @@ function CheckoutContent() {
                 {error}
               </div>
             )}
-          </>
-        )}
+        </>
       </div>
     </div>
   );

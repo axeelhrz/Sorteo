@@ -6,8 +6,10 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { FiAward, FiCheckCircle, FiSearch, FiClock, FiHelpCircle } from 'react-icons/fi';
 import { publicRaffleService } from '@/services/public-raffle-service';
+import { winnerVerificationService } from '@/services/winner-verification-service';
 import { useAuth } from '@/hooks/useAuth';
-import { Raffle, RaffleStatus } from '@/types/raffle';
+import { Raffle, RaffleStatus, type WinnerInfo } from '@/types/raffle';
+import { getWinnerReceiptStatusDisplay } from '@/lib/winner-receipt-status-display';
 import { apiClient } from '@/lib/api-client';
 import styles from './winner.module.css';
 
@@ -22,6 +24,7 @@ export default function WinnerPage() {
   const [winnerTicket, setWinnerTicket] = useState<any | null>(null);
   const [userTickets, setUserTickets] = useState<any[]>([]);
   const [isWinner, setIsWinner] = useState(false);
+  const [myWinnerInfo, setMyWinnerInfo] = useState<WinnerInfo | null>(null);
 
   useEffect(() => {
     const loadRaffle = async () => {
@@ -87,6 +90,30 @@ export default function WinnerPage() {
       loadUserTickets();
     }
   }, [user, raffleId, raffle?.winnerTicketId]);
+
+  useEffect(() => {
+    if (!raffleId || !user?.id || !isWinner) {
+      setMyWinnerInfo(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const wi = await winnerVerificationService.getWinnerInfo(raffleId);
+        if (cancelled) return;
+        if (wi && wi.userId === user.id) {
+          setMyWinnerInfo(wi);
+        } else {
+          setMyWinnerInfo(null);
+        }
+      } catch {
+        if (!cancelled) setMyWinnerInfo(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [raffleId, user?.id, isWinner]);
 
   if (isLoading) {
     return (
@@ -183,6 +210,22 @@ export default function WinnerPage() {
           )}
         </div>
       </div>
+
+      {isWinner && myWinnerInfo && (
+        <div className={styles.winnerStatusBanner} role="status">
+          {(() => {
+            const d = getWinnerReceiptStatusDisplay(myWinnerInfo);
+            return (
+              <>
+                <p className={styles.winnerStatusTitle}>{d.title}</p>
+                {d.subtitle ? (
+                  <p className={styles.winnerStatusSubtitle}>{d.subtitle}</p>
+                ) : null}
+              </>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Main Content */}
       <div className={styles.content}>

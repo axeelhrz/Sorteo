@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Shop, ShopStatus } from '@/types/shop';
+import { normalizeSocialMediaForForm } from '@/lib/social-media-form';
 import { raffleService } from '@/services/raffle-service';
 import { productService } from '@/services/product-service';
+import { shopService } from '@/services/shop-service';
 import { emailService } from '@/services/email-service';
 import { useAuthStore } from '@/store/auth-store';
 import styles from './shop-panel.module.css';
@@ -30,6 +32,13 @@ interface ProductFormData {
   socialNetworks: string;
 }
 
+function initialSocialNetworksFromShop(s: Shop): string {
+  const sm = normalizeSocialMediaForForm(s.socialMedia as unknown);
+  return Object.values(sm)
+    .filter((v) => v != null && String(v).trim())
+    .join(', ');
+}
+
 export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleFormProps) {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -52,7 +61,7 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
     deliveryCost: '',
     pickupAddress: '',
     pickupDistrict: '',
-    socialNetworks: shop.socialMedia ? Object.values(shop.socialMedia).filter(Boolean).join(', ') : '',
+    socialNetworks: initialSocialNetworksFromShop(shop),
   });
 
   const handleProductChange = (field: keyof ProductFormData, value: string | boolean | File | null) => {
@@ -174,6 +183,21 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
 
       // 3. Enviar para aprobación (solicitud en revisión)
       await raffleService.submitForApproval(raffle.id);
+
+      // 3b. Sincronizar redes al perfil del organizador (visible en la página pública del sorteo)
+      const sn = productData.socialNetworks.trim();
+      if (sn) {
+        try {
+          const base = normalizeSocialMediaForForm(shop.socialMedia as unknown);
+          const mergedOther =
+            base.other && !base.other.includes(sn) ? `${base.other}\n${sn}` : base.other || sn;
+          await shopService.updateShop(shop.id, {
+            socialMedia: { ...base, other: mergedOther },
+          });
+        } catch (syncErr) {
+          console.warn('Redes no sincronizadas al perfil del organizador:', syncErr);
+        }
+      }
 
       // 4. Enviar correo al organizador: su solicitud está en revisión
       const organizerEmail = user?.email || shop.publicEmail || '';
@@ -357,6 +381,10 @@ export function CreateRaffleForm({ shop, onSuccess, onCancel }: CreateRaffleForm
             className={styles.formInput}
             placeholder="Ej: Instagram @tienda, Facebook /mitienda"
           />
+          <small style={{ color: '#666', marginTop: '6px', display: 'block', lineHeight: 1.45 }}>
+            También se guarda en las condiciones para el equipo. Si escribes aquí, se actualiza tu perfil (campo «Otras redes»)
+            para que se muestre en la ficha pública del sorteo.
+          </small>
         </div>
       </div>
 

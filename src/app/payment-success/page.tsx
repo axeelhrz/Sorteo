@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
 import { raffleService } from '@/services/raffle-service';
 import { Raffle } from '@/types/raffle';
+import { formatUsdc, penToUsdc } from '@/lib/pen-usdc-display';
 import styles from './payment-success.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -72,6 +73,9 @@ function PaymentSuccessContent() {
     );
   }
 
+  const amountPen = Number(payment.amount);
+  const amountUsdc = penToUsdc(amountPen);
+
   return (
     <div className={styles.container}>
       <div className={styles.successCard}>
@@ -105,7 +109,17 @@ function PaymentSuccessContent() {
           <div className={styles.summaryItem}>
             <span>Monto:</span>
             <span className={styles.value}>
-              S/. {Number(payment.amount).toFixed(2)}
+              {amountUsdc != null ? (
+                <>
+                  {formatUsdc(amountUsdc)}
+                  <span className={styles.valueSub}>
+                    {' '}
+                    (ref. S/. {amountPen.toFixed(2)})
+                  </span>
+                </>
+              ) : (
+                <>S/. {amountPen.toFixed(2)}</>
+              )}
             </span>
           </div>
 

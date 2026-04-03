@@ -89,9 +89,9 @@ export default function RefundPolicyPage() {
         </section>
 
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>9. Reembolsos a Billeteras Digitales</h2>
+          <h2 className={styles.sectionTitle}>9. Reembolsos con criptomoneda</h2>
           <p>
-            Los reembolsos a billeteras digitales (Yape, Plin) se procesan inmediatamente después de la aprobación. Los reembolsos a tarjetas de crédito/débito pueden tardar 5-7 días hábiles.
+            Los reembolsos aprobados se gestionan según el medio acordado con soporte. Los pagos de participación se realizan en criptomoneda; los plazos pueden variar según la red y la verificación de la transacción.
           </p>
         </section>
 

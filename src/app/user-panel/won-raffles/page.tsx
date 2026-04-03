@@ -9,7 +9,42 @@ import { winnerVerificationService } from '@/services/winner-verification-servic
 import { useAuthStore } from '@/store/auth-store';
 import type { UserWonRaffle } from '@/types/user-panel';
 import type { WinnerInfo } from '@/types/raffle';
+import {
+  getWinnerReceiptStatusDisplay,
+  type WinnerReceiptStatusDisplay,
+} from '@/lib/winner-receipt-status-display';
 import styles from './won-raffles.module.css';
+
+function getCardStatusDisplay(
+  raffle: UserWonRaffle,
+  wi: WinnerInfo | undefined
+): WinnerReceiptStatusDisplay {
+  if (wi) {
+    return getWinnerReceiptStatusDisplay(wi);
+  }
+  if (raffle.deliveryStatus === 'delivered') {
+    return {
+      phase: 'pending_confirmation',
+      title: 'Revisa recepción',
+      subtitle: 'Abre esta tarjeta y confirma si ya recibiste el premio.',
+      badgeClass: 'phasePendingConfirmation',
+    };
+  }
+  if (raffle.deliveryStatus === 'in_process') {
+    return {
+      phase: 'in_progress',
+      title: 'Entrega en curso',
+      subtitle: 'El organizador gestiona la entrega.',
+      badgeClass: 'phaseInProgress',
+    };
+  }
+  return {
+    phase: 'awaiting_delivery',
+    title: 'Coordinación pendiente',
+    subtitle: 'Espera novedades del organizador.',
+    badgeClass: 'phaseAwaitingDelivery',
+  };
+}
 
 export default function WonRafflesPage() {
   const { user } = useAuthStore();
@@ -120,11 +155,26 @@ export default function WonRafflesPage() {
                       <h3 className={styles.cardTitle}>{raffle.raffleTitle}</h3>
                       <p className={styles.shopName}>{raffle.shopName}</p>
                     </div>
-                    <div className={`${styles.deliveryBadge} ${styles[raffle.deliveryStatus]}`}>
-                      {raffle.deliveryStatus === 'pending' && '⏳ Pendiente'}
-                      {raffle.deliveryStatus === 'in_process' && '📦 En Proceso'}
-                      {raffle.deliveryStatus === 'delivered' && '✅ Entregado'}
-                    </div>
+                    {(() => {
+                      const statusDisplay = getCardStatusDisplay(
+                        raffle,
+                        winnersInfo.get(raffle.raffleId)
+                      );
+                      const phaseClass =
+                        styles[statusDisplay.badgeClass as keyof typeof styles] || styles.phaseUnknown;
+                      return (
+                        <div className={styles.deliveryBadgeStack}>
+                          <div className={`${styles.deliveryBadge} ${phaseClass}`}>
+                            {statusDisplay.title}
+                          </div>
+                          {statusDisplay.subtitle ? (
+                            <span className={styles.deliveryBadgeSubtitle}>
+                              {statusDisplay.subtitle}
+                            </span>
+                          ) : null}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   <div className={styles.winnerInfo}>

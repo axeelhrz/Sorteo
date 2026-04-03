@@ -135,6 +135,29 @@
   line-height: 1.5;
 }
 
+.winnerStatusBanner {
+  margin: -24px 0 32px 0;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.winnerStatusTitle {
+  margin: 0 0 8px 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.winnerStatusSubtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #64748b;
+}
+
 /* Main Content */
 .content {
   display: grid;

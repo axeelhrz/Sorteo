@@ -297,6 +297,18 @@
   color: #64748b;
 }
 
+.socialText {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.socialText:last-child {
+  margin-bottom: 0;
+}
+
 .viewShopButton {
   width: 100%;
   padding: 14px 20px;
@@ -390,12 +402,26 @@
   font-weight: 700;
 }
 
+.valueAmountBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
 .valueAmount {
   font-size: 36px;
   font-weight: 800;
   color: white;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   letter-spacing: -0.02em;
+}
+
+.valueAmountRef {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  letter-spacing: -0.01em;
 }
 
 .valueSubtext {

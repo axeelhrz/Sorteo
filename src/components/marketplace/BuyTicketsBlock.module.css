@@ -69,6 +69,20 @@
   font-weight: 600;
 }
 
+.valueStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+
+.valueRef {
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+}
+
 .quantitySection {
   margin-bottom: 24px;
 }
@@ -148,14 +162,28 @@
 .subtotalRow {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   font-size: 16px;
+}
+
+.subtotalValueStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
 }
 
 .subtotalValue {
   font-weight: 600;
   color: #007bff;
   font-size: 18px;
+}
+
+.subtotalRef {
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
 }
 
 .errorMessage {

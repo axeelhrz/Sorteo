@@ -81,13 +81,15 @@ const faqItems: FAQItem[] = [
     id: '11',
     category: 'Pagos y Reembolsos',
     question: '¿Qué métodos de pago aceptan?',
-    answer: 'Aceptamos: Tarjetas de crédito (Visa, Mastercard), Tarjetas de débito, Billeteras digitales (Yape, Plin), Transferencia bancaria.'
+    answer:
+      'Las participaciones se pagan únicamente con criptomoneda. En el checkout verás el código QR y la dirección de wallet (red Solana) para completar el pago y subir tu comprobante.'
   },
   {
     id: '12',
     category: 'Pagos y Reembolsos',
     question: '¿Es seguro pagar en TIKETEA ONLINE?',
-    answer: 'Sí, utilizamos procesadores de pago certificados y encriptación de nivel bancario. Nunca almacenamos datos de tarjeta en nuestros servidores.'
+    answer:
+      'El pago se realiza en cadena hacia una wallet indicada en el checkout; la plataforma no almacena claves privadas ni datos de tarjeta. La conexión del sitio usa HTTPS.'
   },
   {
     id: '13',

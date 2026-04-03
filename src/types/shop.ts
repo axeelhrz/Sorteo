@@ -14,6 +14,8 @@ export interface SocialMedia {
   tiktok?: string;
   whatsapp?: string;
   website?: string;
+  /** Texto libre (p. ej. sincronizado desde crear oportunidad) */
+  other?: string;
 }
 
 export interface Organizer {

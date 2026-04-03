@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Raffle, RaffleStatus } from '@/types/raffle';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/auth-store';
 import { UserRole } from '@/types/auth';
 import { firebasePaymentService } from '@/services/firebase-payment-service';
+import { formatUsdc, penToUsdc } from '@/lib/pen-usdc-display';
 import styles from './BuyTicketsBlock.module.css';
 
 interface BuyTicketsBlockProps {
@@ -24,11 +25,14 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isSubmittingRef = useRef(false);
 
   // Calcular tickets disponibles
   const availableTickets = raffle.totalTickets - raffle.soldTickets;
   const pricePerTicket = Number(raffle.productValue);
   const totalPrice = quantity * pricePerTicket;
+  const unitUsdc = penToUsdc(pricePerTicket);
+  const totalUsdc = penToUsdc(totalPrice);
 
   // Validaciones de cantidad
   const isQuantityValid = quantity > 0 && quantity <= availableTickets;
@@ -51,6 +55,10 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
       return;
     }
 
+    if (isSubmittingRef.current) {
+      return;
+    }
+    isSubmittingRef.current = true;
     setLoading(true);
     setError(null);
 
@@ -75,6 +83,7 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
         'Error al procesar la compra. Intenta de nuevo.';
       setError(errorMessage);
       setLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
@@ -141,7 +150,16 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
         </div>
         <div className={styles.infoItem}>
           <span className={styles.label}>Unidad de participación:</span>
-          <span className={styles.value}>S/. {pricePerTicket.toFixed(2)}</span>
+          <span className={styles.valueStack}>
+            {unitUsdc != null ? (
+              <>
+                <span className={styles.value}>{formatUsdc(unitUsdc)}</span>
+                <span className={styles.valueRef}>S/. {pricePerTicket.toFixed(2)}</span>
+              </>
+            ) : (
+              <span className={styles.value}>S/. {pricePerTicket.toFixed(2)}</span>
+            )}
+          </span>
         </div>
       </div>
 
@@ -191,8 +209,15 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
       <div className={styles.subtotalSection}>
         <div className={styles.subtotalRow}>
           <span>Subtotal ({quantity} tickets):</span>
-          <span className={styles.subtotalValue}>
-            S/. {totalPrice.toFixed(2)}
+          <span className={styles.subtotalValueStack}>
+            {totalUsdc != null ? (
+              <>
+                <span className={styles.subtotalValue}>{formatUsdc(totalUsdc)}</span>
+                <span className={styles.subtotalRef}>S/. {totalPrice.toFixed(2)}</span>
+              </>
+            ) : (
+              <span className={styles.subtotalValue}>S/. {totalPrice.toFixed(2)}</span>
+            )}
           </span>
         </div>
       </div>
@@ -202,6 +227,7 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
 
       {/* Botón de compra */}
       <button
+        type="button"
         className={styles.buyButton}
         onClick={handleBuyTickets}
         disabled={!isQuantityValid || loading}

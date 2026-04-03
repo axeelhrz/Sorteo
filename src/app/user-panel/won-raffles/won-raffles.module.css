@@ -158,6 +158,54 @@
   color: #388e3c;
 }
 
+.deliveryBadgeStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+  max-width: 260px;
+}
+
+.deliveryBadgeSubtitle {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  opacity: 0.9;
+  white-space: normal;
+}
+
+/* Fases desde WinnerInfo (se combinan con .deliveryBadge) */
+.phaseCompleted {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.25);
+}
+
+.phasePendingConfirmation {
+  background-color: #fff8e1;
+  color: #f57f17;
+  border: 1px solid rgba(245, 127, 23, 0.35);
+}
+
+.phaseInProgress {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid rgba(21, 101, 192, 0.25);
+}
+
+.phaseAwaitingDelivery {
+  background-color: #fce4ec;
+  color: #c2185b;
+  border: 1px solid rgba(194, 24, 91, 0.2);
+}
+
+.phaseUnknown {
+  background-color: #f5f5f5;
+  color: #616161;
+  border: 1px solid #e0e0e0;
+}
+
 .winnerInfo {
   background-color: #fff3e0;
   border-left: 4px solid #ffc107;

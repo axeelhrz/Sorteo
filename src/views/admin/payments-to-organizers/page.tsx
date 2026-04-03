@@ -3,17 +3,25 @@
 import { useState, useEffect } from 'react';
 import { FiDollarSign, FiExternalLink } from 'react-icons/fi';
 import { adminService, type RafflesListResponse } from '@/services/admin-service';
+import { computeOrganizerPayout } from '@/lib/organizer-payout';
 import Link from 'next/link';
 
 interface Raffle {
   id: string;
   shop: { id: string; name: string };
-  product: { id: string; name: string };
+  product: {
+    id: string;
+    name: string;
+    value?: number;
+    deliveryCost?: number;
+    hasDelivery?: boolean;
+  } | null;
   productValue: number;
   totalTickets: number;
   soldTickets: number;
   paymentToOrganizerAt?: string | Date;
   paymentEvidenceUrl?: string;
+  organizerPaymentConfirmedAt?: string | Date;
 }
 
 export default function AdminPaymentsToOrganizersPage() {
@@ -54,10 +62,16 @@ export default function AdminPaymentsToOrganizersPage() {
     });
   };
 
-  const estimatedAmount = (r: Raffle) => {
-    const revenue = r.soldTickets * r.productValue;
-    return revenue;
-  };
+  const estimatedAmount = (r: Raffle) =>
+    computeOrganizerPayout(
+      r.product
+        ? {
+            value: r.product.value,
+            deliveryCost: r.product.deliveryCost,
+            hasDelivery: r.product.hasDelivery,
+          }
+        : null
+    );
 
   if (loading) {
     return (
@@ -114,10 +128,13 @@ export default function AdminPaymentsToOrganizersPage() {
                     Fecha de pago
                   </th>
                   <th style={{ padding: '14px 16px', textAlign: 'right', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Monto (est.)
+                    Monto liquidación
                   </th>
                   <th style={{ padding: '14px 16px', textAlign: 'center', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Evidencia
+                  </th>
+                  <th style={{ padding: '14px 16px', textAlign: 'center', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Organizador
                   </th>
                   <th style={{ padding: '14px 16px', textAlign: 'center', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Acción
@@ -153,6 +170,18 @@ export default function AdminPaymentsToOrganizersPage() {
                       ) : (
                         <span style={{ color: '#94a3b8', fontSize: '13px' }}>—</span>
                       )}
+                    </td>
+                    <td style={{ padding: '14px 16px', textAlign: 'center', fontSize: '13px' }}>
+                      {r.organizerPaymentConfirmedAt ? (
+                        <span style={{ color: '#047857', fontWeight: 600 }}>Confirmó</span>
+                      ) : (
+                        <span style={{ color: '#b45309', fontWeight: 600 }}>Pendiente</span>
+                      )}
+                      {r.organizerPaymentConfirmedAt ? (
+                        <div style={{ color: '#64748b', fontSize: '12px', marginTop: '4px' }}>
+                          {formatDate(r.organizerPaymentConfirmedAt)}
+                        </div>
+                      ) : null}
                     </td>
                     <td style={{ padding: '14px 16px', textAlign: 'center' }}>
                       <Link

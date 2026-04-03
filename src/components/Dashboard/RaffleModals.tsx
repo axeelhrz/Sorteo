@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { FiAlertTriangle, FiCheck } from 'react-icons/fi';
-import { Raffle, WinnerInfo } from '@/types/raffle';
+import { Raffle, RaffleStatus, WinnerInfo } from '@/types/raffle';
+import { getOrganizerClosureDisplay } from '@/lib/organizer-raffle-closure-display';
 import { WinnerValidation } from '@/components/ShopPanel/WinnerValidation';
 import { DeliveryEvidenceUpload } from '@/components/ShopPanel/DeliveryEvidenceUpload';
 import styles from './StoreDashboard.module.css';
@@ -125,27 +126,44 @@ export default function RaffleModals({
                   <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: '12px' }}>
                     Estado
                   </h3>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      padding: '8px 16px',
-                      backgroundColor: '#f0f4ff',
-                      color: '#6366f1',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      fontWeight: '700',
-                    }}
-                  >
-                    {viewModal.raffle.status === 'draft' && 'Borrador'}
-                    {viewModal.raffle.status === 'pending_approval' && 'Pendiente'}
-                    {viewModal.raffle.status === 'active' && 'Activo'}
-                    {viewModal.raffle.status === 'paused' && 'Pausado'}
-                    {viewModal.raffle.status === 'sold_out' && 'Agotado'}
-                    {viewModal.raffle.status === 'finished' && 'Finalizado'}
-                    {viewModal.raffle.status === 'cancelled' && 'Cancelado'}
-                    {viewModal.raffle.status === 'rejected' && 'Rechazado'}
-                    {!['draft', 'pending_approval', 'active', 'paused', 'sold_out', 'finished', 'cancelled', 'rejected'].includes(viewModal.raffle.status) && String(viewModal.raffle.status)}
-                  </span>
+                  <div className={styles.closureCell} style={{ maxWidth: '100%' }}>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '8px 16px',
+                        backgroundColor: '#f0f4ff',
+                        color: '#6366f1',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        fontWeight: '700',
+                      }}
+                    >
+                      {viewModal.raffle.status === 'draft' && 'Borrador'}
+                      {viewModal.raffle.status === 'pending_approval' && 'Pendiente'}
+                      {viewModal.raffle.status === 'active' && 'Activo'}
+                      {viewModal.raffle.status === 'paused' && 'Pausado'}
+                      {viewModal.raffle.status === 'sold_out' && 'Agotado'}
+                      {viewModal.raffle.status === 'finished' && 'Finalizado'}
+                      {viewModal.raffle.status === 'cancelled' && 'Cancelado'}
+                      {viewModal.raffle.status === 'rejected' && 'Rechazado'}
+                      {!['draft', 'pending_approval', 'active', 'paused', 'sold_out', 'finished', 'cancelled', 'rejected'].includes(viewModal.raffle.status) && String(viewModal.raffle.status)}
+                    </span>
+                    {viewModal.raffle.status === RaffleStatus.FINISHED &&
+                      (() => {
+                        const closure = getOrganizerClosureDisplay(viewModal.raffle);
+                        if (!closure) return null;
+                        return (
+                          <span
+                            className={`${styles.closureHint} ${closure.tone === 'action_required' ? styles.closureHintEmphasis : ''}`}
+                          >
+                            {closure.headline}
+                            {closure.detail ? (
+                              <span className={styles.closureHintDetail}>{closure.detail}</span>
+                            ) : null}
+                          </span>
+                        );
+                      })()}
+                  </div>
                 </div>
 
                 {/* Tickets (no se muestra mientras está pendiente de aprobación) */}

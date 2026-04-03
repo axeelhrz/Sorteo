@@ -104,6 +104,11 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
     raffleExecutedAt: data.raffleExecutedAt ? convertTimestamp(data.raffleExecutedAt) : undefined,
     paymentToOrganizerAt: data.paymentToOrganizerAt ? convertTimestamp(data.paymentToOrganizerAt) : undefined,
     paymentEvidenceUrl: data.paymentEvidenceUrl,
+    organizerPaymentConfirmedAt: data.organizerPaymentConfirmedAt
+      ? convertTimestamp(data.organizerPaymentConfirmedAt)
+      : undefined,
+    organizerPaymentConfirmedBy:
+      typeof data.organizerPaymentConfirmedBy === 'string' ? data.organizerPaymentConfirmedBy : undefined,
   };
 
   // Cargar relaciones si existen

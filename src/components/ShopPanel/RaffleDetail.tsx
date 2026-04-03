@@ -8,6 +8,7 @@ import { winnerVerificationService } from '@/services/winner-verification-servic
 import { useAuthStore } from '@/store/auth-store';
 import styles from './shop-panel.module.css';
 import { StatusBadge } from './StatusBadge';
+import { getOrganizerClosureDisplay } from '@/lib/organizer-raffle-closure-display';
 import { WinnerValidation } from './WinnerValidation';
 import { DeliveryEvidenceUpload } from './DeliveryEvidenceUpload';
 
@@ -127,7 +128,26 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
           <h1 className={styles.raffleDetailTitle}>{raffle.product?.name || 'Sorteo'}</h1>
           <p style={{ margin: '5px 0 0 0', color: '#7f8c8d' }}>ID: {raffle.id}</p>
         </div>
-        <StatusBadge status={raffle.status} />
+        <div className={styles.raffleDetailHeaderStatus}>
+          <StatusBadge status={raffle.status} />
+          {raffle.status === RaffleStatus.FINISHED &&
+            (() => {
+              const closure = getOrganizerClosureDisplay(raffle);
+              if (!closure) return null;
+              return (
+                <p
+                  className={`${styles.closurePhaseHint} ${
+                    closure.tone === 'action_required' ? styles.closurePhaseHintEmphasis : ''
+                  }`}
+                >
+                  {closure.headline}
+                  {closure.detail ? (
+                    <span className={styles.closurePhaseDetail}>{closure.detail}</span>
+                  ) : null}
+                </p>
+              );
+            })()}
+        </div>
       </div>
 
       <div className={styles.raffleDetailSection}>
@@ -207,7 +227,7 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
           )}
           {raffle.raffleExecutedAt && (
             <div className={styles.raffleDetailItem}>
-              <div className={styles.raffleDetailItemLabel}>Finalizado</div>
+              <div className={styles.raffleDetailItemLabel}>Fecha de ejecución del sorteo</div>
               <div className={styles.raffleDetailItemValue}>
                 {new Date(raffle.raffleExecutedAt).toLocaleDateString()}
               </div>

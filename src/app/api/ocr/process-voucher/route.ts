@@ -35,13 +35,12 @@ export async function POST(request: NextRequest) {
     // Mock OCR response
     // In production, this would call Google Cloud Vision API or similar
     const mockText = `
-      YAPE
-      Transferencia exitosa
-      Monto: S/ 50.00
-      Fecha: 20/01/2025
-      Hora: 14:30
-      Operación: 123456789
-      Destinatario: TIKETEA
+      Crypto transfer
+      Amount: 12.5 USDC
+      To: Gx9g...453m
+      Date: 20/01/2025
+      Tx: 5KJp7v...abc
+      Status: Confirmed
     `;
 
     return NextResponse.json({

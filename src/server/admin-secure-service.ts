@@ -397,6 +397,9 @@ export const adminSecureService = {
         activatedAt: toDate(data.activatedAt),
         raffleExecutedAt: toDate(data.raffleExecutedAt),
         paymentToOrganizerAt: toDate(data.paymentToOrganizerAt),
+        organizerPaymentConfirmedAt: toDate(data.organizerPaymentConfirmedAt),
+        organizerPaymentConfirmedBy:
+          typeof data.organizerPaymentConfirmedBy === 'string' ? data.organizerPaymentConfirmedBy : undefined,
       };
     });
     if (shopId) {
@@ -464,7 +467,15 @@ export const adminSecureService = {
     );
 
     const pagosOrg = organizerPayments.map((r: any) => {
-      const amount = (r.soldTickets || 0) * (r.productValue || 0);
+      const amount = computeOrganizerPayout(
+        r.product
+          ? {
+              value: r.product.value,
+              deliveryCost: r.product.deliveryCost,
+              hasDelivery: r.product.hasDelivery,
+            }
+          : null
+      );
       const date = r.paymentToOrganizerAt || new Date(0);
       return {
         id: `org-${r.id}`,

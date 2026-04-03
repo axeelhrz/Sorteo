@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shop, ShopStatus } from '@/types/shop';
+import { Shop, ShopStatus, type SocialMedia } from '@/types/shop';
+import { compactSocialMedia, normalizeSocialMediaForForm } from '@/lib/social-media-form';
 import { shopService } from '@/services/shop-service';
 import styles from './shop-panel.module.css';
 import { StatusBadge } from './StatusBadge';
@@ -11,19 +12,45 @@ interface ShopProfileProps {
   onUpdate: (shop: Shop) => void;
 }
 
+const SOCIAL_FIELDS: { key: keyof SocialMedia; label: string; placeholder: string; type?: string }[] = [
+  { key: 'instagram', label: 'Instagram', placeholder: '@usuario o URL' },
+  { key: 'facebook', label: 'Facebook', placeholder: 'Usuario o URL' },
+  { key: 'twitter', label: 'X (Twitter)', placeholder: '@usuario o URL' },
+  { key: 'tiktok', label: 'TikTok', placeholder: '@usuario o URL' },
+  { key: 'whatsapp', label: 'WhatsApp', placeholder: '+51 999 999 999', type: 'tel' },
+  { key: 'website', label: 'Sitio web', placeholder: 'https://...', type: 'url' },
+];
+
+function shopToFormState(s: Shop): Shop {
+  return {
+    ...s,
+    socialMedia: normalizeSocialMediaForForm(s.socialMedia as unknown),
+  };
+}
+
 export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState(shop);
+  const [formData, setFormData] = useState(() => shopToFormState(shop));
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
-    setFormData(shop);
+    setFormData(shopToFormState(shop));
   }, [shop]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSocialChange = (field: keyof SocialMedia, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      socialMedia: {
+        ...normalizeSocialMediaForForm(prev.socialMedia as unknown),
+        [field]: value,
+      },
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,13 +59,14 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
     setMessage(null);
 
     try {
+      const socialMedia = compactSocialMedia(formData.socialMedia as SocialMedia);
       const updated = await shopService.updateShop(shop.id, {
         name: formData.name,
         description: formData.description,
         logo: formData.logo,
         publicEmail: formData.publicEmail,
         phone: formData.phone,
-        socialMedia: formData.socialMedia,
+        socialMedia: Object.keys(socialMedia).length > 0 ? socialMedia : undefined,
       });
 
       setMessage({ type: 'success', text: 'Organizador actualizado correctamente' });
@@ -108,20 +136,26 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
             <div className={styles.raffleDetailItem}>
               <div className={styles.raffleDetailItemLabel}>Redes sociales</div>
               <div className={styles.raffleDetailItemValue}>
-                {shop.socialMedia && typeof shop.socialMedia === 'object' ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    {shop.socialMedia.facebook && <span>Facebook: {shop.socialMedia.facebook}</span>}
-                    {shop.socialMedia.instagram && <span>Instagram: {shop.socialMedia.instagram}</span>}
-                    {shop.socialMedia.twitter && <span>Twitter: {shop.socialMedia.twitter}</span>}
-                    {shop.socialMedia.tiktok && <span>TikTok: {shop.socialMedia.tiktok}</span>}
-                    {shop.socialMedia.whatsapp && <span>WhatsApp: {shop.socialMedia.whatsapp}</span>}
-                    {shop.socialMedia.website && <span>Website: {shop.socialMedia.website}</span>}
-                  </div>
-                ) : shop.socialMedia ? (
-                  String(shop.socialMedia)
-                ) : (
-                  'No especificado'
-                )}
+                {(() => {
+                  const sm = shop.socialMedia;
+                  if (sm && typeof sm === 'object') {
+                    const rows = SOCIAL_FIELDS.filter((f) => sm[f.key]).map((f) => (
+                      <span key={f.key}>
+                        {f.label}: {sm[f.key]}
+                      </span>
+                    ));
+                    const other = sm.other?.trim();
+                    if (other) {
+                      rows.push(<span key="other">Otras: {other}</span>);
+                    }
+                    if (rows.length > 0) {
+                      return <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>{rows}</div>;
+                    }
+                    return 'No especificado';
+                  }
+                  if (sm) return String(sm);
+                  return 'No especificado';
+                })()}
               </div>
             </div>
           </div>
@@ -198,14 +232,34 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
 
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Redes sociales</label>
-            <input
-              type="text"
-              name="socialMedia"
-              value={typeof formData.socialMedia === 'string' ? formData.socialMedia : ''}
-              onChange={handleChange}
-              className={styles.formInput}
-              placeholder="@usuario o enlace"
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {SOCIAL_FIELDS.map(({ key, label, placeholder, type }) => (
+                <div key={key}>
+                  <label className={styles.formLabel} style={{ fontSize: '13px', marginBottom: '4px' }}>
+                    {label}
+                  </label>
+                  <input
+                    type={type || 'text'}
+                    value={(formData.socialMedia as SocialMedia)?.[key] ?? ''}
+                    onChange={(e) => handleSocialChange(key, e.target.value)}
+                    className={styles.formInput}
+                    placeholder={placeholder}
+                  />
+                </div>
+              ))}
+              <div>
+                <label className={styles.formLabel} style={{ fontSize: '13px', marginBottom: '4px' }}>
+                  Otras redes o notas
+                </label>
+                <textarea
+                  value={(formData.socialMedia as SocialMedia)?.other ?? ''}
+                  onChange={(e) => handleSocialChange('other', e.target.value)}
+                  className={styles.formTextarea}
+                  placeholder="Texto libre (ej. varias redes en una sola línea)"
+                  rows={3}
+                />
+              </div>
+            </div>
           </div>
 
           <div className={styles.buttonGroup}>
@@ -217,7 +271,7 @@ export function ShopProfile({ shop, onUpdate }: ShopProfileProps) {
               className={styles.secondaryButton}
               onClick={() => {
                 setIsEditing(false);
-                setFormData(shop);
+                setFormData(shopToFormState(shop));
               }}
             >
               Cancelar

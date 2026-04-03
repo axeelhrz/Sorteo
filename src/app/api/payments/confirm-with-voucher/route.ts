@@ -3,18 +3,25 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminStorage, getAdminFirestore } from '@/lib/firebase-admin';
 import { sendPaymentValidationEmail } from '@/lib/emails/send-payment-validation';
 
+function paymentMethodLabel(paymentMethod: string): string {
+  if (paymentMethod === 'yape') return 'Yape';
+  if (paymentMethod === 'plin') return 'Plin';
+  if (paymentMethod === 'crypto') return 'Criptomoneda';
+  return paymentMethod;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const voucher = formData.get('voucher') as File;
+    const voucher = formData.get('voucher') as File | null;
     const paymentId = formData.get('paymentId') as string;
     const paymentMethod = formData.get('paymentMethod') as string;
     const amount = formData.get('amount') as string;
     const ticketQuantity = formData.get('ticketQuantity') as string;
 
-    if (!voucher || !paymentId || !paymentMethod) {
+    if (!paymentId || !paymentMethod) {
       return NextResponse.json(
-        { error: 'Faltan campos requeridos (voucher, paymentId, paymentMethod)' },
+        { error: 'Faltan campos requeridos (paymentId, paymentMethod)' },
         { status: 400 }
       );
     }
@@ -35,6 +42,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Pago no encontrado' },
         { status: 404 }
+      );
+    }
+
+    const paymentData = paymentSnap.data() || {};
+    const currentStatus = paymentData.status as string | undefined;
+
+    if (currentStatus !== 'pending') {
+      const message =
+        currentStatus === 'pending_validation'
+          ? 'Tu comprobante ya fue recibido. Está en validación.'
+          : 'Esta participación ya fue procesada.';
+      return NextResponse.json({
+        id: paymentId,
+        status: currentStatus,
+        message,
+        idempotent: true,
+        voucherUrl: paymentData.voucherUrl,
+        paymentMethod: paymentData.paymentMethod ?? paymentMethod,
+      });
+    }
+
+    if (!voucher || typeof (voucher as File).arrayBuffer !== 'function') {
+      return NextResponse.json(
+        { error: 'Faltan campos requeridos (voucher)' },
+        { status: 400 }
       );
     }
 
@@ -61,21 +93,45 @@ export async function POST(request: NextRequest) {
     });
     const voucherUrl = signedUrl;
 
-    const paymentData = paymentSnap.data() || {};
-    const finalAmount = parseFloat(amount || paymentData.amount || '0') || 0;
-    const finalTicketQuantity = parseInt(ticketQuantity || paymentData.ticketQuantity || '1', 10) || 1;
+    const finalAmount = parseFloat(amount || String(paymentData.amount ?? '0')) || 0;
+    const finalTicketQuantity =
+      parseInt(ticketQuantity || String(paymentData.ticketQuantity ?? '1'), 10) || 1;
 
-    await paymentRef.update({
-      status: 'pending_validation',
-      paymentMethod,
-      voucherUrl,
-      voucherUploadedAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
-      amount: finalAmount,
-      ticketQuantity: finalTicketQuantity,
+    let didUpdate = false;
+    await adminFirestore.runTransaction(async (transaction) => {
+      const snap = await transaction.get(paymentRef);
+      if (!snap.exists) {
+        return;
+      }
+      const d = snap.data() || {};
+      if (d.status !== 'pending') {
+        return;
+      }
+      transaction.update(paymentRef, {
+        status: 'pending_validation',
+        paymentMethod,
+        voucherUrl,
+        voucherUploadedAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        amount: finalAmount,
+        ticketQuantity: finalTicketQuantity,
+      });
+      didUpdate = true;
     });
 
-    // Enviar correo de participación registrada al usuario
+    if (!didUpdate) {
+      const fresh = await paymentRef.get();
+      const d = fresh.data() || {};
+      return NextResponse.json({
+        id: paymentId,
+        status: d.status,
+        message: 'Esta participación ya fue registrada anteriormente.',
+        idempotent: true,
+        voucherUrl: d.voucherUrl,
+        paymentMethod: d.paymentMethod ?? paymentMethod,
+      });
+    }
+
     const userId = paymentData.userId as string | undefined;
     if (userId) {
       try {
@@ -91,7 +147,7 @@ export async function POST(request: NextRequest) {
               name: userName,
               ticketQuantity: finalTicketQuantity,
               amount: finalAmount,
-              paymentMethod: paymentMethod === 'yape' ? 'Yape' : paymentMethod === 'plin' ? 'Plin' : paymentMethod,
+              paymentMethod: paymentMethodLabel(paymentMethod),
             });
           } catch (emailErr) {
             console.warn('No se pudo enviar el correo de participación:', emailErr);

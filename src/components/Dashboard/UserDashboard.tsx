@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,8 @@ import { publicRaffleService } from '@/services/public-raffle-service';
 import { productService } from '@/services/product-service';
 import { DeliveryConfirmation } from '@/components/UserPanel/DeliveryConfirmation';
 import type { WinnerInfo } from '@/types/raffle';
+import { getWinnerReceiptStatusDisplay } from '@/lib/winner-receipt-status-display';
+import { formatUsdc, penToUsdc } from '@/lib/pen-usdc-display';
 import styles from './UserDashboard.module.css';
 
 interface Raffle {
@@ -63,6 +65,8 @@ export default function UserDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [ticketQuantity, setTicketQuantity] = useState<{ [raffleId: string]: number }>({});
+  const [checkoutLoadingRaffleId, setCheckoutLoadingRaffleId] = useState<string | null>(null);
+  const purchaseInFlightRef = useRef<Set<string>>(new Set());
   const [expandedTicketsRaffleId, setExpandedTicketsRaffleId] = useState<string | null>(null);
   const [expandedWonRaffleId, setExpandedWonRaffleId] = useState<string | null>(null);
 
@@ -148,6 +152,9 @@ export default function UserDashboard() {
       setError('Solo las cuentas de usuario pueden comprar tickets.');
       return;
     }
+    if (purchaseInFlightRef.current.has(raffleId)) {
+      return;
+    }
     const quantity = ticketQuantity[raffleId] || 1;
     const raffle = activeRaffles.find(r => r.id === raffleId);
     
@@ -167,6 +174,8 @@ export default function UserDashboard() {
       return;
     }
 
+    purchaseInFlightRef.current.add(raffleId);
+    setCheckoutLoadingRaffleId(raffleId);
     try {
       const { firebasePaymentService } = await import('@/services/firebase-payment-service');
       const productValue = raffle.productValue || raffle.product?.value || 0;
@@ -181,6 +190,9 @@ export default function UserDashboard() {
       router.push(`/checkout?paymentId=${payment.id}`);
     } catch (err: any) {
       setError(err.message || 'Error al procesar la compra');
+    } finally {
+      purchaseInFlightRef.current.delete(raffleId);
+      setCheckoutLoadingRaffleId((current) => (current === raffleId ? null : current));
     }
   };
 
@@ -447,16 +459,42 @@ export default function UserDashboard() {
                               <td>🏆 {productName}</td>
                               <td>#{winnerInfo?.ticketNumber ?? '-'}</td>
                               <td>
-                                <span
-                                  className={styles.ticketBadge}
+                                <div
                                   style={{
-                                    backgroundColor: '#059669',
-                                    color: '#fff',
-                                    borderColor: 'transparent',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '6px',
+                                    alignItems: 'flex-start',
+                                    maxWidth: '220px',
                                   }}
                                 >
-                                  Ganado
-                                </span>
+                                  <span
+                                    className={styles.ticketBadge}
+                                    style={{
+                                      backgroundColor: '#059669',
+                                      color: '#fff',
+                                      borderColor: 'transparent',
+                                    }}
+                                  >
+                                    Ganado
+                                  </span>
+                                  {winnerInfo ? (
+                                    <span
+                                      style={{
+                                        fontSize: '11px',
+                                        lineHeight: 1.35,
+                                        color: '#475569',
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {getWinnerReceiptStatusDisplay(winnerInfo).title}
+                                    </span>
+                                  ) : (
+                                    <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                                      Cargando estado…
+                                    </span>
+                                  )}
+                                </div>
                               </td>
                               <td style={{ textAlign: 'right' }}>
                                 <span style={{ fontSize: '12px', color: '#64748b' }}>
@@ -526,6 +564,8 @@ export default function UserDashboard() {
                 const productValue = raffle.productValue || raffle.product?.value || products.find(p => p.id === raffle.productId)?.value || 0;
                 const quantity = ticketQuantity[raffle.id] || 1;
                 const totalPrice = quantity * productValue;
+                const unitUsdc = penToUsdc(productValue);
+                const totalUsdc = penToUsdc(totalPrice);
                 const canBuy = raffle.status === 'active' && availableTickets > 0;
                 const statusLabels: { [key: string]: string } = {
                   'active': 'Activo',
@@ -565,9 +605,28 @@ export default function UserDashboard() {
                       </span>
                     </div>
 
-                    <p className={styles.rafflePrice}>
-                      S/. {productValue.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
+                    <div className={styles.rafflePriceBlock}>
+                      {unitUsdc != null ? (
+                        <>
+                          <p className={styles.rafflePrice}>{formatUsdc(unitUsdc)}</p>
+                          <p className={styles.rafflePriceRef}>
+                            S/.{' '}
+                            {productValue.toLocaleString('es-PE', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </p>
+                        </>
+                      ) : (
+                        <p className={styles.rafflePrice}>
+                          S/.{' '}
+                          {productValue.toLocaleString('es-PE', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </p>
+                      )}
+                    </div>
 
                     <div className={styles.progressSection}>
                       <div className={styles.progressInfo}>
@@ -625,14 +684,39 @@ export default function UserDashboard() {
                             +
                           </button>
                         </div>
-                        <p className={styles.totalPrice}>
-                          Total: S/. {totalPrice.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </p>
+                        <div className={styles.totalPriceBlock}>
+                          {totalUsdc != null ? (
+                            <>
+                              <p className={styles.totalPrice}>
+                                Total: {formatUsdc(totalUsdc)}
+                              </p>
+                              <p className={styles.totalPriceRef}>
+                                S/.{' '}
+                                {totalPrice.toLocaleString('es-PE', {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
+                              </p>
+                            </>
+                          ) : (
+                            <p className={styles.totalPrice}>
+                              Total: S/.{' '}
+                              {totalPrice.toLocaleString('es-PE', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </p>
+                          )}
+                        </div>
                         <button
+                          type="button"
                           onClick={() => handleBuyTickets(raffle.id)}
                           className={styles.buyBtn}
+                          disabled={checkoutLoadingRaffleId === raffle.id}
                         >
-                          Comprar Tickets
+                          {checkoutLoadingRaffleId === raffle.id
+                            ? 'Procesando...'
+                            : 'Comprar Tickets'}
                         </button>
                       </div>
                     ) : (

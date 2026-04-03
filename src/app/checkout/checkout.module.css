@@ -211,6 +211,14 @@
   letter-spacing: -0.02em;
 }
 
+.summaryRateNote {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
 /* Payment Methods */
 .methodsContainer {
   display: grid;
@@ -491,6 +499,19 @@
   letter-spacing: 1px;
 }
 
+.walletRow {
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.walletValue {
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: break-all;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
 .copyBtn {
   width: 44px;
   height: 44px;
@@ -567,6 +588,33 @@
   font-size: 36px;
   font-weight: 800;
   letter-spacing: -0.02em;
+}
+
+.amountRefLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-top: 16px;
+  margin-bottom: 4px;
+  opacity: 0.85;
+}
+
+.amountRefValue {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.amountRateHint {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 14px 0 0 0;
+  opacity: 0.88;
+  font-weight: 500;
 }
 
 .infoBox {
