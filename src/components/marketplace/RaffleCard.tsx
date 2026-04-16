@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Raffle, RaffleStatus } from '@/types/raffle';
+import { participationUnitAdminDisplay } from '@/lib/pen-usdc-display';
 import styles from './RaffleCard.module.css';
 
 interface RaffleCardProps {
@@ -45,6 +46,12 @@ const RaffleCard: React.FC<RaffleCardProps> = ({ raffle }) => {
 
   // Determinar si está disponible para compra
   const isAvailable = raffle.status === RaffleStatus.ACTIVE && availableTickets > 0;
+
+  const unitDisp = participationUnitAdminDisplay({
+    ticketUnitUsdc: raffle.ticketUnitUsdc,
+    productValue: Number(raffle.productValue),
+    solesPerUsdcAtApproval: raffle.solesPerUsdcAtApproval,
+  });
 
   return (
     <Link href={`/sorteos/${raffle.id}`}>
@@ -91,9 +98,26 @@ const RaffleCard: React.FC<RaffleCardProps> = ({ raffle }) => {
 
           {/* Value */}
           <div className={styles.value}>
-            <span className={styles.valueLabel}>Unidad de participación</span>
+            <span className={styles.valueLabel}>Unidad de participación en USDC</span>
             <div className={styles.valueAmount}>
-              S/. {raffle.productValue.toFixed(2)}
+              {unitDisp.usdcFormatted != null ? (
+                <>
+                  <span style={{ display: 'block' }}>{unitDisp.usdcFormatted}</span>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: '0.85em',
+                      fontWeight: 500,
+                      color: 'var(--muted, #64748b)',
+                      marginTop: 4,
+                    }}
+                  >
+                    {unitDisp.solesTicketLine}
+                  </span>
+                </>
+              ) : (
+                unitDisp.solesTicketLine
+              )}
             </div>
           </div>
 

@@ -15,7 +15,7 @@ import { productService } from '@/services/product-service';
 import { DeliveryConfirmation } from '@/components/UserPanel/DeliveryConfirmation';
 import type { WinnerInfo } from '@/types/raffle';
 import { getWinnerReceiptStatusDisplay } from '@/lib/winner-receipt-status-display';
-import { formatUsdc, penToUsdc } from '@/lib/pen-usdc-display';
+import { formatUsdc, participationUnitAdminDisplay, penToUsdc } from '@/lib/pen-usdc-display';
 import styles from './UserDashboard.module.css';
 
 interface Raffle {
@@ -34,6 +34,8 @@ interface Raffle {
   createdAt: string | Date;
   productValue?: number;
   winnerTicketId?: string;
+  solesPerUsdcAtApproval?: number;
+  ticketUnitUsdc?: number;
 }
 
 interface RaffleTicket {
@@ -562,10 +564,20 @@ export default function UserDashboard() {
                 const progress = raffle.totalTickets > 0 ? (raffle.soldTickets / raffle.totalTickets) * 100 : 0;
                 const productName = raffle.product?.name || products.find(p => p.id === raffle.productId)?.name || 'Producto desconocido';
                 const productValue = raffle.productValue || raffle.product?.value || products.find(p => p.id === raffle.productId)?.value || 0;
+                const productValueNum = Number(productValue);
                 const quantity = ticketQuantity[raffle.id] || 1;
                 const totalPrice = quantity * productValue;
-                const unitUsdc = penToUsdc(productValue);
-                const totalUsdc = penToUsdc(totalPrice);
+                const unitDisp = participationUnitAdminDisplay({
+                  ticketUnitUsdc: raffle.ticketUnitUsdc,
+                  productValue: productValueNum,
+                  solesPerUsdcAtApproval: raffle.solesPerUsdcAtApproval,
+                });
+                const totalUsdcNum =
+                  raffle.ticketUnitUsdc != null &&
+                  Number.isFinite(Number(raffle.ticketUnitUsdc)) &&
+                  Number(raffle.ticketUnitUsdc) > 0
+                    ? quantity * Number(raffle.ticketUnitUsdc)
+                    : penToUsdc(totalPrice, raffle.solesPerUsdcAtApproval);
                 const canBuy = raffle.status === 'active' && availableTickets > 0;
                 const statusLabels: { [key: string]: string } = {
                   'active': 'Activo',
@@ -606,25 +618,25 @@ export default function UserDashboard() {
                     </div>
 
                     <div className={styles.rafflePriceBlock}>
-                      {unitUsdc != null ? (
+                      <p
+                        style={{
+                          fontSize: 12,
+                          color: '#64748b',
+                          margin: '0 0 6px 0',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
+                        }}
+                      >
+                        Unidad de participación en USDC
+                      </p>
+                      {unitDisp.usdcFormatted != null ? (
                         <>
-                          <p className={styles.rafflePrice}>{formatUsdc(unitUsdc)}</p>
-                          <p className={styles.rafflePriceRef}>
-                            S/.{' '}
-                            {productValue.toLocaleString('es-PE', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </p>
+                          <p className={styles.rafflePrice}>{unitDisp.usdcFormatted}</p>
+                          <p className={styles.rafflePriceRef}>{unitDisp.solesTicketLine}</p>
                         </>
                       ) : (
-                        <p className={styles.rafflePrice}>
-                          S/.{' '}
-                          {productValue.toLocaleString('es-PE', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </p>
+                        <p className={styles.rafflePrice}>{unitDisp.solesTicketLine}</p>
                       )}
                     </div>
 
@@ -685,10 +697,10 @@ export default function UserDashboard() {
                           </button>
                         </div>
                         <div className={styles.totalPriceBlock}>
-                          {totalUsdc != null ? (
+                          {totalUsdcNum != null ? (
                             <>
                               <p className={styles.totalPrice}>
-                                Total: {formatUsdc(totalUsdc)}
+                                Total: {formatUsdc(totalUsdcNum)}
                               </p>
                               <p className={styles.totalPriceRef}>
                                 S/.{' '}

@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/auth-store';
 import styles from './shop-panel.module.css';
 import { StatusBadge } from './StatusBadge';
 import { getOrganizerClosureDisplay } from '@/lib/organizer-raffle-closure-display';
+import { participationUnitAdminDisplay } from '@/lib/pen-usdc-display';
 import { WinnerValidation } from './WinnerValidation';
 import { DeliveryEvidenceUpload } from './DeliveryEvidenceUpload';
 
@@ -211,6 +212,26 @@ export function RaffleDetail({ raffleId }: RaffleDetailProps) {
               <StatusBadge status={raffle.status} />
             </div>
           </div>
+          {raffle.status !== RaffleStatus.DRAFT && raffle.status !== RaffleStatus.PENDING_APPROVAL && (
+            <div className={styles.raffleDetailItem}>
+              <div className={styles.raffleDetailItemLabel}>Unidad de participación en USDC</div>
+              <div className={styles.raffleDetailItemValue}>
+                {(() => {
+                  const u = participationUnitAdminDisplay({
+                    ticketUnitUsdc: raffle.ticketUnitUsdc,
+                    productValue: Number(raffle.productValue),
+                    solesPerUsdcAtApproval: raffle.solesPerUsdcAtApproval,
+                  });
+                  return (
+                    <>
+                      <div>{u.usdcFormatted ?? '—'}</div>
+                      <div style={{ fontSize: '0.9em', color: '#64748b', marginTop: 4 }}>{u.solesTicketLine}</div>
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
           <div className={styles.raffleDetailItem}>
             <div className={styles.raffleDetailItemLabel}>Creado</div>
             <div className={styles.raffleDetailItemValue}>

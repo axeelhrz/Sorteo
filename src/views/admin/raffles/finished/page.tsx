@@ -4,7 +4,17 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FiCheck, FiCircle, FiUpload, FiX, FiExternalLink } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
+import { participationUnitAdminDisplay } from '@/lib/pen-usdc-display';
 import styles from '@/views/admin/admin.module.css';
+
+function formatDeliveryEnvio(product?: { hasDelivery?: boolean; deliveryCost?: number }): string {
+  if (!product) return '—';
+  const c = Number(product.deliveryCost ?? 0);
+  const withDelivery = product.hasDelivery === true || c > 0;
+  if (!withDelivery) return '—';
+  if (!Number.isFinite(c) || c < 0) return '—';
+  return `S/. ${c.toFixed(2)}`;
+}
 
 interface WinnerInfo {
   userId?: string;
@@ -25,7 +35,7 @@ interface WinnerInfo {
 interface Raffle {
   id: string;
   shop: { id: string; name: string };
-  product: { id: string; name: string; value?: number; deliveryCost?: number };
+  product: { id: string; name: string; value?: number; deliveryCost?: number; hasDelivery?: boolean };
   productValue: number;
   totalTickets: number;
   soldTickets: number;
@@ -36,6 +46,8 @@ interface Raffle {
   tickets: any[];
   paymentToOrganizerAt?: string | Date;
   paymentEvidenceUrl?: string;
+  solesPerUsdcAtApproval?: number;
+  ticketUnitUsdc?: number;
 }
 
 export default function FinishedRaffles() {
@@ -165,6 +177,15 @@ export default function FinishedRaffles() {
     );
   }
 
+  const detailParticipationUnit =
+    selectedRaffle == null
+      ? null
+      : participationUnitAdminDisplay({
+          ticketUnitUsdc: selectedRaffle.ticketUnitUsdc,
+          productValue: selectedRaffle.productValue,
+          solesPerUsdcAtApproval: selectedRaffle.solesPerUsdcAtApproval,
+        });
+
   return (
     <div className={styles.finishedPage}>
       <div className={styles.finishedPageHeader}>
@@ -207,7 +228,8 @@ export default function FinishedRaffles() {
                   <th className={styles.finishedTh}>Organizador</th>
                   <th className={styles.finishedTh}>Oportunidad</th>
                   <th className={styles.finishedTh}>Valor</th>
-                  <th className={styles.finishedTh}>Unidad</th>
+                  <th className={styles.finishedTh}>Delivery / envío</th>
+                  <th className={styles.finishedTh}>Unidad (USDC)</th>
                   <th className={styles.finishedTh}>Tickets</th>
                   <th className={styles.finishedTh}>Ticket ganador</th>
                   <th className={styles.finishedTh}>Nombre de usuario</th>
@@ -219,7 +241,11 @@ export default function FinishedRaffles() {
               <tbody>
                 {raffles.map((raffle) => {
                   const valorProducto = raffle.product?.value != null ? Math.round(Number(raffle.product.value)) : null;
-                  const unidadDisplay = Math.round(Number(raffle.productValue));
+                  const unitDisp = participationUnitAdminDisplay({
+                    ticketUnitUsdc: raffle.ticketUnitUsdc,
+                    productValue: raffle.productValue,
+                    solesPerUsdcAtApproval: raffle.solesPerUsdcAtApproval,
+                  });
                   return (
                   <tr key={raffle.id} className={styles.finishedRow}>
                     <td className={styles.finishedTdOrg}>{raffle.shop.name}</td>
@@ -227,8 +253,14 @@ export default function FinishedRaffles() {
                     <td className={styles.finishedTdValue}>
                       {valorProducto != null ? `S/. ${valorProducto.toLocaleString('es-PE')}` : '—'}
                     </td>
+                    <td className={styles.finishedTdValue}>{formatDeliveryEnvio(raffle.product)}</td>
                     <td className={styles.finishedTdValue}>
-                      S/. {unidadDisplay.toLocaleString('es-PE')}
+                      <span style={{ display: 'block', fontWeight: 600, color: '#334155' }}>
+                        {unitDisp.usdcFormatted ?? '—'}
+                      </span>
+                      <span style={{ display: 'block', fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+                        {unitDisp.solesTicketLine}
+                      </span>
                     </td>
                     <td className={styles.finishedTdTickets}>
                       <span className={styles.ticketsCount}>
@@ -338,16 +370,25 @@ export default function FinishedRaffles() {
                   </p>
                 </div>
                 <div className={styles.detailGridItem}>
-                  <label>Costo de delivery</label>
-                  <p className={styles.value}>
-                    {selectedRaffle.product?.deliveryCost != null && selectedRaffle.product.deliveryCost > 0
-                      ? `S/. ${Number(selectedRaffle.product.deliveryCost).toFixed(2)}`
-                      : '—'}
-                  </p>
+                  <label>Valor delivery / envío</label>
+                  <p className={styles.value}>{formatDeliveryEnvio(selectedRaffle.product)}</p>
                 </div>
                 <div className={styles.detailGridItem}>
-                  <label>Unidad (valor de ticket)</label>
-                  <p className={styles.value}>S/. {Math.round(Number(selectedRaffle.productValue)).toLocaleString('es-PE')}</p>
+                  <label>Unidad de participación en USDC</label>
+                  <p className={styles.value}>
+                    {detailParticipationUnit ? (
+                      <>
+                        <span style={{ display: 'block' }}>
+                          {detailParticipationUnit.usdcFormatted ?? '—'}
+                        </span>
+                        <span style={{ display: 'block', fontSize: 13, color: '#64748b', marginTop: 4 }}>
+                          Referencia ticket: {detailParticipationUnit.solesTicketLine}
+                        </span>
+                      </>
+                    ) : (
+                      '—'
+                    )}
+                  </p>
                 </div>
                 <div className={styles.detailGridItem}>
                   <label>Tickets Vendidos</label>

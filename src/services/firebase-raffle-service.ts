@@ -109,6 +109,14 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
       : undefined,
     organizerPaymentConfirmedBy:
       typeof data.organizerPaymentConfirmedBy === 'string' ? data.organizerPaymentConfirmedBy : undefined,
+    solesPerUsdcAtApproval:
+      typeof data.solesPerUsdcAtApproval === 'number' && Number.isFinite(data.solesPerUsdcAtApproval)
+        ? data.solesPerUsdcAtApproval
+        : undefined,
+    ticketUnitUsdc:
+      typeof data.ticketUnitUsdc === 'number' && Number.isFinite(data.ticketUnitUsdc)
+        ? data.ticketUnitUsdc
+        : undefined,
   };
 
   // Cargar relaciones si existen

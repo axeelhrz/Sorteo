@@ -51,6 +51,14 @@ const convertRaffleDoc = async (docSnap: QueryDocumentSnapshot<DocumentData>): P
       : undefined,
     organizerPaymentConfirmedBy:
       typeof data.organizerPaymentConfirmedBy === 'string' ? data.organizerPaymentConfirmedBy : undefined,
+    solesPerUsdcAtApproval:
+      typeof data.solesPerUsdcAtApproval === 'number' && Number.isFinite(data.solesPerUsdcAtApproval)
+        ? data.solesPerUsdcAtApproval
+        : undefined,
+    ticketUnitUsdc:
+      typeof data.ticketUnitUsdc === 'number' && Number.isFinite(data.ticketUnitUsdc)
+        ? data.ticketUnitUsdc
+        : undefined,
     winnerInfo: data.winnerInfo,
   };
 };
@@ -153,13 +161,23 @@ export const firebaseRaffleWriteService = {
    */
   async approveRaffle(
     id: string,
-    params: { costPerTicket: number; totalTickets: number }
+    params: { exchangeRateSolesPerUsdc: number; ticketUnitUsdc: number; totalTickets: number }
   ): Promise<Raffle> {
     try {
+      const rate = Number(params.exchangeRateSolesPerUsdc);
+      const unitUsdc = Number(params.ticketUnitUsdc);
+      const totalTickets = Math.floor(Number(params.totalTickets));
+      if (!Number.isFinite(rate) || rate <= 0) throw new Error('Tipo de cambio inválido');
+      if (!Number.isFinite(unitUsdc) || unitUsdc <= 0) throw new Error('Unidad USDC inválida');
+      if (!Number.isFinite(totalTickets) || totalTickets < 1) throw new Error('Número de tickets inválido');
+      const productValuePen = Math.round(unitUsdc * rate * 100) / 100;
+
       const raffleRef = doc(db, 'raffles', id);
       await updateDoc(raffleRef, {
-        productValue: params.costPerTicket,
-        totalTickets: params.totalTickets,
+        productValue: productValuePen,
+        totalTickets,
+        solesPerUsdcAtApproval: rate,
+        ticketUnitUsdc: unitUsdc,
         status: RaffleStatus.ACTIVE,
         updatedAt: serverTimestamp(),
         activatedAt: serverTimestamp(),

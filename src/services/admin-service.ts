@@ -85,7 +85,14 @@ export const adminService = {
     return callAdminSecure('getUserData', { userId });
   },
 
-  async getRaffleData(raffleId: string): Promise<{ name: string; costPerTicket?: number }> {
+  async getRaffleData(
+    raffleId: string
+  ): Promise<{
+    name: string;
+    costPerTicket?: number;
+    solesPerUsdcAtApproval?: number;
+    ticketUnitUsdc?: number;
+  }> {
     return callAdminSecure('getRaffleData', { raffleId });
   },
 
@@ -117,7 +124,8 @@ export const adminService = {
   async approveRaffle(raffleId: string, params: ApproveRaffleParams) {
     await callAdminSecure('approveRaffle', {
       raffleId,
-      costPerTicket: params.costPerTicket,
+      exchangeRateSolesPerUsdc: params.exchangeRateSolesPerUsdc,
+      ticketUnitUsdc: params.ticketUnitUsdc,
       totalTickets: params.totalTickets,
     });
   },

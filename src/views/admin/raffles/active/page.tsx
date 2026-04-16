@@ -4,17 +4,29 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FiSearch, FiPlay, FiTrash2, FiTrendingUp, FiCheckCircle, FiExternalLink } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
+import { participationUnitAdminDisplay } from '@/lib/pen-usdc-display';
 import styles from '@/views/admin/admin.module.css';
 
 interface Raffle {
   id: string;
   shop: { id: string; name: string };
-  product: { id: string; name: string; value?: number };
+  product: { id: string; name: string; value?: number; hasDelivery?: boolean; deliveryCost?: number };
   productValue: number;
   totalTickets: number;
   soldTickets: number;
   activatedAt: string;
   status: string;
+  solesPerUsdcAtApproval?: number;
+  ticketUnitUsdc?: number;
+}
+
+function formatDeliveryEnvio(product?: Raffle['product']): string {
+  if (!product) return '—';
+  const c = Number(product.deliveryCost ?? 0);
+  const withDelivery = product.hasDelivery === true || c > 0;
+  if (!withDelivery) return '—';
+  if (!Number.isFinite(c) || c < 0) return '—';
+  return `S/. ${c.toFixed(2)}`;
 }
 
 export default function ActiveRaffles() {
@@ -164,7 +176,8 @@ export default function ActiveRaffles() {
                   <th>Organizador</th>
                   <th>Oportunidad</th>
                   <th>Valor</th>
-                  <th>Unidad</th>
+                  <th>Delivery / envío</th>
+                  <th>Unidad (USDC)</th>
                   <th>Tickets</th>
                   <th>Progreso</th>
                   <th>Activo desde</th>
@@ -175,6 +188,11 @@ export default function ActiveRaffles() {
                 {raffles.map((raffle) => {
                   const progress = getProgressPercentage(raffle.soldTickets, raffle.totalTickets);
                   const valorProducto = raffle.product?.value != null ? Math.round(Number(raffle.product.value)) : null;
+                  const unitDisp = participationUnitAdminDisplay({
+                    ticketUnitUsdc: raffle.ticketUnitUsdc,
+                    productValue: raffle.productValue,
+                    solesPerUsdcAtApproval: raffle.solesPerUsdcAtApproval,
+                  });
                   return (
                     <tr key={raffle.id}>
                       <td>
@@ -191,7 +209,15 @@ export default function ActiveRaffles() {
                         )}
                       </td>
                       <td>
-                        <span className={styles.activeValue}>S/. {raffle.productValue.toFixed(2)}</span>
+                        <span className={styles.activeValue}>{formatDeliveryEnvio(raffle.product)}</span>
+                      </td>
+                      <td>
+                        <span className={styles.activeValue} style={{ display: 'block' }}>
+                          {unitDisp.usdcFormatted ?? '—'}
+                        </span>
+                        <span style={{ display: 'block', fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+                          {unitDisp.solesTicketLine}
+                        </span>
                       </td>
                       <td>
                         <span style={{ fontWeight: 600, color: '#334155' }}>{raffle.soldTickets}</span>

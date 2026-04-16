@@ -37,7 +37,15 @@ async function fetchRaffleData(raffleId: string) {
     }
   }
   const costPerTicket = data.productValue ?? data.costPerTicket;
-  return { name, costPerTicket };
+  const solesPerUsdcAtApproval =
+    typeof data.solesPerUsdcAtApproval === 'number' && Number.isFinite(data.solesPerUsdcAtApproval)
+      ? data.solesPerUsdcAtApproval
+      : undefined;
+  const ticketUnitUsdc =
+    typeof data.ticketUnitUsdc === 'number' && Number.isFinite(data.ticketUnitUsdc)
+      ? data.ticketUnitUsdc
+      : undefined;
+  return { name, costPerTicket, solesPerUsdcAtApproval, ticketUnitUsdc };
 }
 
 async function fetchRaffleDataWithShop(raffleId: string) {
@@ -317,11 +325,31 @@ export const adminSecureService = {
     return { data: enriched, total: raffles.length };
   },
 
-  async approveRaffle(raffleId: string, params: { costPerTicket: number; totalTickets: number }) {
+  async approveRaffle(
+    raffleId: string,
+    params: { exchangeRateSolesPerUsdc: number; ticketUnitUsdc: number; totalTickets: number }
+  ) {
+    const rate = Number(params.exchangeRateSolesPerUsdc);
+    const unitUsdc = Number(params.ticketUnitUsdc);
+    const totalTickets = Math.floor(Number(params.totalTickets));
+    if (!Number.isFinite(rate) || rate <= 0) {
+      throw new Error('Tipo de cambio inválido: debe ser soles por 1 USDC y mayor que 0');
+    }
+    if (!Number.isFinite(unitUsdc) || unitUsdc <= 0) {
+      throw new Error('Unidad de participación USDC inválida');
+    }
+    if (!Number.isFinite(totalTickets) || totalTickets < 1) {
+      throw new Error('El número de tickets debe ser al menos 1');
+    }
+
+    const productValuePen = Math.round(unitUsdc * rate * 100) / 100;
+
     const raffleRef = adminDb.collection('raffles').doc(raffleId);
     await raffleRef.update({
-      productValue: params.costPerTicket,
-      totalTickets: params.totalTickets,
+      productValue: productValuePen,
+      totalTickets,
+      solesPerUsdcAtApproval: rate,
+      ticketUnitUsdc: unitUsdc,
       status: 'active',
       updatedAt: FieldValue.serverTimestamp(),
       activatedAt: FieldValue.serverTimestamp(),

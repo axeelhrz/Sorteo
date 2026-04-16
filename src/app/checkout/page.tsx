@@ -4,7 +4,9 @@ import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FiCopy, FiCheck, FiX, FiUpload, FiCheckCircle } from 'react-icons/fi';
 import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
-import { formatUsdc, penToUsdc, solesPerUsdc } from '@/lib/pen-usdc-display';
+import { publicRaffleService } from '@/services/public-raffle-service';
+import { Raffle } from '@/types/raffle';
+import { formatUsdc, penToUsdc, resolveSolesPerUsdc } from '@/lib/pen-usdc-display';
 import styles from './checkout.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -20,6 +22,7 @@ function CheckoutContent() {
   const paymentId = searchParams.get('paymentId');
 
   const [payment, setPayment] = useState<Payment | null>(null);
+  const [checkoutRaffle, setCheckoutRaffle] = useState<Raffle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -50,6 +53,25 @@ function CheckoutContent() {
 
     fetchPayment();
   }, [paymentId]);
+
+  useEffect(() => {
+    if (!payment?.raffleId) {
+      setCheckoutRaffle(null);
+      return;
+    }
+    let cancelled = false;
+    publicRaffleService
+      .getRaffleById(payment.raffleId)
+      .then((r) => {
+        if (!cancelled) setCheckoutRaffle(r);
+      })
+      .catch(() => {
+        if (!cancelled) setCheckoutRaffle(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [payment?.raffleId]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -180,8 +202,8 @@ function CheckoutContent() {
   }
 
   const amountPen = Number(payment.amount);
-  const amountUsdc = penToUsdc(amountPen);
-  const rateConfigured = solesPerUsdc() != null;
+  const amountUsdc = penToUsdc(amountPen, checkoutRaffle?.solesPerUsdcAtApproval);
+  const rateConfigured = resolveSolesPerUsdc(checkoutRaffle?.solesPerUsdcAtApproval) != null;
 
   return (
     <div className={styles.pageWrapper}>
@@ -222,7 +244,7 @@ function CheckoutContent() {
             )}
             {!rateConfigured ? (
               <p className={styles.summaryRateNote}>
-                Tipo de cambio USDC no configurado: se muestra solo el monto en soles.
+                Sin tipo de cambio (ni en la oportunidad ni en la plataforma): se muestra solo el monto en soles.
               </p>
             ) : null}
           </div>
@@ -287,7 +309,9 @@ function CheckoutContent() {
                         <span className={styles.amountRefLabel}>Referencia en soles</span>
                         <span className={styles.amountRefValue}>S/ {amountPen.toFixed(2)}</span>
                         <p className={styles.amountRateHint}>
-                          Tipo de cambio configurado por la plataforma (soles por 1 USDC), no es cotización en tiempo real.
+                          {checkoutRaffle?.solesPerUsdcAtApproval != null
+                            ? 'Tipo de cambio guardado al aprobar la oportunidad (soles por 1 USDC), no es cotización en tiempo real.'
+                            : 'Tipo de cambio configurado por la plataforma (soles por 1 USDC), no es cotización en tiempo real.'}
                         </p>
                       </>
                     ) : (

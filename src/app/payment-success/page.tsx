@@ -74,7 +74,7 @@ function PaymentSuccessContent() {
   }
 
   const amountPen = Number(payment.amount);
-  const amountUsdc = penToUsdc(amountPen);
+  const amountUsdc = penToUsdc(amountPen, raffle?.solesPerUsdcAtApproval);
 
   return (
     <div className={styles.container}>

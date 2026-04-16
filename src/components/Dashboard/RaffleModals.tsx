@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { FiAlertTriangle, FiCheck } from 'react-icons/fi';
 import { Raffle, RaffleStatus, WinnerInfo } from '@/types/raffle';
 import { getOrganizerClosureDisplay } from '@/lib/organizer-raffle-closure-display';
+import { participationUnitAdminDisplay } from '@/lib/pen-usdc-display';
 import { WinnerValidation } from '@/components/ShopPanel/WinnerValidation';
 import { DeliveryEvidenceUpload } from '@/components/ShopPanel/DeliveryEvidenceUpload';
 import styles from './StoreDashboard.module.css';
@@ -165,6 +166,30 @@ export default function RaffleModals({
                       })()}
                   </div>
                 </div>
+
+                {/* Unidad de participación (tras aprobación / activación) */}
+                {viewModal.raffle.status !== 'draft' && viewModal.raffle.status !== 'pending_approval' && (
+                  <div>
+                    <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: '12px' }}>
+                      Unidad de participación en USDC
+                    </h3>
+                    {(() => {
+                      const u = participationUnitAdminDisplay({
+                        ticketUnitUsdc: viewModal.raffle.ticketUnitUsdc,
+                        productValue: Number(viewModal.raffle.productValue),
+                        solesPerUsdcAtApproval: viewModal.raffle.solesPerUsdcAtApproval,
+                      });
+                      return (
+                        <div style={{ margin: 0 }}>
+                          <p style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>
+                            {u.usdcFormatted ?? '—'}
+                          </p>
+                          <p style={{ margin: '6px 0 0 0', fontSize: '13px', color: '#64748b' }}>{u.solesTicketLine}</p>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
 
                 {/* Tickets (no se muestra mientras está pendiente de aprobación) */}
                 <div>

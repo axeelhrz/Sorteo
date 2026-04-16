@@ -128,6 +128,14 @@ export async function GET(
       updatedAt: convertTimestamp(data.updatedAt),
       activatedAt: data.activatedAt ? convertTimestamp(data.activatedAt) : undefined,
       raffleExecutedAt: data.raffleExecutedAt ? convertTimestamp(data.raffleExecutedAt) : undefined,
+      solesPerUsdcAtApproval:
+        typeof data.solesPerUsdcAtApproval === 'number' && Number.isFinite(data.solesPerUsdcAtApproval)
+          ? data.solesPerUsdcAtApproval
+          : undefined,
+      ticketUnitUsdc:
+        typeof data.ticketUnitUsdc === 'number' && Number.isFinite(data.ticketUnitUsdc)
+          ? data.ticketUnitUsdc
+          : undefined,
       shop,
       product,
     };

@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/auth-store';
 import { UserRole } from '@/types/auth';
 import { firebasePaymentService } from '@/services/firebase-payment-service';
-import { formatUsdc, penToUsdc } from '@/lib/pen-usdc-display';
+import { formatUsdc, participationUnitAdminDisplay, penToUsdc } from '@/lib/pen-usdc-display';
 import styles from './BuyTicketsBlock.module.css';
 
 interface BuyTicketsBlockProps {
@@ -31,8 +31,20 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
   const availableTickets = raffle.totalTickets - raffle.soldTickets;
   const pricePerTicket = Number(raffle.productValue);
   const totalPrice = quantity * pricePerTicket;
-  const unitUsdc = penToUsdc(pricePerTicket);
-  const totalUsdc = penToUsdc(totalPrice);
+  const rate = raffle.solesPerUsdcAtApproval;
+  const unitDisp = participationUnitAdminDisplay({
+    ticketUnitUsdc: raffle.ticketUnitUsdc,
+    productValue: pricePerTicket,
+    solesPerUsdcAtApproval: rate,
+  });
+  const totalUsdcNum =
+    raffle.ticketUnitUsdc != null &&
+    Number.isFinite(Number(raffle.ticketUnitUsdc)) &&
+    Number(raffle.ticketUnitUsdc) > 0
+      ? quantity * Number(raffle.ticketUnitUsdc)
+      : penToUsdc(totalPrice, rate);
+  const totalUsdcFormatted =
+    totalUsdcNum != null && Number.isFinite(totalUsdcNum) ? formatUsdc(totalUsdcNum) : null;
 
   // Validaciones de cantidad
   const isQuantityValid = quantity > 0 && quantity <= availableTickets;
@@ -149,15 +161,15 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
           <span className={styles.value}>{availableTickets}</span>
         </div>
         <div className={styles.infoItem}>
-          <span className={styles.label}>Unidad de participación:</span>
+          <span className={styles.label}>Unidad de participación en USDC</span>
           <span className={styles.valueStack}>
-            {unitUsdc != null ? (
+            {unitDisp.usdcFormatted != null ? (
               <>
-                <span className={styles.value}>{formatUsdc(unitUsdc)}</span>
-                <span className={styles.valueRef}>S/. {pricePerTicket.toFixed(2)}</span>
+                <span className={styles.value}>{unitDisp.usdcFormatted}</span>
+                <span className={styles.valueRef}>{unitDisp.solesTicketLine}</span>
               </>
             ) : (
-              <span className={styles.value}>S/. {pricePerTicket.toFixed(2)}</span>
+              <span className={styles.value}>{unitDisp.solesTicketLine}</span>
             )}
           </span>
         </div>
@@ -210,9 +222,9 @@ export const BuyTicketsBlock: React.FC<BuyTicketsBlockProps> = ({
         <div className={styles.subtotalRow}>
           <span>Subtotal ({quantity} tickets):</span>
           <span className={styles.subtotalValueStack}>
-            {totalUsdc != null ? (
+            {totalUsdcFormatted != null ? (
               <>
-                <span className={styles.subtotalValue}>{formatUsdc(totalUsdc)}</span>
+                <span className={styles.subtotalValue}>{totalUsdcFormatted}</span>
                 <span className={styles.subtotalRef}>S/. {totalPrice.toFixed(2)}</span>
               </>
             ) : (

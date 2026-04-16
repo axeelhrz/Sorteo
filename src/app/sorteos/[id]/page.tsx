@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Raffle, RaffleStatus } from '@/types/raffle';
 import { BuyTicketsBlock } from '@/components/marketplace/BuyTicketsBlock';
 import { getOrganizerSocialDisplayItems } from '@/lib/organizer-social-display';
-import { formatUsdc, penToUsdc } from '@/lib/pen-usdc-display';
+import { participationUnitAdminDisplay } from '@/lib/pen-usdc-display';
 import styles from './detail.module.css';
 
 export default function RaffleDetailPage() {
@@ -156,7 +156,11 @@ export default function RaffleDetailPage() {
   const isFinished = raffle.status === RaffleStatus.FINISHED;
   const isPaused = raffle.status === RaffleStatus.PAUSED;
   const unitParticipationPen = Number(raffle.productValue);
-  const unitParticipationUsdc = penToUsdc(unitParticipationPen);
+  const unitParticipationDisp = participationUnitAdminDisplay({
+    ticketUnitUsdc: raffle.ticketUnitUsdc,
+    productValue: unitParticipationPen,
+    solesPerUsdcAtApproval: raffle.solesPerUsdcAtApproval,
+  });
 
   return (
     <main className={styles.container}>
@@ -260,15 +264,15 @@ export default function RaffleDetailPage() {
 
           {/* Unit of participation */}
           <div className={styles.valueBox}>
-            <span className={styles.valueLabel}>Unidad de participación</span>
+            <span className={styles.valueLabel}>Unidad de participación en USDC</span>
             <div className={styles.valueAmountBlock}>
-              {unitParticipationUsdc != null ? (
+              {unitParticipationDisp.usdcFormatted != null ? (
                 <>
-                  <span className={styles.valueAmount}>{formatUsdc(unitParticipationUsdc)}</span>
-                  <span className={styles.valueAmountRef}>≈ S/ {unitParticipationPen.toFixed(2)}</span>
+                  <span className={styles.valueAmount}>{unitParticipationDisp.usdcFormatted}</span>
+                  <span className={styles.valueAmountRef}>{unitParticipationDisp.solesTicketLine}</span>
                 </>
               ) : (
-                <span className={styles.valueAmount}>S/ {unitParticipationPen.toFixed(2)}</span>
+                <span className={styles.valueAmount}>{unitParticipationDisp.solesTicketLine}</span>
               )}
             </div>
           </div>

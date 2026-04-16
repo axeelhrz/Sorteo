@@ -39,6 +39,10 @@ export interface Raffle {
   organizerPaymentConfirmedBy?: string;
   shop?: Shop;
   product?: Product;
+  /** Soles por 1 USDC fijados al aprobar la oportunidad (si existe, la UI USDC debe usar este valor) */
+  solesPerUsdcAtApproval?: number;
+  /** Unidad de participación en USDC definida al aprobar */
+  ticketUnitUsdc?: number;
 }
 
 export interface CreateRaffleDto {
@@ -59,8 +63,11 @@ export interface UpdateRaffleDto {
 
 /** Parámetros que el admin define al aprobar una oportunidad */
 export interface ApproveRaffleParams {
-  costPerTicket: number; // Costo por ticket (S/.)
-  totalTickets: number;   // Número de tickets
+  /** Soles por 1 USDC (misma noción que NEXT_PUBLIC_SOLES_PER_USDC) */
+  exchangeRateSolesPerUsdc: number;
+  /** Valor por ticket en USDC */
+  ticketUnitUsdc: number;
+  totalTickets: number;
 }
 
 export interface RaffleWithRelations extends Raffle {

@@ -4,12 +4,12 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { adminService } from '@/services/admin-service';
+import { solesPerUsdc } from '@/lib/pen-usdc-display';
 
-/** Costo por ticket por defecto según valor del producto: 0-50 → S/1, 50.01-100 → S/2, 100.1+ → S/5 */
-function defaultCostPerTicket(productValue: number): number {
-  if (productValue <= 50) return 1;
-  if (productValue <= 100) return 2;
-  return 5;
+/** Unidad de participación (USDC) por defecto según valor declarado del producto en soles: 0–100 → 1 USDC, >100 → 2 USDC */
+function defaultTicketUnitUsdc(productValueSoles: number): number {
+  if (productValueSoles <= 100) return 1;
+  return 2;
 }
 
 /** Formatea el valor declarado para mostrar: evita artefactos de coma flotante (ej. 34.98 cuando el organizador declaró 35) */
@@ -20,16 +20,18 @@ function formatDeclaredValue(val: number): string {
   return rounded.toFixed(2);
 }
 
-/** Número de tickets por defecto: ceil((valor producto + costo delivery) * ratio / costo por ticket) — se redondea al superior */
+/** ceil(((producto + delivery) / tipoCambio) * (ratio / unidadUsdc)) — tipoCambio = soles por 1 USDC */
 function defaultNumberOfTickets(
   productValue: number,
   deliveryCost: number,
   ratio: number,
-  costPerTicket: number
+  ticketUnitUsdc: number,
+  exchangeRateSolesPerUsdc: number
 ): number {
-  const totalBase = productValue + (deliveryCost || 0);
-  if (costPerTicket <= 0) return 0;
-  return Math.ceil((totalBase * ratio) / costPerTicket);
+  const totalBasePen = productValue + (deliveryCost || 0);
+  if (ticketUnitUsdc <= 0 || exchangeRateSolesPerUsdc <= 0) return 0;
+  const usdcBase = totalBasePen / exchangeRateSolesPerUsdc;
+  return Math.ceil(usdcBase * (ratio / ticketUnitUsdc));
 }
 
 interface Raffle {
@@ -69,7 +71,8 @@ export default function PendingRafflesPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   // Campos editables por admin al aprobar
-  const [costPerTicket, setCostPerTicket] = useState(1);
+  const [exchangeRateSolesPerUsdc, setExchangeRateSolesPerUsdc] = useState(0);
+  const [ticketUnitUsdc, setTicketUnitUsdc] = useState(1);
   const [ratio, setRatio] = useState(2);
   const [numberOfTickets, setNumberOfTickets] = useState(0);
 
@@ -97,11 +100,17 @@ export default function PendingRafflesPage() {
   const openApproveModal = (raffle: Raffle) => {
     const productValue = Number(raffle.product?.value ?? raffle.productValue ?? 0);
     const deliveryCost = Number(raffle.product?.deliveryCost ?? 0);
-    const defaultUnit = defaultCostPerTicket(productValue);
-    const defaultTickets = defaultNumberOfTickets(productValue, deliveryCost, 2, defaultUnit);
+    const envRate = solesPerUsdc();
+    const rate = envRate ?? 0;
+    const defaultUnit = defaultTicketUnitUsdc(productValue);
+    const defaultTickets =
+      rate > 0 && defaultUnit > 0
+        ? defaultNumberOfTickets(productValue, deliveryCost, 2, defaultUnit, rate)
+        : 0;
 
     setSelectedRaffle(raffle);
-    setCostPerTicket(defaultUnit);
+    setExchangeRateSolesPerUsdc(rate);
+    setTicketUnitUsdc(defaultUnit);
     setRatio(2);
     setNumberOfTickets(defaultTickets);
     setShowApproveModal(true);
@@ -113,17 +122,28 @@ export default function PendingRafflesPage() {
     setShowRejectModal(true);
   };
 
-  // Recalcular número de tickets cuando el admin cambia costo o ratio
+  // Recalcular número de tickets cuando el admin cambia tipo de cambio, unidad USDC o ratio
   useEffect(() => {
     if (!selectedRaffle || !showApproveModal) return;
     const productValue = Number(selectedRaffle.product?.value ?? selectedRaffle.productValue ?? 0);
     const deliveryCost = Number(selectedRaffle.product?.deliveryCost ?? 0);
-    const n = costPerTicket > 0 ? defaultNumberOfTickets(productValue, deliveryCost, ratio, costPerTicket) : 0;
+    const n =
+      ticketUnitUsdc > 0 && exchangeRateSolesPerUsdc > 0
+        ? defaultNumberOfTickets(productValue, deliveryCost, ratio, ticketUnitUsdc, exchangeRateSolesPerUsdc)
+        : 0;
     setNumberOfTickets(n);
-  }, [costPerTicket, ratio, selectedRaffle, showApproveModal]);
+  }, [ticketUnitUsdc, exchangeRateSolesPerUsdc, ratio, selectedRaffle, showApproveModal]);
 
   const handleApprove = async () => {
     if (!selectedRaffle) return;
+    if (exchangeRateSolesPerUsdc <= 0 || !Number.isFinite(exchangeRateSolesPerUsdc)) {
+      alert('Indica un tipo de cambio válido (soles por 1 USDC), mayor que 0.');
+      return;
+    }
+    if (ticketUnitUsdc <= 0 || !Number.isFinite(ticketUnitUsdc)) {
+      alert('La unidad de participación en USDC debe ser mayor que 0.');
+      return;
+    }
     if (numberOfTickets < 1) {
       alert('El número de tickets debe ser al menos 1.');
       return;
@@ -131,7 +151,8 @@ export default function PendingRafflesPage() {
     try {
       setActionLoading(true);
       await adminService.approveRaffle(selectedRaffle.id, {
-        costPerTicket,
+        exchangeRateSolesPerUsdc,
+        ticketUnitUsdc,
         totalTickets: numberOfTickets,
       });
       const organizerEmail = selectedRaffle.shop?.publicEmail || '';
@@ -251,7 +272,7 @@ export default function PendingRafflesPage() {
           Aprobar Oportunidad
         </h2>
         <p style={{ margin: '0', color: '#64748b', fontSize: '14px' }}>
-          Revisa las solicitudes de los organizadores. Puedes variar unidad de participación, ratio y número de tickets antes de aprobar.
+          Revisa las solicitudes de los organizadores. Puedes variar tipo de cambio, unidad de participación (USDC), ratio y número de tickets antes de aprobar.
         </p>
       </div>
 
@@ -449,17 +470,35 @@ export default function PendingRafflesPage() {
               <p style={{ ...modalStyles.sectionTitle, marginBottom: '14px' }}>Aprobación</p>
               <div style={{ display: 'grid', gap: '16px' }}>
                 <div>
-                  <label style={modalStyles.label}>Unidad de participación (S/.) — valor por ticket</label>
+                  <label style={modalStyles.label}>Tipo de cambio (soles por 1 USDC)</label>
                   <input
                     type="number"
-                    min="0.01"
+                    min="0.0001"
+                    step="0.0001"
+                    value={exchangeRateSolesPerUsdc || ''}
+                    onChange={(e) => {
+                      const v = parseFloat(e.target.value);
+                      setExchangeRateSolesPerUsdc(Number.isFinite(v) ? v : 0);
+                    }}
+                    style={modalStyles.input}
+                    placeholder="Ej. 3.75"
+                  />
+                  <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
+                    Misma noción que la variable de entorno de la plataforma. Si no hay valor por defecto, debes ingresarlo antes de aprobar.
+                  </small>
+                </div>
+                <div>
+                  <label style={modalStyles.label}>Unidad de participación (USDC) — valor por ticket</label>
+                  <input
+                    type="number"
+                    min="0.0001"
                     step="0.01"
-                    value={costPerTicket}
-                    onChange={(e) => setCostPerTicket(parseFloat(e.target.value) || 0)}
+                    value={ticketUnitUsdc}
+                    onChange={(e) => setTicketUnitUsdc(parseFloat(e.target.value) || 0)}
                     style={modalStyles.input}
                   />
                   <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
-                    Lo que vale cada ticket. Por defecto según valor del producto: 0-50 → S/1, 50.01-100 → S/2, 100.1+ → S/5. Puedes modificarlo.
+                    Por defecto según valor del producto (soles): 0–100 → 1 USDC; mayor a 100 → 2 USDC. Puedes modificarlo.
                   </small>
                 </div>
                 <div>
@@ -483,7 +522,7 @@ export default function PendingRafflesPage() {
                     style={modalStyles.input}
                   />
                   <small style={{ display: 'block', marginTop: '6px', color: '#94a3b8', fontSize: '12px' }}>
-                    (valor producto + delivery) × ratio / valor por ticket ≈ número de tickets
+                    ⌈((valor producto + delivery) / tipo de cambio) × (ratio / unidad USDC)⌉ — puedes ajustar el número manualmente.
                   </small>
                 </div>
               </div>
@@ -508,17 +547,31 @@ export default function PendingRafflesPage() {
               </button>
               <button
                 onClick={handleApprove}
-                disabled={actionLoading || numberOfTickets < 1}
+                disabled={
+                  actionLoading ||
+                  numberOfTickets < 1 ||
+                  exchangeRateSolesPerUsdc <= 0 ||
+                  ticketUnitUsdc <= 0
+                }
                 style={{
                   padding: '12px 24px',
-                  backgroundColor: numberOfTickets < 1 ? '#cbd5e1' : '#059669',
+                  backgroundColor:
+                    numberOfTickets < 1 || exchangeRateSolesPerUsdc <= 0 || ticketUnitUsdc <= 0
+                      ? '#cbd5e1'
+                      : '#059669',
                   color: 'white',
                   border: 'none',
                   borderRadius: '10px',
-                  cursor: actionLoading || numberOfTickets < 1 ? 'not-allowed' : 'pointer',
+                  cursor:
+                    actionLoading || numberOfTickets < 1 || exchangeRateSolesPerUsdc <= 0 || ticketUnitUsdc <= 0
+                      ? 'not-allowed'
+                      : 'pointer',
                   fontSize: '14px',
                   fontWeight: 600,
-                  boxShadow: numberOfTickets >= 1 ? '0 2px 8px rgba(5, 150, 105, 0.35)' : 'none',
+                  boxShadow:
+                    numberOfTickets >= 1 && exchangeRateSolesPerUsdc > 0 && ticketUnitUsdc > 0
+                      ? '0 2px 8px rgba(5, 150, 105, 0.35)'
+                      : 'none',
                 }}
               >
                 {actionLoading ? 'Aprobando...' : 'Aprobar oportunidad'}

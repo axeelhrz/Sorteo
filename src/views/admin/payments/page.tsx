@@ -6,13 +6,24 @@ import { FiCheck, FiCheckCircle, FiX, FiEye, FiDownload, FiChevronLeft, FiChevro
 import { adminService } from '@/services/admin-service';
 import { firebasePaymentService, Payment } from '@/services/firebase-payment-service';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { formatUsdc, penToUsdc } from '@/lib/pen-usdc-display';
+import { formatUsdc, participationUnitAdminDisplay, penToUsdc } from '@/lib/pen-usdc-display';
+
+function paymentAmountUsdcDisplay(amountPen: number, solesPerUsdcAtApproval?: number | null) {
+  const pen = Number(amountPen);
+  const usdc = penToUsdc(pen, solesPerUsdcAtApproval);
+  return {
+    usdcLine: usdc != null ? formatUsdc(usdc) : null,
+    solesLine: `S/. ${Number.isFinite(pen) ? pen.toFixed(2) : '0.00'}`,
+  };
+}
 
 interface PaymentWithDetails extends Payment {
   userName?: string;
   userEmail?: string;
   raffleName?: string;
   costPerTicket?: number;
+  solesPerUsdcAtApproval?: number;
+  ticketUnitUsdc?: number;
 }
 
 export default function AdminPaymentsPage() {
@@ -56,6 +67,8 @@ export default function AdminPaymentsPage() {
             userEmail: userData.email,
             raffleName: raffleData.name,
             costPerTicket: raffleData.costPerTicket,
+            solesPerUsdcAtApproval: raffleData.solesPerUsdcAtApproval,
+            ticketUnitUsdc: raffleData.ticketUnitUsdc,
           } as PaymentWithDetails;
         })
       );
@@ -176,6 +189,9 @@ export default function AdminPaymentsPage() {
           {statusFilter === 'completed' && ' aprobadas'}
           {raffleIdFilter.trim() && ` (oportunidad ${raffleIdFilter.trim().substring(0, 8)}…)`}
         </p>
+        <p style={{ margin: '8px 0 0 0', color: '#94a3b8', fontSize: '13px', lineHeight: 1.5 }}>
+          Participación únicamente por wallet (Solana) en USDC. Los montos se muestran en USDC; el valor en soles es referencia según el tipo de cambio de la oportunidad.
+        </p>
       </div>
 
       {/* Filtros */}
@@ -249,10 +265,7 @@ export default function AdminPaymentsPage() {
                       Oportunidad
                     </th>
                     <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Monto
-                    </th>
-                    <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Método
+                      Monto (USDC)
                     </th>
                     <th style={{ padding: '14px 16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Estado
@@ -285,10 +298,17 @@ export default function AdminPaymentsPage() {
                         {payment.raffleName || 'N/A'}
                       </td>
                       <td style={{ padding: '14px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>
-                        S/. {Number(payment.amount).toFixed(2)}
-                      </td>
-                      <td style={{ padding: '14px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>
-                        {payment.paymentMethod?.toUpperCase() || 'N/A'}
+                        {(() => {
+                          const d = paymentAmountUsdcDisplay(Number(payment.amount), payment.solesPerUsdcAtApproval);
+                          return d.usdcLine != null ? (
+                            <div>
+                              <div style={{ fontWeight: 700, color: '#059669' }}>{d.usdcLine}</div>
+                              <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginTop: 2 }}>{d.solesLine}</div>
+                            </div>
+                          ) : (
+                            <span>{d.solesLine}</span>
+                          );
+                        })()}
                       </td>
                       <td style={{ padding: '14px 16px' }}>
                         {getStatusBadge(payment.status)}
@@ -658,27 +678,44 @@ export default function AdminPaymentsPage() {
                 </div>
                 {selectedPayment.costPerTicket != null && (
                   <div>
-                    <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Unidad de Participación</p>
-                    <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>S/. {Number(selectedPayment.costPerTicket).toFixed(2)}</p>
-                    {penToUsdc(Number(selectedPayment.costPerTicket)) != null ? (
-                      <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '13px', fontWeight: '600' }}>
-                        {formatUsdc(penToUsdc(Number(selectedPayment.costPerTicket))!)}
-                      </p>
-                    ) : null}
+                    <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Unidad de participación (USDC)
+                    </p>
+                    {(() => {
+                      const u = participationUnitAdminDisplay({
+                        ticketUnitUsdc: selectedPayment.ticketUnitUsdc,
+                        productValue: Number(selectedPayment.costPerTicket),
+                        solesPerUsdcAtApproval: selectedPayment.solesPerUsdcAtApproval,
+                      });
+                      return u.usdcFormatted != null ? (
+                        <>
+                          <p style={{ margin: '0', color: '#059669', fontSize: '18px', fontWeight: '700' }}>{u.usdcFormatted}</p>
+                          <p style={{ margin: '6px 0 0 0', color: '#64748b', fontSize: '14px', fontWeight: '600' }}>{u.solesTicketLine} ref.</p>
+                        </>
+                      ) : (
+                        <p style={{ margin: '0', color: '#1e293b', fontSize: '16px', fontWeight: '700' }}>{u.solesTicketLine}</p>
+                      );
+                    })()}
                   </div>
                 )}
                 <div>
-                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Monto esperado</p>
-                  <p style={{ margin: '0', color: '#10b981', fontSize: '16px', fontWeight: '700' }}>S/. {Number(selectedPayment.amount).toFixed(2)}</p>
-                  {penToUsdc(Number(selectedPayment.amount)) != null ? (
-                    <p style={{ margin: '4px 0 0 0', color: '#059669', fontSize: '14px', fontWeight: '700' }}>
-                      {formatUsdc(penToUsdc(Number(selectedPayment.amount))!)}
-                    </p>
-                  ) : null}
-                </div>
-                <div>
-                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Método</p>
-                  <p style={{ margin: '0', color: '#1e293b', fontSize: '14px', fontWeight: '600' }}>{selectedPayment.paymentMethod?.toUpperCase()}</p>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Monto esperado (USDC)
+                  </p>
+                  {(() => {
+                    const d = paymentAmountUsdcDisplay(
+                      Number(selectedPayment.amount),
+                      selectedPayment.solesPerUsdcAtApproval
+                    );
+                    return d.usdcLine != null ? (
+                      <>
+                        <p style={{ margin: '0', color: '#059669', fontSize: '18px', fontWeight: '700' }}>{d.usdcLine}</p>
+                        <p style={{ margin: '6px 0 0 0', color: '#64748b', fontSize: '14px', fontWeight: '600' }}>{d.solesLine} ref.</p>
+                      </>
+                    ) : (
+                      <p style={{ margin: '0', color: '#10b981', fontSize: '16px', fontWeight: '700' }}>{d.solesLine}</p>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -690,10 +727,30 @@ export default function AdminPaymentsPage() {
                 <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e8ecf1' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
-                      <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600' }}>Monto detectado</p>
-                      <p style={{ margin: '0', color: selectedPayment.ocrValid ? '#10b981' : '#ef4444', fontSize: '16px', fontWeight: '700' }}>
-                        S/. {selectedPayment.ocrExtractedAmount?.toFixed(2) || 'N/A'}
-                      </p>
+                      <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600' }}>Monto detectado (USDC)</p>
+                      {(() => {
+                        const ocrPen = selectedPayment.ocrExtractedAmount;
+                        if (ocrPen == null || !Number.isFinite(Number(ocrPen))) {
+                          return (
+                            <p style={{ margin: '0', color: selectedPayment.ocrValid ? '#10b981' : '#ef4444', fontSize: '16px', fontWeight: '700' }}>
+                              N/A
+                            </p>
+                          );
+                        }
+                        const d = paymentAmountUsdcDisplay(Number(ocrPen), selectedPayment.solesPerUsdcAtApproval);
+                        return d.usdcLine != null ? (
+                          <>
+                            <p style={{ margin: '0', color: selectedPayment.ocrValid ? '#10b981' : '#ef4444', fontSize: '16px', fontWeight: '700' }}>
+                              {d.usdcLine}
+                            </p>
+                            <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '13px', fontWeight: '600' }}>{d.solesLine}</p>
+                          </>
+                        ) : (
+                          <p style={{ margin: '0', color: selectedPayment.ocrValid ? '#10b981' : '#ef4444', fontSize: '16px', fontWeight: '700' }}>
+                            {d.solesLine}
+                          </p>
+                        );
+                      })()}
                     </div>
                     <div>
                       <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontWeight: '600' }}>Confianza</p>
